@@ -82,10 +82,12 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('pengerjaan')->middleware('throttle:100,1')->group(function () {
         Route::get('/', [PengerjaanController::class, 'index'])->name('pengerjaan.index');
-        Route::get('/riwayat', [PengerjaanController::class, 'riwayat'])->name('pengerjaan.riwayat');
+        Route::get('/riwayat', [PengerjaanController::class, 'laporan'])->name('pengerjaan.riwayat');
         Route::post('/tambah', [PengerjaanController::class, 'store'])->name('pengerjaan.store');
         Route::delete('/{id}', [PengerjaanController::class, 'destroy'])->name('pengerjaan.destroy');
     });
+
+    Route::get('/laporan-subcon', [PengerjaanController::class, 'laporan'])->name('laporan.index')->middleware('throttle:100,1');
 
 
     /*

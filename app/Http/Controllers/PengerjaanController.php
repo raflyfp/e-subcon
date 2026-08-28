@@ -91,11 +91,18 @@ class PengerjaanController extends Controller
     }
 
     /**
-     * Halaman Riwayat Data Pengerjaan Barang (Terpisah)
+     * Halaman Laporan Subcon (dengan filter tanggal, karyawan, barang, dan lokasi)
      */
-    public function riwayat()
+    public function laporan(Request $request)
     {
         $user = auth()->user();
+
+        // Default tanggal: awal bulan ini s/d hari ini jika belum diisi
+        $tanggalMulai = $request->input('tanggal_mulai', now()->startOfMonth()->toDateString());
+        $tanggalAkhir = $request->input('tanggal_akhir', now()->toDateString());
+        $selectedKaryawan = $request->input('karyawan_id');
+        $selectedBarang   = $request->input('barang_id');
+        $selectedLokasi   = $request->input('lokasi_subcon_id');
 
         $query = DB::table('tb_pengerjaan as p')
             ->join('tb_karyawan as k', 'k.id', '=', 'p.karyawan_id')
@@ -114,8 +121,30 @@ class PengerjaanController extends Controller
                 'p.keterangan'
             );
 
-        // Karyawan hanya melihat data milik sendiri
-        if (!$user->is_admin) {
+        // Filter Tanggal
+        if ($tanggalMulai) {
+            $query->where('p.tanggal', '>=', $tanggalMulai);
+        }
+        if ($tanggalAkhir) {
+            $query->where('p.tanggal', '<=', $tanggalAkhir);
+        }
+
+        // Filter Barang
+        if ($selectedBarang) {
+            $query->where('p.barang_id', $selectedBarang);
+        }
+
+        // Filter Lokasi
+        if ($selectedLokasi) {
+            $query->where('p.lokasi_subcon_id', $selectedLokasi);
+        }
+
+        // Role check & Filter Karyawan
+        if ($user->is_admin) {
+            if ($selectedKaryawan) {
+                $query->where('p.karyawan_id', $selectedKaryawan);
+            }
+        } else {
             $karyawan = $user->karyawan;
             if ($karyawan) {
                 $query->where('p.karyawan_id', $karyawan->id);
@@ -128,7 +157,39 @@ class PengerjaanController extends Controller
             ->orderBy('p.id', 'desc')
             ->get();
 
-        return view('pages.riwayat-pengerjaan', compact('pengerjaan'));
+        // Data dropdown untuk filter
+        $karyawanList = [];
+        if ($user->is_admin) {
+            $karyawanList = DB::table('tb_karyawan as k')
+                ->join('tb_user as u', 'u.id', '=', 'k.user_id')
+                ->where('k.is_active', true)
+                ->select('k.id', 'u.name as nama_karyawan', 'k.no_karyawan')
+                ->orderBy('u.name')
+                ->get();
+        }
+
+        $barangList = Barang::where('is_active', true)->orderBy('nama_barang')->get();
+        $lokasiList = LokasiSubcon::where('is_active', true)->orderBy('nama_lokasi')->get();
+
+        return view('pages.laporan-subcon', compact(
+            'pengerjaan',
+            'karyawanList',
+            'barangList',
+            'lokasiList',
+            'tanggalMulai',
+            'tanggalAkhir',
+            'selectedKaryawan',
+            'selectedBarang',
+            'selectedLokasi'
+        ));
+    }
+
+    /**
+     * Alias untuk riwayat agar kompatibel
+     */
+    public function riwayat(Request $request)
+    {
+        return $this->laporan($request);
     }
 
     /**

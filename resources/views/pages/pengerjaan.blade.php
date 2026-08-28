@@ -9,8 +9,8 @@
             <p class="text-muted mb-0">Catat hasil pengerjaan barang harian dengan cepat dan akurat</p>
         </div>
         <div>
-            <a href="{{ url('pengerjaan/riwayat') }}" class="btn btn-outline-primary">
-                <i class="ti ti-table me-1"></i> Lihat Riwayat Pengerjaan
+            <a href="{{ url('laporan-subcon') }}" class="btn btn-outline-primary">
+                <i class="ti ti-file-analytics me-1"></i> Buka Laporan Subcon
             </a>
         </div>
     </div>
@@ -115,10 +115,11 @@
                     <label class="form-label fw-bold" for="auth_tanggal">
                         {{ auth()->user()->is_admin ? '4.' : '3.' }} Tanggal Pengerjaan <span class="text-danger">*</span>
                     </label>
-                    <p class="text-muted small mb-2">Tanggal saat pengerjaan dilaksanakan:</p>
+                    <p class="text-muted small mb-2">Tanggal pengerjaan otomatis terisi hari ini:</p>
 
                     <input type="date" class="form-control form-control-lg" name="tanggal" id="auth_tanggal"
-                        value="{{ old('tanggal', date('Y-m-d')) }}" required>
+                        value="{{ date('Y-m-d') }}" readonly style="background-color: #f1f5f9; cursor: not-allowed;">
+                    <small class="text-muted mt-2 d-block"><i class="ti ti-lock me-1"></i>Tanggal terkunci otomatis hari ini ({{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}).</small>
                 </div>
 
                 {{-- 5. Jumlah --}}
@@ -126,21 +127,12 @@
                     <label class="form-label fw-bold" for="auth_jumlah">
                         {{ auth()->user()->is_admin ? '5.' : '4.' }} Jumlah Barang Selesai (Unit) <span class="text-danger">*</span>
                     </label>
-                    <p class="text-muted small mb-2">Total kuantitas barang yang telah selesai dikerjakan:</p>
+                    <p class="text-muted small mb-2">Masukkan kuantitas unit produk yang berhasil diselesaikan:</p>
 
-                    <div class="input-group input-group-lg mb-2">
-                        <input type="number" class="form-control fw-bold text-primary" name="jumlah" id="auth_jumlah"
-                            min="1" placeholder="Contoh: 50" value="{{ old('jumlah') }}" required>
-                        <span class="input-group-text bg-white">Unit / Pcs</span>
-                    </div>
-
-                    <div class="d-flex gap-2 flex-wrap align-items-center mt-2">
-                        <small class="text-muted me-1">Tambah cepat:</small>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addAuthQty(10)">+10</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addAuthQty(25)">+25</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addAuthQty(50)">+50</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addAuthQty(100)">+100</button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="document.getElementById('auth_jumlah').value=''">Reset</button>
+                    <div class="input-group input-group-lg">
+                        <input type="number" class="form-control form-control-lg" name="jumlah" id="auth_jumlah"
+                            min="1" placeholder="Masukkan jumlah unit (contoh: 50)" value="{{ old('jumlah') }}" required>
+                        <span class="input-group-text bg-white fw-bold text-muted">Unit / Pcs</span>
                     </div>
                 </div>
 
@@ -182,10 +174,29 @@
 
     <script>
         $(document).ready(function() {
-            // Inisialisasi Select2
+            // Inisialisasi Select2: Search dulu baru muncul pilihan
             $('#auth_karyawan_id, #auth_barang_id, #auth_lokasi_subcon_id').select2({
                 theme: 'bootstrap-5',
-                width: '100%'
+                width: '100%',
+                minimumInputLength: 1,
+                language: {
+                    inputTooShort: function() {
+                        return "Ketik minimal 1 huruf/angka untuk mencari...";
+                    },
+                    noResults: function() {
+                        return "Tidak ditemukan data yang cocok";
+                    },
+                    searching: function() {
+                        return "Mencari data...";
+                    }
+                }
+            });
+
+            // Fokus otomatis ke search field saat dibuka
+            $(document).on('select2:open', () => {
+                setTimeout(() => {
+                    document.querySelector('.select2-search__field')?.focus();
+                }, 50);
             });
 
             // Auto-fill Lokasi saat Karyawan dipilih (Admin)
@@ -198,11 +209,7 @@
             });
         });
 
-        function addAuthQty(n) {
-            const el = document.getElementById('auth_jumlah');
-            let current = parseInt(el.value) || 0;
-            el.value = current + n;
-        }
+
     </script>
 
     @if (session('success'))

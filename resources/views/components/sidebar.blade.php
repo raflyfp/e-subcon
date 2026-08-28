@@ -62,9 +62,9 @@
                 </li>
 
                 <li class="pc-item">
-                    <a href="{{ url('pengerjaan/riwayat') }}" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-table"></i></span>
-                        <span class="pc-mtext">Riwayat Pengerjaan</span>
+                    <a href="{{ url('laporan-subcon') }}" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-file-analytics"></i></span>
+                        <span class="pc-mtext">Laporan Subcon</span>
                     </a>
                 </li>
 
