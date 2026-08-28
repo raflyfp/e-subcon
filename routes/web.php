@@ -33,7 +33,21 @@ Route::get('/refresh-csrf', function () {
     return response()->json(['csrf_token' => csrf_token()]);
 })->name('refresh-csrf')->middleware('web');
 
+// Halaman utama: jika belum login langsung muncul Formulir Pengerjaan Barang, jika sudah login muncul Dashboard
+Route::get('/', function () {
+    if (Auth::check()) {
+        return app(PengerjaanController::class)->dashboard();
+    }
+    return app(PengerjaanController::class)->formPublic();
+})->name('home');
+
+Route::get('/form-pengerjaan', [PengerjaanController::class, 'formPublic'])->name('pengerjaan.form-public');
+Route::post('/form-pengerjaan', [PengerjaanController::class, 'storePublic'])->name('pengerjaan.store-public');
+
 Route::get('/login', function () {
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
     return view('pages.login');
 })->name('login')->middleware('throttle:10,1');
 
@@ -55,7 +69,7 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/', [PengerjaanController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [PengerjaanController::class, 'dashboard'])->name('dashboard');
     Route::get('/password', [UserController::class, 'password'])->name('password')->middleware('throttle:10,1');
     Route::get('/reset_password', [UserController::class, 'ChangePassword'])->name('password.change')->middleware('throttle:10,1');
 
@@ -68,6 +82,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('pengerjaan')->middleware('throttle:100,1')->group(function () {
         Route::get('/', [PengerjaanController::class, 'index'])->name('pengerjaan.index');
+        Route::get('/riwayat', [PengerjaanController::class, 'riwayat'])->name('pengerjaan.riwayat');
         Route::post('/tambah', [PengerjaanController::class, 'store'])->name('pengerjaan.store');
         Route::delete('/{id}', [PengerjaanController::class, 'destroy'])->name('pengerjaan.destroy');
     });

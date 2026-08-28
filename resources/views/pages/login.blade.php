@@ -70,10 +70,20 @@
                             </div>
 
                             <div class="d-grid mt-4">
-                                <button type="submit" id="btn-login" class="btn btn-primary">Login</button>
+                                <button type="submit" id="btn-login" class="btn btn-primary">Login Dashboard</button>
                             </div>
                     </form>
 
+                    <div class="position-relative my-4 text-center">
+                        <hr class="text-secondary opacity-25">
+                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small">atau</span>
+                    </div>
+
+                    <div class="d-grid">
+                        <a href="{{ route('pengerjaan.form-public') }}" class="btn btn-outline-primary py-2 fw-semibold">
+                            <i class="ti ti-clipboard-list me-1"></i> Isi Formulir Pengerjaan (Tanpa Login)
+                        </a>
+                    </div>
 
                     <div class="text-center mt-3">
                         <small class="text-muted">Pencatatan Pengerjaan Barang Subcon</small>

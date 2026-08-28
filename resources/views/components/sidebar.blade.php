@@ -56,8 +56,15 @@
 
                 <li class="pc-item">
                     <a href="{{ url('pengerjaan') }}" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-clipboard-list"></i></span>
-                        <span class="pc-mtext">Data Pengerjaan</span>
+                        <span class="pc-micon"><i class="ti ti-edit"></i></span>
+                        <span class="pc-mtext">Formulir Pengerjaan</span>
+                    </a>
+                </li>
+
+                <li class="pc-item">
+                    <a href="{{ url('pengerjaan/riwayat') }}" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-table"></i></span>
+                        <span class="pc-mtext">Riwayat Pengerjaan</span>
                     </a>
                 </li>
 

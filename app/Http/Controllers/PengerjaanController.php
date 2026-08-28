@@ -53,9 +53,47 @@ class PengerjaanController extends Controller
     }
 
     /**
-     * Halaman daftar pengerjaan
+     * Halaman Formulir Input Pengerjaan Barang (Di dalam Dashboard / Login)
      */
     public function index()
+    {
+        $user = auth()->user();
+
+        // Data Karyawan beserta lokasi subcon terakhir yang digunakan
+        $karyawanList = DB::table('tb_karyawan as k')
+            ->join('tb_user as u', 'u.id', '=', 'k.user_id')
+            ->where('k.is_active', true)
+            ->select(
+                'k.id',
+                'u.name as nama_karyawan',
+                'k.no_karyawan',
+                'k.telepon',
+                DB::raw('(SELECT p.lokasi_subcon_id FROM tb_pengerjaan p WHERE p.karyawan_id = k.id ORDER BY p.tanggal DESC, p.id DESC LIMIT 1) as last_lokasi_id')
+            )
+            ->orderBy('u.name')
+            ->get();
+
+        $barangList = Barang::where('is_active', true)->orderBy('nama_barang')->get();
+        $lokasiList = LokasiSubcon::where('is_active', true)->orderBy('nama_lokasi')->get();
+
+        // Default karyawan untuk user yang bukan admin
+        $currentKaryawan = null;
+        if (!$user->is_admin && $user->karyawan) {
+            $currentKaryawan = $karyawanList->firstWhere('id', $user->karyawan->id);
+        }
+
+        return view('pages.pengerjaan', compact(
+            'karyawanList',
+            'barangList',
+            'lokasiList',
+            'currentKaryawan'
+        ));
+    }
+
+    /**
+     * Halaman Riwayat Data Pengerjaan Barang (Terpisah)
+     */
+    public function riwayat()
     {
         $user = auth()->user();
 
@@ -90,22 +128,31 @@ class PengerjaanController extends Controller
             ->orderBy('p.id', 'desc')
             ->get();
 
-        // Data untuk dropdown form input
-        $karyawanList = [];
-        $barangList   = Barang::where('is_active', true)->orderBy('nama_barang')->get();
-        $lokasiList   = LokasiSubcon::where('is_active', true)->orderBy('nama_lokasi')->get();
+        return view('pages.riwayat-pengerjaan', compact('pengerjaan'));
+    }
 
-        if ($user->is_admin) {
-            $karyawanList = DB::table('tb_karyawan as k')
-                ->join('tb_user as u', 'u.id', '=', 'k.user_id')
-                ->where('k.is_active', true)
-                ->select('k.id', 'u.name as nama_karyawan', 'k.no_karyawan')
-                ->orderBy('u.name')
-                ->get();
-        }
+    /**
+     * Halaman Publik Formulir Input Pengerjaan Barang (Tanpa Perlu Login)
+     */
+    public function formPublic()
+    {
+        $karyawanList = DB::table('tb_karyawan as k')
+            ->join('tb_user as u', 'u.id', '=', 'k.user_id')
+            ->where('k.is_active', true)
+            ->select(
+                'k.id',
+                'u.name as nama_karyawan',
+                'k.no_karyawan',
+                'k.telepon',
+                DB::raw('(SELECT p.lokasi_subcon_id FROM tb_pengerjaan p WHERE p.karyawan_id = k.id ORDER BY p.tanggal DESC, p.id DESC LIMIT 1) as last_lokasi_id')
+            )
+            ->orderBy('u.name')
+            ->get();
 
-        return view('pages.pengerjaan', compact(
-            'pengerjaan',
+        $barangList = Barang::where('is_active', true)->orderBy('nama_barang')->get();
+        $lokasiList = LokasiSubcon::where('is_active', true)->orderBy('nama_lokasi')->get();
+
+        return view('pages.form-pengerjaan-public', compact(
             'karyawanList',
             'barangList',
             'lokasiList'
@@ -113,7 +160,38 @@ class PengerjaanController extends Controller
     }
 
     /**
-     * Simpan pengerjaan baru
+     * Simpan pengerjaan dari Formulir Publik (Tanpa Login)
+     */
+    public function storePublic(Request $request)
+    {
+        $request->validate([
+            'karyawan_id'      => 'required|exists:tb_karyawan,id',
+            'barang_id'        => 'required|exists:tb_barang,id',
+            'lokasi_subcon_id' => 'required|exists:tb_lokasi_subcon,id',
+            'tanggal'          => 'required|date',
+            'jumlah'           => 'required|integer|min:1',
+            'keterangan'       => 'nullable|string',
+        ]);
+
+        try {
+            Pengerjaan::create([
+                'karyawan_id'      => $request->karyawan_id,
+                'barang_id'        => $request->barang_id,
+                'lokasi_subcon_id' => $request->lokasi_subcon_id,
+                'tanggal'          => $request->tanggal,
+                'jumlah'           => $request->jumlah,
+                'keterangan'       => $request->keterangan,
+            ]);
+
+            return redirect()->back()->with('form_success', 'Data pengerjaan barang berhasil dicatat!');
+        } catch (\Throwable $e) {
+            Log::error('StorePublicPengerjaan error', ['message' => $e->getMessage()]);
+            return redirect()->back()->withInput()->with('error', 'Gagal menyimpan data pengerjaan barang.');
+        }
+    }
+
+    /**
+     * Simpan pengerjaan baru (Logged In)
      */
     public function store(Request $request)
     {
@@ -127,7 +205,7 @@ class PengerjaanController extends Controller
             'keterangan'       => 'nullable|string',
         ];
 
-        // Admin harus memilih karyawan, karyawan biasa otomatis dari session
+        // Admin harus memilih karyawan, karyawan biasa otomatis dari session atau input
         if ($user->is_admin) {
             $rules['karyawan_id'] = 'required|exists:tb_karyawan,id';
         }
@@ -136,7 +214,7 @@ class PengerjaanController extends Controller
 
         $karyawanId = $user->is_admin
             ? $request->karyawan_id
-            : $user->karyawan?->id;
+            : ($user->karyawan?->id ?? $request->karyawan_id);
 
         if (!$karyawanId) {
             return redirect()->back()->with('error', 'Data karyawan tidak ditemukan. Hubungi admin.');
@@ -152,10 +230,10 @@ class PengerjaanController extends Controller
                 'keterangan'       => $request->keterangan,
             ]);
 
-            return redirect()->back()->with('success', 'Pengerjaan berhasil ditambahkan');
+            return redirect()->back()->with('success', 'Pengerjaan barang berhasil ditambahkan');
         } catch (\Throwable $e) {
             Log::error('CreatePengerjaan error', ['message' => $e->getMessage()]);
-            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan pengerjaan.');
+            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan pengerjaan barang.');
         }
     }
 
@@ -181,7 +259,7 @@ class PengerjaanController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Pengerjaan berhasil dihapus',
+            'message' => 'Pengerjaan barang berhasil dihapus',
         ]);
     }
 }
