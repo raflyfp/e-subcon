@@ -3,219 +3,360 @@
 
 @section('content')
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <h1 class="content mb-1">Laporan Subcon</h1>
-            <p class="text-muted mb-0">Rekapitulasi data pengerjaan barang subcon berdasarkan periode dan filter</p>
+            <p class="text-muted mb-0">Laporan rekapitulasi data pengerjaan barang subcon</p>
         </div>
         <div>
-            <a href="{{ url('pengerjaan') }}" class="btn btn-outline-primary">
-                <i class="ti ti-edit me-1"></i> Buka Formulir Pengerjaan
+            <a href="{{ url('pengerjaan') }}" class="btn btn-outline-primary btn-sm">
+                <i class="ti ti-edit me-1"></i> Formulir Pengerjaan
             </a>
         </div>
     </div>
 
-    {{-- Filter Card (Flat & Simple) --}}
-    <div class="card mb-4">
-        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 text-dark fw-bold">
-                <i class="ti ti-filter text-primary me-2"></i>Filter Laporan
-            </h5>
-            <div class="d-flex gap-1 flex-wrap">
-                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setFilterPeriod('today')">Hari Ini</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setFilterPeriod('this_month')">Bulan Ini</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setFilterPeriod('last_month')">Bulan Lalu</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setFilterPeriod('all')">Semua Waktu</button>
-            </div>
-        </div>
-        <div class="card-body p-4">
-            <form method="GET" action="{{ route('laporan.index') }}" id="filterForm">
-                <div class="row g-3">
-                    {{-- Tanggal Mulai --}}
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold">Tanggal Mulai</label>
-                        <input type="date" class="form-control" name="tanggal_mulai" id="filter_tanggal_mulai"
-                            value="{{ $tanggalMulai }}">
-                    </div>
+    <div class="row g-4">
 
-                    {{-- Tanggal Akhir --}}
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold">Tanggal Akhir</label>
-                        <input type="date" class="form-control" name="tanggal_akhir" id="filter_tanggal_akhir"
-                            value="{{ $tanggalAkhir }}">
-                    </div>
+        {{-- ========================================================================= --}}
+        {{-- SEBELAH KIRI: PANEL FILTER LAPORAN                                        --}}
+        {{-- ========================================================================= --}}
+        <div class="col-lg-4 col-xl-3">
+            <div class="card border shadow-sm sticky-top" style="top: 90px; z-index: 10;">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h5 class="mb-0 text-dark fw-bold">
+                        <i class="ti ti-adjustments-horizontal text-primary me-2"></i>Filter Laporan
+                    </h5>
+                    <small class="text-muted">Pilih kriteria untuk menyaring data</small>
+                </div>
+                <div class="card-body p-3">
+                    <form method="GET" action="{{ route('laporan.index') }}" id="filterForm">
+                        <input type="hidden" name="filter" value="1">
 
-                    {{-- Admin: Filter Karyawan --}}
-                    @if (auth()->user()->is_admin)
-                        <div class="col-md-3">
-                            <label class="form-label fw-semibold">Karyawan</label>
-                            <select class="form-select select2-filter" name="karyawan_id" id="filter_karyawan_id">
-                                <option value="">-- Semua Karyawan --</option>
-                                @foreach ($karyawanList as $k)
-                                    <option value="{{ $k->id }}" {{ $selectedKaryawan == $k->id ? 'selected' : '' }}>
-                                        {{ $k->nama_karyawan }} ({{ $k->no_karyawan }})
+                        {{-- Tanggal Mulai --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="filter_tanggal_mulai">Tanggal Mulai</label>
+                            <input type="date" class="form-control" name="tanggal_mulai" id="filter_tanggal_mulai"
+                                value="{{ $tanggalMulai }}">
+                        </div>
+
+                        {{-- Tanggal Akhir --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="filter_tanggal_akhir">Tanggal Akhir</label>
+                            <input type="date" class="form-control" name="tanggal_akhir" id="filter_tanggal_akhir"
+                                value="{{ $tanggalAkhir }}">
+                        </div>
+
+                        <hr class="text-secondary opacity-25">
+
+                        {{-- Filter Karyawan (Admin Only) --}}
+                        @if (auth()->user()->is_admin)
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" for="filter_karyawan_id">Karyawan</label>
+                                <select class="form-select select2-filter" name="karyawan_id" id="filter_karyawan_id">
+                                    <option value="">-- Semua Karyawan --</option>
+                                    @foreach ($karyawanList as $k)
+                                        <option value="{{ $k->id }}"
+                                            {{ $selectedKaryawan == $k->id ? 'selected' : '' }}>
+                                            {{ $k->nama_karyawan }} ({{ $k->no_karyawan }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
+
+                        {{-- Filter Barang --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="filter_barang_id">Barang</label>
+                            <select class="form-select select2-filter" name="barang_id" id="filter_barang_id">
+                                <option value="">-- Semua Barang --</option>
+                                @foreach ($barangList as $b)
+                                    <option value="{{ $b->id }}" {{ $selectedBarang == $b->id ? 'selected' : '' }}>
+                                        [{{ $b->kode_barang }}] {{ $b->nama_barang }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
-                    @endif
 
-                    {{-- Filter Barang --}}
-                    <div class="col-md-{{ auth()->user()->is_admin ? '3' : '3' }}">
-                        <label class="form-label fw-semibold">Barang</label>
-                        <select class="form-select select2-filter" name="barang_id" id="filter_barang_id">
-                            <option value="">-- Semua Barang --</option>
-                            @foreach ($barangList as $b)
-                                <option value="{{ $b->id }}" {{ $selectedBarang == $b->id ? 'selected' : '' }}>
-                                    [{{ $b->kode_barang }}] {{ $b->nama_barang }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                        {{-- Filter Lokasi Subcon --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="filter_lokasi_subcon_id">Lokasi Subcon</label>
+                            <select class="form-select select2-filter" name="lokasi_subcon_id" id="filter_lokasi_subcon_id">
+                                <option value="">-- Semua Lokasi --</option>
+                                @foreach ($lokasiList as $l)
+                                    <option value="{{ $l->id }}" {{ $selectedLokasi == $l->id ? 'selected' : '' }}>
+                                        {{ $l->nama_lokasi }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    {{-- Filter Lokasi Subcon --}}
-                    <div class="col-md-{{ auth()->user()->is_admin ? '3' : '3' }}">
-                        <label class="form-label fw-semibold">Lokasi Subcon</label>
-                        <select class="form-select select2-filter" name="lokasi_subcon_id" id="filter_lokasi_subcon_id">
-                            <option value="">-- Semua Lokasi --</option>
-                            @foreach ($lokasiList as $l)
-                                <option value="{{ $l->id }}" {{ $selectedLokasi == $l->id ? 'selected' : '' }}>
-                                    {{ $l->nama_lokasi }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
+                        {{-- Submit Buttons --}}
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary fw-semibold py-2">
+                                <i class="ti ti-filter me-1"></i> Terapkan Filter
+                            </button>
+                            <a href="{{ route('laporan.index') }}" class="btn btn-outline-secondary btn-sm py-2">
+                                <i class="ti ti-rotate-2 me-1"></i> Reset Filter
+                            </a>
+                        </div>
 
-                <div class="d-flex justify-content-end align-items-center gap-2 mt-4 pt-3 border-top">
-                    <a href="{{ route('laporan.index') }}" class="btn btn-outline-secondary">
-                        <i class="ti ti-rotate-2 me-1"></i> Reset Filter
-                    </a>
-                    <button type="submit" class="btn btn-primary px-4">
-                        <i class="ti ti-search me-1"></i> Terapkan Filter
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    {{-- Ringkasan Statistik Laporan Sesuai Filter --}}
-    <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-lg-4">
-            <div class="card border p-3 bg-white mb-0">
-                <div class="d-flex align-items-center">
-                    <div class="avtar avtar-lg bg-light-primary text-primary me-3">
-                        <i class="ti ti-checkup-list fs-2"></i>
-                    </div>
-                    <div>
-                        <h6 class="text-muted mb-1 small fw-semibold">Total Unit Selesai</h6>
-                        <h3 class="mb-0 fw-bold text-primary">{{ number_format($pengerjaan->sum('jumlah'), 0, ',', '.') }} <small class="fs-6 text-muted">Unit</small></h3>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
 
-        <div class="col-sm-6 col-lg-4">
-            <div class="card border p-3 bg-white mb-0">
-                <div class="d-flex align-items-center">
-                    <div class="avtar avtar-lg bg-light-success text-success me-3">
-                        <i class="ti ti-clipboard-list fs-2"></i>
-                    </div>
-                    <div>
-                        <h6 class="text-muted mb-1 small fw-semibold">Total Transaksi Pengerjaan</h6>
-                        <h3 class="mb-0 fw-bold text-success">{{ number_format($pengerjaan->count(), 0, ',', '.') }} <small class="fs-6 text-muted">Data</small></h3>
+        {{-- ========================================================================= --}}
+        {{-- SEBELAH KANAN: HASIL LAPORAN (Report Sheet Document Style)                --}}
+        {{-- ========================================================================= --}}
+        <div class="col-lg-8 col-xl-9">
+
+            @if (!$isFiltered)
+                {{-- State Awal: Belum Filter (Kosong) --}}
+                <div class="card border bg-white shadow-sm text-center py-5 px-4" style="min-height: 450px;">
+                    <div class="my-auto py-4">
+                        <div class="mb-3 text-primary opacity-50">
+                            <i class="ti ti-file-search" style="font-size: 64px;"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Laporan Belum Ditampilkan</h4>
+                        <p class="text-muted fs-6 mb-4" style="max-width: 520px; margin: 0 auto;">
+                            Silakan tentukan kriteria tanggal, barang, atau karyawan pada panel filter di sebelah kiri,
+                            kemudian klik tombol <strong>"Terapkan Filter"</strong> untuk memuat data laporan.
+                        </p>
                     </div>
                 </div>
-            </div>
-        </div>
+            @else
+                {{-- Action Toolbar: Print, Export PDF, Export Excel --}}
+                <div class="card mb-3 border-0 shadow-sm">
+                    <div class="card-body p-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            {{-- <span class="badge bg-primary px-3 py-2 fs-6">
+                                Total: {{ number_format($pengerjaan->sum('jumlah'), 0, ',', '.') }} Unit
+                            </span>
+                            <span class="badge bg-secondary px-3 py-2 fs-6">
+                                {{ $pengerjaan->count() }} Transaksi
+                            </span>
+                            <span class="badge bg-info px-3 py-2 fs-6">
+                                {{ $pengerjaan->pluck('kode_barang')->unique()->count() }} Jenis Barang
+                            </span> --}}
+                        </div>
 
-        <div class="col-sm-12 col-lg-4">
-            <div class="card border p-3 bg-white mb-0">
-                <div class="d-flex align-items-center">
-                    <div class="avtar avtar-lg bg-light-info text-info me-3">
-                        <i class="ti ti-package fs-2"></i>
-                    </div>
-                    <div>
-                        <h6 class="text-muted mb-1 small fw-semibold">Jumlah Jenis Barang</h6>
-                        <h3 class="mb-0 fw-bold text-info">{{ $pengerjaan->pluck('kode_barang')->unique()->count() }} <small class="fs-6 text-muted">Item</small></h3>
+                        <div class="d-flex gap-2">
+                            {{-- Tombol Print --}}
+                            <button type="button" class="btn btn-outline-dark btn-sm fw-semibold"
+                                onclick="printReportSheet()">
+                                <i class="ti ti-printer me-1"></i> Print Laporan
+                            </button>
+                            {{-- Tombol PDF --}}
+                            <button type="button" class="btn btn-danger btn-sm fw-semibold" onclick="exportReportPDF()">
+                                <i class="ti ti-file-type-pdf me-1"></i> Export PDF
+                            </button>
+                            {{-- Tombol Excel --}}
+                            <button type="button" class="btn btn-success btn-sm fw-semibold" onclick="exportReportExcel()">
+                                <i class="ti ti-file-spreadsheet me-1"></i> Export Excel
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    {{-- Tabel Laporan & Toolbar Ekspor (Excel, PDF, Print) --}}
-    <div class="card">
-        <div class="card-header bg-white py-3 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
-            <div>
-                <h5 class="mb-1 text-dark fw-bold">
-                    <i class="ti ti-table me-2 text-primary"></i>Tabel Rekapitulasi Laporan
-                </h5>
-                <small class="text-muted">
-                    Periode: <strong>{{ $tanggalMulai ? \Carbon\Carbon::parse($tanggalMulai)->format('d/m/Y') : 'Awal' }}</strong> s/d <strong>{{ $tanggalAkhir ? \Carbon\Carbon::parse($tanggalAkhir)->format('d/m/Y') : 'Sekarang' }}</strong>
-                </small>
-            </div>
-        </div>
-        <div class="card-body p-4">
-            <div class="dt-responsive table-responsive">
-                <table id="laporan-table" class="table table-striped table-bordered align-middle nowrap w-100">
-                    <thead class="table-light">
-                        <tr class="text-center">
-                            <th style="width: 50px;">No</th>
-                            <th>Tanggal</th>
+                {{-- Lembar Dokumen Laporan (Printable & Exportable Sheet) --}}
+                <div class="card border bg-white shadow-sm p-4 p-md-5" id="printable-report-sheet"
+                    style="min-height: 600px; color: #000;">
+
+                    {{-- Header Dokumen Laporan --}}
+                    <div class="report-header mb-4 pb-2 border-bottom">
+                        <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.02em;">PT. Sinaraya
+                            Nugraha</h4>
+                        <h5 class="fw-bold mb-1 text-dark">Laporan Pengerjaan Barang Subcon</h5>
+                        <div class="fw-bold text-dark fs-6 mb-2">
+                            Periode : {{ $tanggalMulai ? \Carbon\Carbon::parse($tanggalMulai)->format('Y-m-d') : 'Awal' }}
+                            s/d {{ $tanggalAkhir ? \Carbon\Carbon::parse($tanggalAkhir)->format('Y-m-d') : 'Sekarang' }}
+                        </div>
+                        <div class="small fw-semibold text-secondary pt-1">
+                            <span><strong>Barang :</strong>
+                                {{ $selectedBarangObj ? '[' . $selectedBarangObj->kode_barang . '] ' . $selectedBarangObj->nama_barang : 'SEMUA BARANG' }}</span>
+                            <span class="mx-2">|</span>
+                            <span><strong>Lokasi :</strong>
+                                {{ $selectedLokasiObj ? $selectedLokasiObj->nama_lokasi : 'SEMUA LOKASI' }}</span>
                             @if (auth()->user()->is_admin)
-                                <th>Karyawan</th>
+                                <span class="mx-2">|</span>
+                                <span><strong>Karyawan :</strong>
+                                    {{ $selectedKaryawanObj ? $selectedKaryawanObj->nama_karyawan . ' (' . $selectedKaryawanObj->no_karyawan . ')' : 'SEMUA KARYAWAN' }}</span>
                             @endif
-                            <th>Kode Barang</th>
-                            <th>Nama Barang</th>
-                            <th>Lokasi Subcon</th>
-                            <th>Jumlah Selesai</th>
-                            <th>Keterangan</th>
-                            <th class="no-export" style="width: 70px;">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($pengerjaan as $item)
-                            <tr class="text-center">
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y') }}</td>
-                                @if (auth()->user()->is_admin)
-                                    <td class="text-start">{{ $item->nama_karyawan }} ({{ $item->no_karyawan }})</td>
-                                @endif
-                                <td><span class="badge bg-secondary">{{ $item->kode_barang }}</span></td>
-                                <td class="text-start">{{ $item->nama_barang }}</td>
-                                <td>{{ $item->nama_lokasi }}</td>
-                                <td><strong>{{ number_format($item->jumlah, 0, ',', '.') }}</strong> Unit</td>
-                                <td class="text-start">{{ $item->keterangan ?: '-' }}</td>
-                                <td class="no-export">
-                                    <button type="button" class="btn btn-danger btn-sm btn-hapus-pengerjaan"
-                                        data-id="{{ $item->id }}"
-                                        title="Hapus Data">
-                                        <i class="ti ti-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                    <tfoot class="table-light">
-                        <tr class="fw-bold text-center">
-                            <td colspan="{{ auth()->user()->is_admin ? 6 : 5 }}" class="text-end">Total Kuantitas:</td>
-                            <td>{{ number_format($pengerjaan->sum('jumlah'), 0, ',', '.') }} Unit</td>
-                            <td colspan="2"></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
+                        </div>
+                    </div>
+
+                    {{-- Tabel-Tabel Terpisah Per Kode Barang --}}
+                    @php
+                        $groupedPengerjaan = $pengerjaan->groupBy('kode_barang');
+                    @endphp
+
+                    @forelse ($groupedPengerjaan as $kodeBarang => $items)
+                        @php
+                            $firstItem = $items->first();
+                            $subtotal = $items->sum('jumlah');
+                        @endphp
+
+                        <div class="barang-report-block mb-4" style="page-break-inside: avoid;">
+                            {{-- Header Tabel Per Barang --}}
+                            <div class="d-flex justify-content-between align-items-center px-3 py-2 border rounded-top"
+                                style="background-color: #e0f2fe; color: #0369a1; font-weight: 700; border-color: #94a3b8 !important;">
+                                <div>
+                                    <i class="ti ti-package me-1"></i>
+                                    <span class="fs-6">[{{ $kodeBarang }}] {{ $firstItem->nama_barang }}</span>
+                                </div>
+                                {{-- <div class="text-end">
+                                    <span class="badge bg-primary px-2 py-1 fs-6">Total: {{ number_format($subtotal, 0, ',', '.') }} Unit</span>
+                                    <span class="badge bg-secondary px-2 py-1 fs-6 ms-1">{{ $items->count() }} Data</span>
+                                </div> --}}
+                            </div>
+
+                            {{-- Tabel Rincian Data untuk Barang Ini --}}
+                            <div class="table-responsive">
+                                <table class="table table-bordered align-middle w-100 report-table mb-0"
+                                    style="border-color: #94a3b8; font-size: 0.92rem; border-top: 0;">
+                                    <thead>
+                                        <tr class="text-center"
+                                            style="background-color: #f8fafc; color: #0f172a; font-weight: 600; border-color: #94a3b8;">
+                                            <th style="width: 45px; border: 1px solid #94a3b8;">No</th>
+                                            <th style="width: 120px; border: 1px solid #94a3b8;">Tanggal</th>
+                                            @if (auth()->user()->is_admin)
+                                                <th style="border: 1px solid #94a3b8;">Karyawan</th>
+                                            @endif
+                                            <th style="border: 1px solid #94a3b8;">Lokasi Subcon</th>
+                                            <th style="width: 140px; border: 1px solid #94a3b8;">Jumlah Selesai</th>
+                                            <th style="border: 1px solid #94a3b8;">Keterangan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($items as $item)
+                                            <tr class="text-center" style="border: 1px solid #cbd5e1;">
+                                                <td style="border: 1px solid #cbd5e1;">{{ $loop->iteration }}</td>
+                                                <td style="border: 1px solid #cbd5e1;">
+                                                    {{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y') }}</td>
+                                                @if (auth()->user()->is_admin)
+                                                    <td class="text-start" style="border: 1px solid #cbd5e1;">
+                                                        {{ $item->nama_karyawan }} ({{ $item->no_karyawan }})</td>
+                                                @endif
+                                                <td style="border: 1px solid #cbd5e1;">{{ $item->nama_lokasi }}</td>
+                                                <td class="text-end fw-bold text-dark pe-3"
+                                                    style="border: 1px solid #cbd5e1;">
+                                                    {{ number_format($item->jumlah, 0, ',', '.') }} Unit
+                                                </td>
+                                                <td class="text-start" style="border: 1px solid #cbd5e1;">
+                                                    {{ $item->keterangan ?: '-' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="fw-bold" style="background-color: #f1f5f9; border: 1px solid #94a3b8;">
+                                            <td colspan="{{ auth()->user()->is_admin ? 4 : 3 }}" class="text-end pe-3">
+                                                Total :</td>
+                                            <td class="text-end fw-bold text-primary pe-3">
+                                                {{ number_format($subtotal, 0, ',', '.') }} Unit</td>
+                                            <td style="border: 1px solid #94a3b8;"></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-5 text-muted border rounded p-4 bg-light">
+                            <i class="ti ti-alert-circle fs-2 d-block mb-2 text-secondary"></i>
+                            Tidak ada data pengerjaan barang pada periode / filter ini.
+                        </div>
+                    @endforelse
+
+                    {{-- Footer Lembar Laporan --}}
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 text-muted small"
+                        style="border-top: 1px dashed #cbd5e1;">
+                        <div>
+                            Dicetak oleh: <strong>{{ auth()->user()->name }}</strong>
+                        </div>
+                        <div>
+                            Waktu cetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB
+                        </div>
+                    </div>
+
+                </div>
+            @endif
+
         </div>
+
     </div>
+
+    {{-- CSS Khusus untuk Print Media --}}
+    <style>
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+
+            .pc-sidebar,
+            .pc-header,
+            .top-navbar,
+            .page-header,
+            .sticky-top,
+            .card-header,
+            .btn,
+            .d-flex.justify-content-between.align-items-center.mb-3 {
+                display: none !important;
+            }
+
+            .col-lg-4,
+            .col-xl-3 {
+                display: none !important;
+            }
+
+            .col-lg-8,
+            .col-xl-9 {
+                width: 100% !important;
+                max-width: 100% !important;
+                flex: 0 0 100% !important;
+            }
+
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+            }
+
+            #printable-report-sheet {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+            }
+
+            .barang-report-block {
+                page-break-inside: avoid !important;
+                margin-bottom: 20px !important;
+            }
+
+            table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+            }
+
+            th,
+            td {
+                border: 1px solid #000000 !important;
+                padding: 6px 8px !important;
+                color: #000000 !important;
+            }
+        }
+    </style>
 
 @endsection
 
 @push('scripts')
     <!-- Select2 CSS & JS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <!-- html2pdf.js for exact PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
         $(document).ready(function() {
@@ -224,160 +365,112 @@
                 theme: 'bootstrap-5',
                 width: '100%'
             });
-
-            // Inisialisasi DataTables Laporan dengan Export Excel, PDF, Print
-            if (!$.fn.DataTable.isDataTable('#laporan-table')) {
-                $('#laporan-table').DataTable({
-                    pageLength: 25,
-                    info: true,
-                    dom: '<"d-flex flex-wrap justify-content-between align-items-center mb-3"Bf>rt<"d-flex flex-wrap justify-content-between align-items-center mt-3"ip>',
-                    order: [[1, 'desc']],
-                    language: {
-                        emptyTable: "Tidak ada data pengerjaan pada periode/filter ini",
-                        zeroRecords: "Tidak ditemukan data yang sesuai",
-                        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ pengerjaan",
-                        infoEmpty: "Menampilkan 0 data",
-                        search: "Cari di tabel:",
-                        paginate: {
-                            first: "Awal",
-                            last: "Akhir",
-                            next: "Berikutnya",
-                            previous: "Sebelumnya"
-                        }
-                    },
-                    buttons: [
-                        {
-                            extend: 'excelHtml5',
-                            text: '<i class="ti ti-file-spreadsheet me-1"></i> Excel',
-                            className: 'btn btn-success btn-sm',
-                            title: 'Laporan_Pengerjaan_Barang_Subcon',
-                            filename: function() {
-                                let tglMulai = $('#filter_tanggal_mulai').val() || 'Awal';
-                                let tglAkhir = $('#filter_tanggal_akhir').val() || 'Sekarang';
-                                return 'Laporan_Subcon_' + tglMulai + '_sd_' + tglAkhir;
-                            },
-                            exportOptions: { columns: ':not(.no-export)' },
-                            footer: true
-                        },
-                        {
-                            extend: 'pdfHtml5',
-                            text: '<i class="ti ti-file-type-pdf me-1"></i> PDF',
-                            className: 'btn btn-danger btn-sm',
-                            orientation: 'landscape',
-                            pageSize: 'A4',
-                            title: 'Laporan Pengerjaan Barang Subcon',
-                            messageTop: function() {
-                                let tglMulai = $('#filter_tanggal_mulai').val() || 'Awal';
-                                let tglAkhir = $('#filter_tanggal_akhir').val() || 'Sekarang';
-                                return 'Periode: ' + tglMulai + ' s/d ' + tglAkhir;
-                            },
-                            exportOptions: { columns: ':not(.no-export)' },
-                            footer: true
-                        },
-                        {
-                            extend: 'print',
-                            text: '<i class="ti ti-printer me-1"></i> Print',
-                            className: 'btn btn-secondary btn-sm',
-                            title: 'Laporan Pengerjaan Barang Subcon',
-                            messageTop: function() {
-                                let tglMulai = $('#filter_tanggal_mulai').val() || 'Awal';
-                                let tglAkhir = $('#filter_tanggal_akhir').val() || 'Sekarang';
-                                return '<p style="margin-bottom:15px; font-size:14px;">Periode: <strong>' + tglMulai + '</strong> s/d <strong>' + tglAkhir + '</strong></p>';
-                            },
-                            exportOptions: { columns: ':not(.no-export)' },
-                            footer: true
-                        },
-                        {
-                            extend: 'colvis',
-                            text: '<i class="ti ti-columns me-1"></i> Kolom',
-                            className: 'btn btn-outline-secondary btn-sm',
-                            columns: ':not(.d-none)'
-                        }
-                    ]
-                });
-            }
         });
 
-        // Quick Period Setter
-        function setFilterPeriod(type) {
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            const todayStr = `${yyyy}-${mm}-${dd}`;
-
-            let startStr = todayStr;
-            let endStr = todayStr;
-
-            if (type === 'today') {
-                startStr = todayStr;
-                endStr = todayStr;
-            } else if (type === 'this_month') {
-                startStr = `${yyyy}-${mm}-01`;
-                endStr = todayStr;
-            } else if (type === 'last_month') {
-                const lastMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-                const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
-                const lmY = lastMonthDate.getFullYear();
-                const lmM = String(lastMonthDate.getMonth() + 1).padStart(2, '0');
-                const lmLastDay = String(lastMonthEnd.getDate()).padStart(2, '0');
-                startStr = `${lmY}-${lmM}-01`;
-                endStr = `${lmY}-${lmM}-${lmLastDay}`;
-            } else if (type === 'all') {
-                startStr = '';
-                endStr = '';
-            }
-
-            document.getElementById('filter_tanggal_mulai').value = startStr;
-            document.getElementById('filter_tanggal_akhir').value = endStr;
-            document.getElementById('filterForm').submit();
+        // Print Laporan Sheet
+        function printReportSheet() {
+            window.print();
         }
 
-        // Hapus pengerjaan
-        $(document).on('click', '.btn-hapus-pengerjaan', function() {
-            let id = $(this).data('id');
+        // Export PDF Laporan (Exact Document PDF)
+        function exportReportPDF() {
+            const element = document.getElementById('printable-report-sheet');
+            const tglMulai = document.getElementById('filter_tanggal_mulai').value || 'Awal';
+            const tglAkhir = document.getElementById('filter_tanggal_akhir').value || 'Sekarang';
+            const filename = 'Laporan_Subcon_' + tglMulai + '_sd_' + tglAkhir + '.pdf';
+
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: filename,
+                image: {
+                    type: 'jpeg',
+                    quality: 0.98
+                },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'landscape'
+                }
+            };
 
             Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: 'Data pengerjaan barang akan dihapus permanen',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "{{ url('pengerjaan') }}/" + id,
-                        method: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                            _method: 'DELETE'
-                        },
-                        success: function(res) {
-                            if (res.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Berhasil',
-                                    text: res.message,
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                }).then(() => location.reload());
-                            } else {
-                                Swal.fire('Gagal', res.message || 'Terjadi kesalahan.', 'error');
-                            }
-                        },
-                        error: function(err) {
-                            let msg = 'Terjadi kesalahan koneksi.';
-                            if (err.status === 403) {
-                                msg = 'Anda tidak memiliki akses untuk menghapus data ini.';
-                            }
-                            Swal.fire('Gagal', msg, 'error');
-                        }
-                    });
+                title: 'Sedang Membuat PDF...',
+                text: 'Mohon tunggu sebentar',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
                 }
             });
-        });
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                Swal.close();
+            }).catch(err => {
+                Swal.fire('Gagal', 'Terjadi kesalahan saat mengekspor PDF.', 'error');
+            });
+        }
+
+        // Export Excel Laporan (Structured HTML Tables per Barang with Header & Subheaders)
+        function exportReportExcel() {
+            const tglMulai = document.getElementById('filter_tanggal_mulai').value || 'Awal';
+            const tglAkhir = document.getElementById('filter_tanggal_akhir').value || 'Sekarang';
+            const filename = 'Laporan_Subcon_' + tglMulai + '_sd_' + tglAkhir + '.xls';
+
+            const reportHeaderHtml = `
+                <table border="0">
+                    <tr><td colspan="6" style="font-size:16px; font-weight:bold;">e-Subcon — PT. Sinaraya Nugraha</td></tr>
+                    <tr><td colspan="6" style="font-size:14px; font-weight:bold;">Laporan Pengerjaan Barang Subcon</td></tr>
+                    <tr><td colspan="6" style="font-size:12px; font-weight:bold;">Periode: ` + tglMulai + ` s/d ` +
+                tglAkhir + `</td></tr>
+                    <tr><td colspan="6"></td></tr>
+                </table>
+            `;
+
+            let tablesHtml = '';
+            const blocks = document.querySelectorAll('.barang-report-block');
+            blocks.forEach(block => {
+                const headerText = block.querySelector('.rounded-top')?.innerText.trim() || '';
+                const table = block.querySelector('table');
+                if (table) {
+                    tablesHtml +=
+                        `
+                        <table border="0">
+                            <tr><td colspan="6" style="background-color:#e0f2fe; font-size:13px; font-weight:bold; color:#0369a1; border:0.5pt solid #94a3b8;">` +
+                        headerText + `</td></tr>
+                        </table>
+                    ` + table.outerHTML + `<br/>`;
+                }
+            });
+
+            const fullExcelHtml = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8"/>
+                    <style>
+                        table { border-collapse: collapse; margin-bottom: 15px; }
+                        th, td { border: 0.5pt solid #000000; padding: 5px; }
+                        th { background-color: #f8fafc; font-weight: bold; }
+                    </style>
+                </head>
+                <body>
+                    ` + reportHeaderHtml + `
+                    ` + tablesHtml + `
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob([fullExcelHtml], {
+                type: 'application/vnd.ms-excel;charset=utf-8'
+            });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     </script>
 @endpush

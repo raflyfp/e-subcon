@@ -97,65 +97,74 @@ class PengerjaanController extends Controller
     {
         $user = auth()->user();
 
-        // Default tanggal: awal bulan ini s/d hari ini jika belum diisi
-        $tanggalMulai = $request->input('tanggal_mulai', now()->startOfMonth()->toDateString());
-        $tanggalAkhir = $request->input('tanggal_akhir', now()->toDateString());
+        $defaultMulai = now()->startOfMonth()->toDateString();
+        $defaultAkhir = now()->toDateString();
+
+        $tanggalMulai     = $request->input('tanggal_mulai', $defaultMulai);
+        $tanggalAkhir     = $request->input('tanggal_akhir', $defaultAkhir);
         $selectedKaryawan = $request->input('karyawan_id');
         $selectedBarang   = $request->input('barang_id');
         $selectedLokasi   = $request->input('lokasi_subcon_id');
 
-        $query = DB::table('tb_pengerjaan as p')
-            ->join('tb_karyawan as k', 'k.id', '=', 'p.karyawan_id')
-            ->join('tb_user as u', 'u.id', '=', 'k.user_id')
-            ->join('tb_barang as b', 'b.id', '=', 'p.barang_id')
-            ->join('tb_lokasi_subcon as l', 'l.id', '=', 'p.lokasi_subcon_id')
-            ->select(
-                'p.id',
-                'p.tanggal',
-                'u.name as nama_karyawan',
-                'k.no_karyawan',
-                'b.kode_barang',
-                'b.nama_barang',
-                'l.nama_lokasi',
-                'p.jumlah',
-                'p.keterangan'
-            );
+        // Cek apakah tombol "Terapkan Filter" sudah diklik (memiliki parameter filter=1)
+        $isFiltered = $request->has('filter');
 
-        // Filter Tanggal
-        if ($tanggalMulai) {
-            $query->where('p.tanggal', '>=', $tanggalMulai);
-        }
-        if ($tanggalAkhir) {
-            $query->where('p.tanggal', '<=', $tanggalAkhir);
-        }
+        $pengerjaan = collect([]);
 
-        // Filter Barang
-        if ($selectedBarang) {
-            $query->where('p.barang_id', $selectedBarang);
-        }
+        if ($isFiltered) {
+            $query = DB::table('tb_pengerjaan as p')
+                ->join('tb_karyawan as k', 'k.id', '=', 'p.karyawan_id')
+                ->join('tb_user as u', 'u.id', '=', 'k.user_id')
+                ->join('tb_barang as b', 'b.id', '=', 'p.barang_id')
+                ->join('tb_lokasi_subcon as l', 'l.id', '=', 'p.lokasi_subcon_id')
+                ->select(
+                    'p.id',
+                    'p.tanggal',
+                    'u.name as nama_karyawan',
+                    'k.no_karyawan',
+                    'b.kode_barang',
+                    'b.nama_barang',
+                    'l.nama_lokasi',
+                    'p.jumlah',
+                    'p.keterangan'
+                );
 
-        // Filter Lokasi
-        if ($selectedLokasi) {
-            $query->where('p.lokasi_subcon_id', $selectedLokasi);
-        }
-
-        // Role check & Filter Karyawan
-        if ($user->is_admin) {
-            if ($selectedKaryawan) {
-                $query->where('p.karyawan_id', $selectedKaryawan);
+            // Filter Tanggal
+            if ($tanggalMulai) {
+                $query->where('p.tanggal', '>=', $tanggalMulai);
             }
-        } else {
-            $karyawan = $user->karyawan;
-            if ($karyawan) {
-                $query->where('p.karyawan_id', $karyawan->id);
+            if ($tanggalAkhir) {
+                $query->where('p.tanggal', '<=', $tanggalAkhir);
+            }
+
+            // Filter Barang
+            if ($selectedBarang) {
+                $query->where('p.barang_id', $selectedBarang);
+            }
+
+            // Filter Lokasi
+            if ($selectedLokasi) {
+                $query->where('p.lokasi_subcon_id', $selectedLokasi);
+            }
+
+            // Role check & Filter Karyawan
+            if ($user->is_admin) {
+                if ($selectedKaryawan) {
+                    $query->where('p.karyawan_id', $selectedKaryawan);
+                }
             } else {
-                $query->whereRaw('1 = 0');
+                $karyawan = $user->karyawan;
+                if ($karyawan) {
+                    $query->where('p.karyawan_id', $karyawan->id);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
             }
-        }
 
-        $pengerjaan = $query->orderBy('p.tanggal', 'desc')
-            ->orderBy('p.id', 'desc')
-            ->get();
+            $pengerjaan = $query->orderBy('p.tanggal', 'desc')
+                ->orderBy('p.id', 'desc')
+                ->get();
+        }
 
         // Data dropdown untuk filter
         $karyawanList = [];
@@ -171,8 +180,13 @@ class PengerjaanController extends Controller
         $barangList = Barang::where('is_active', true)->orderBy('nama_barang')->get();
         $lokasiList = LokasiSubcon::where('is_active', true)->orderBy('nama_lokasi')->get();
 
+        $selectedKaryawanObj = $selectedKaryawan ? collect($karyawanList)->firstWhere('id', $selectedKaryawan) : null;
+        $selectedBarangObj   = $selectedBarang ? $barangList->firstWhere('id', $selectedBarang) : null;
+        $selectedLokasiObj   = $selectedLokasi ? $lokasiList->firstWhere('id', $selectedLokasi) : null;
+
         return view('pages.laporan-subcon', compact(
             'pengerjaan',
+            'isFiltered',
             'karyawanList',
             'barangList',
             'lokasiList',
@@ -180,7 +194,10 @@ class PengerjaanController extends Controller
             'tanggalAkhir',
             'selectedKaryawan',
             'selectedBarang',
-            'selectedLokasi'
+            'selectedLokasi',
+            'selectedKaryawanObj',
+            'selectedBarangObj',
+            'selectedLokasiObj'
         ));
     }
 
