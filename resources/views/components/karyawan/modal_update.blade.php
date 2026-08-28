@@ -24,20 +24,21 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">No. Telepon / WhatsApp</label>
-                        <input type="text" class="form-control" name="telepon" id="telepon_update" placeholder="Nomor Telepon">
+                        <label class="form-label fw-semibold">Penempatan Subcon <span class="text-danger">*</span></label>
+                        <select class="form-select" name="lokasi_subcon_id" id="lokasi_subcon_update" required>
+                            <option value="">-- Pilih Lokasi Subcon --</option>
+                            @foreach ($subconList as $s)
+                                <option value="{{ $s->id }}">
+                                    {{ $s->nama_lokasi }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Karyawan akan muncul pada formulir pengerjaan akun subcon ini.</small>
                     </div>
 
-                    <div class="p-3 bg-light rounded border mb-2">
-                        <h6 class="fw-bold mb-2 text-dark"><i class="ti ti-lock me-1"></i>Akun Login Karyawan</h6>
-                        <div class="mb-2">
-                            <label class="form-label small text-muted">Username</label>
-                            <input type="text" class="form-control form-control-sm" name="username" id="username_update">
-                        </div>
-                        <div>
-                            <label class="form-label small text-muted">Ganti Password (Kosongkan jika tidak diubah)</label>
-                            <input type="password" class="form-control form-control-sm" name="password" placeholder="Masukkan password baru">
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">No. Telepon / WhatsApp</label>
+                        <input type="text" class="form-control" name="telepon" id="telepon_update" placeholder="Nomor Telepon">
                     </div>
 
                 </div>

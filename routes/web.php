@@ -33,16 +33,17 @@ Route::get('/refresh-csrf', function () {
     return response()->json(['csrf_token' => csrf_token()]);
 })->name('refresh-csrf')->middleware('web');
 
-// Halaman utama: jika belum login langsung muncul Formulir Pengerjaan Barang, jika sudah login muncul Dashboard
+// Halaman utama: jika belum login langsung ke login, jika sudah login ke dashboard
 Route::get('/', function () {
     if (Auth::check()) {
-        return app(PengerjaanController::class)->dashboard();
+        return redirect()->route('dashboard');
     }
-    return app(PengerjaanController::class)->formPublic();
+    return redirect()->route('login');
 })->name('home');
 
-Route::get('/form-pengerjaan', [PengerjaanController::class, 'formPublic'])->name('pengerjaan.form-public');
-Route::post('/form-pengerjaan', [PengerjaanController::class, 'storePublic'])->name('pengerjaan.store-public');
+Route::get('/form-pengerjaan', function() {
+    return redirect()->route('pengerjaan.index');
+})->name('pengerjaan.form-public');
 
 Route::get('/login', function () {
     if (Auth::check()) {

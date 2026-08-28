@@ -48,21 +48,26 @@
 
                         <hr class="text-secondary opacity-25">
 
-                        {{-- Filter Karyawan (Admin Only) --}}
-                        @if (auth()->user()->is_admin)
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold" for="filter_karyawan_id">Karyawan</label>
-                                <select class="form-select select2-filter" name="karyawan_id" id="filter_karyawan_id">
-                                    <option value="">-- Semua Karyawan --</option>
-                                    @foreach ($karyawanList as $k)
-                                        <option value="{{ $k->id }}"
-                                            {{ $selectedKaryawan == $k->id ? 'selected' : '' }}>
-                                            {{ $k->nama_karyawan }} ({{ $k->no_karyawan }})
-                                        </option>
-                                    @endforeach
-                                </select>
+                        @if (!auth()->user()->is_admin)
+                            <div class="mb-3 p-2 bg-light rounded border">
+                                <small class="text-muted d-block">Subcon Pelaksana:</small>
+                                <strong class="text-primary"><i class="ti ti-building me-1"></i>{{ $subcon->nama_lokasi ?? auth()->user()->name }}</strong>
                             </div>
                         @endif
+
+                        {{-- Filter Karyawan --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="filter_karyawan_id">Karyawan Pelaksana</label>
+                            <select class="form-select select2-filter" name="karyawan_id" id="filter_karyawan_id">
+                                <option value="">-- Semua Karyawan --</option>
+                                @foreach ($karyawanList as $k)
+                                    <option value="{{ $k->id }}"
+                                        {{ $selectedKaryawan == $k->id ? 'selected' : '' }}>
+                                        {{ $k->nama_karyawan }} ({{ $k->no_karyawan }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
                         {{-- Filter Barang --}}
                         <div class="mb-3">
@@ -77,18 +82,20 @@
                             </select>
                         </div>
 
-                        {{-- Filter Lokasi Subcon --}}
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold" for="filter_lokasi_subcon_id">Lokasi Subcon</label>
-                            <select class="form-select select2-filter" name="lokasi_subcon_id" id="filter_lokasi_subcon_id">
-                                <option value="">-- Semua Lokasi --</option>
-                                @foreach ($lokasiList as $l)
-                                    <option value="{{ $l->id }}" {{ $selectedLokasi == $l->id ? 'selected' : '' }}>
-                                        {{ $l->nama_lokasi }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                        {{-- Filter Lokasi Subcon (Hanya Admin) --}}
+                        @if (auth()->user()->is_admin)
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" for="filter_lokasi_subcon_id">Lokasi Subcon</label>
+                                <select class="form-select select2-filter" name="lokasi_subcon_id" id="filter_lokasi_subcon_id">
+                                    <option value="">-- Semua Lokasi --</option>
+                                    @foreach ($lokasiList as $l)
+                                        <option value="{{ $l->id }}" {{ $selectedLokasi == $l->id ? 'selected' : '' }}>
+                                            {{ $l->nama_lokasi }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
 
                         {{-- Submit Buttons --}}
                         <div class="d-grid gap-2 mt-4">

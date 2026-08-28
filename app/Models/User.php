@@ -34,4 +34,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Karyawan::class, 'user_id', 'id');
     }
+
+    public function lokasiSubcon()
+    {
+        return $this->hasOne(LokasiSubcon::class, 'user_id', 'id');
+    }
 }

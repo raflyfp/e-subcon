@@ -22,72 +22,147 @@ class PengerjaanController extends Controller
         $monthStart = now()->startOfMonth()->toDateString();
 
         if ($user->is_admin) {
-            // Admin: lihat ringkasan seluruh data
+            // Admin: lihat ringkasan seluruh data sistem
             $pengerjaanHariIni  = Pengerjaan::where('tanggal', $today)->sum('jumlah');
             $pengerjaanBulanIni = Pengerjaan::where('tanggal', '>=', $monthStart)->sum('jumlah');
+            $totalSubcon        = LokasiSubcon::where('is_active', true)->count();
             $totalKaryawan      = Karyawan::where('is_active', true)->count();
-            $totalBarang         = Barang::where('is_active', true)->count();
+            $totalBarang        = Barang::where('is_active', true)->count();
 
             return view('pages.dashboard', compact(
                 'pengerjaanHariIni',
                 'pengerjaanBulanIni',
+                'totalSubcon',
                 'totalKaryawan',
                 'totalBarang'
             ));
         }
 
-        // Karyawan: lihat ringkasan milik sendiri
-        $karyawan = $user->karyawan;
+        // Akun Subcon: lihat ringkasan khusus subcon tersebut
+        $subcon = $user->lokasiSubcon;
+        $subconId = $subcon?->id;
+
         $pengerjaanHariIni  = 0;
         $pengerjaanBulanIni = 0;
+        $totalKaryawan      = 0;
+        $totalBarang        = 0;
 
-        if ($karyawan) {
-            $pengerjaanHariIni  = $karyawan->pengerjaan()->where('tanggal', $today)->sum('jumlah');
-            $pengerjaanBulanIni = $karyawan->pengerjaan()->where('tanggal', '>=', $monthStart)->sum('jumlah');
+        if ($subconId) {
+            $pengerjaanHariIni  = Pengerjaan::where('lokasi_subcon_id', $subconId)->where('tanggal', $today)->sum('jumlah');
+            $pengerjaanBulanIni = Pengerjaan::where('lokasi_subcon_id', $subconId)->where('tanggal', '>=', $monthStart)->sum('jumlah');
+            $totalKaryawan      = Karyawan::where('lokasi_subcon_id', $subconId)->where('is_active', true)->count();
+            
+            $assignedBarangCount = $subcon->barang()->where('tb_barang.is_active', true)->count();
+            $totalBarang        = $assignedBarangCount > 0 ? $assignedBarangCount : Barang::where('is_active', true)->count();
         }
 
         return view('pages.dashboard', compact(
             'pengerjaanHariIni',
-            'pengerjaanBulanIni'
+            'pengerjaanBulanIni',
+            'totalKaryawan',
+            'totalBarang',
+            'subcon'
         ));
     }
 
     /**
-     * Halaman Formulir Input Pengerjaan Barang (Di dalam Dashboard / Login)
+     * Halaman Formulir Input Pengerjaan Barang (Wajib Login)
      */
     public function index()
     {
         $user = auth()->user();
 
-        // Data Karyawan beserta lokasi subcon terakhir yang digunakan
-        $karyawanList = DB::table('tb_karyawan as k')
-            ->join('tb_user as u', 'u.id', '=', 'k.user_id')
-            ->where('k.is_active', true)
-            ->select(
-                'k.id',
-                'u.name as nama_karyawan',
-                'k.no_karyawan',
-                'k.telepon',
-                DB::raw('(SELECT p.lokasi_subcon_id FROM tb_pengerjaan p WHERE p.karyawan_id = k.id ORDER BY p.tanggal DESC, p.id DESC LIMIT 1) as last_lokasi_id')
-            )
-            ->orderBy('u.name')
+        if ($user->is_admin) {
+            // Admin dapat memilih seluruh karyawan, barang, dan lokasi subcon
+            $karyawanList = Karyawan::where('is_active', true)->orderBy('nama_karyawan')->get();
+            $barangList   = Barang::where('is_active', true)->orderBy('nama_barang')->get();
+            $lokasiList   = LokasiSubcon::where('is_active', true)->orderBy('nama_lokasi')->get();
+            $subcon       = null;
+
+            return view('pages.pengerjaan', compact(
+                'karyawanList',
+                'barangList',
+                'lokasiList',
+                'subcon'
+            ));
+        }
+
+        // Akun Subcon: Karyawan dan barang sesuai subcon yang login
+        $subcon = $user->lokasiSubcon;
+        $subconId = $subcon?->id;
+
+        // Ambil karyawan yang terdaftar pada subcon ini (fallback ke semua karyawan aktif jika belum diatur)
+        $karyawanList = Karyawan::where('lokasi_subcon_id', $subconId)
+            ->where('is_active', true)
+            ->orderBy('nama_karyawan')
             ->get();
 
-        $barangList = Barang::where('is_active', true)->orderBy('nama_barang')->get();
-        $lokasiList = LokasiSubcon::where('is_active', true)->orderBy('nama_lokasi')->get();
-
-        // Default karyawan untuk user yang bukan admin
-        $currentKaryawan = null;
-        if (!$user->is_admin && $user->karyawan) {
-            $currentKaryawan = $karyawanList->firstWhere('id', $user->karyawan->id);
+        if ($karyawanList->isEmpty()) {
+            $karyawanList = Karyawan::where('is_active', true)->orderBy('nama_karyawan')->get();
         }
+
+        // Ambil barang yang ditugaskan ke subcon ini (fallback ke semua barang aktif jika belum diatur)
+        $barangList = collect([]);
+        if ($subcon) {
+            $barangList = $subcon->barang()->where('tb_barang.is_active', true)->orderBy('nama_barang')->get();
+        }
+        if ($barangList->isEmpty()) {
+            $barangList = Barang::where('is_active', true)->orderBy('nama_barang')->get();
+        }
+
+        $lokasiList = collect([]);
 
         return view('pages.pengerjaan', compact(
             'karyawanList',
             'barangList',
             'lokasiList',
-            'currentKaryawan'
+            'subcon'
         ));
+    }
+
+    /**
+     * Simpan pengerjaan baru (Logged In)
+     */
+    public function store(Request $request)
+    {
+        $user = auth()->user();
+
+        $rules = [
+            'karyawan_id'      => 'required|exists:tb_karyawan,id',
+            'barang_id'        => 'required|exists:tb_barang,id',
+            'tanggal'          => 'required|date',
+            'jumlah'           => 'required|integer|min:1',
+            'keterangan'       => 'nullable|string',
+        ];
+
+        if ($user->is_admin) {
+            $rules['lokasi_subcon_id'] = 'required|exists:tb_lokasi_subcon,id';
+            $lokasiSubconId = $request->lokasi_subcon_id;
+        } else {
+            $subcon = $user->lokasiSubcon;
+            if (!$subcon) {
+                return redirect()->back()->with('error', 'Akun Anda belum terhubung dengan lokasi subcon. Hubungi admin.');
+            }
+            $lokasiSubconId = $subcon->id;
+        }
+
+        $request->validate($rules);
+
+        try {
+            Pengerjaan::create([
+                'karyawan_id'      => $request->karyawan_id,
+                'barang_id'        => $request->barang_id,
+                'lokasi_subcon_id' => $lokasiSubconId,
+                'tanggal'          => $request->tanggal,
+                'jumlah'           => $request->jumlah,
+                'keterangan'       => $request->keterangan,
+            ]);
+
+            return redirect()->back()->with('success', 'Data pengerjaan barang berhasil disimpan.');
+        } catch (\Throwable $e) {
+            Log::error('CreatePengerjaan error', ['message' => $e->getMessage()]);
+            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan pengerjaan barang.');
+        }
     }
 
     /**
@@ -106,7 +181,6 @@ class PengerjaanController extends Controller
         $selectedBarang   = $request->input('barang_id');
         $selectedLokasi   = $request->input('lokasi_subcon_id');
 
-        // Cek apakah tombol "Terapkan Filter" sudah diklik (memiliki parameter filter=1)
         $isFiltered = $request->has('filter');
 
         $pengerjaan = collect([]);
@@ -114,13 +188,12 @@ class PengerjaanController extends Controller
         if ($isFiltered) {
             $query = DB::table('tb_pengerjaan as p')
                 ->join('tb_karyawan as k', 'k.id', '=', 'p.karyawan_id')
-                ->join('tb_user as u', 'u.id', '=', 'k.user_id')
                 ->join('tb_barang as b', 'b.id', '=', 'p.barang_id')
                 ->join('tb_lokasi_subcon as l', 'l.id', '=', 'p.lokasi_subcon_id')
                 ->select(
                     'p.id',
                     'p.tanggal',
-                    'u.name as nama_karyawan',
+                    'k.nama_karyawan',
                     'k.no_karyawan',
                     'b.kode_barang',
                     'b.nama_barang',
@@ -131,10 +204,10 @@ class PengerjaanController extends Controller
 
             // Filter Tanggal
             if ($tanggalMulai) {
-                $query->where('p.tanggal', '>=', $tanggalMulai);
+                $query->whereDate('p.tanggal', '>=', $tanggalMulai);
             }
             if ($tanggalAkhir) {
-                $query->where('p.tanggal', '<=', $tanggalAkhir);
+                $query->whereDate('p.tanggal', '<=', $tanggalAkhir);
             }
 
             // Filter Barang
@@ -142,20 +215,21 @@ class PengerjaanController extends Controller
                 $query->where('p.barang_id', $selectedBarang);
             }
 
-            // Filter Lokasi
-            if ($selectedLokasi) {
-                $query->where('p.lokasi_subcon_id', $selectedLokasi);
+            // Filter Karyawan
+            if ($selectedKaryawan) {
+                $query->where('p.karyawan_id', $selectedKaryawan);
             }
 
-            // Role check & Filter Karyawan
+            // Role check & Filter Lokasi
             if ($user->is_admin) {
-                if ($selectedKaryawan) {
-                    $query->where('p.karyawan_id', $selectedKaryawan);
+                if ($selectedLokasi) {
+                    $query->where('p.lokasi_subcon_id', $selectedLokasi);
                 }
             } else {
-                $karyawan = $user->karyawan;
-                if ($karyawan) {
-                    $query->where('p.karyawan_id', $karyawan->id);
+                $subcon = $user->lokasiSubcon;
+                if ($subcon) {
+                    // Akun subcon HANYA bisa melihat pengerjaan di subcon miliknya
+                    $query->where('p.lokasi_subcon_id', $subcon->id);
                 } else {
                     $query->whereRaw('1 = 0');
                 }
@@ -167,22 +241,34 @@ class PengerjaanController extends Controller
         }
 
         // Data dropdown untuk filter
-        $karyawanList = [];
         if ($user->is_admin) {
-            $karyawanList = DB::table('tb_karyawan as k')
-                ->join('tb_user as u', 'u.id', '=', 'k.user_id')
-                ->where('k.is_active', true)
-                ->select('k.id', 'u.name as nama_karyawan', 'k.no_karyawan')
-                ->orderBy('u.name')
-                ->get();
-        }
+            $karyawanList = Karyawan::where('is_active', true)->orderBy('nama_karyawan')->get();
+            $barangList   = Barang::where('is_active', true)->orderBy('nama_barang')->get();
+            $lokasiList   = LokasiSubcon::where('is_active', true)->orderBy('nama_lokasi')->get();
+            $subcon       = null;
+        } else {
+            $subcon   = $user->lokasiSubcon;
+            $subconId = $subcon?->id;
 
-        $barangList = Barang::where('is_active', true)->orderBy('nama_barang')->get();
-        $lokasiList = LokasiSubcon::where('is_active', true)->orderBy('nama_lokasi')->get();
+            $karyawanList = Karyawan::where('lokasi_subcon_id', $subconId)->where('is_active', true)->orderBy('nama_karyawan')->get();
+            if ($karyawanList->isEmpty()) {
+                $karyawanList = Karyawan::where('is_active', true)->orderBy('nama_karyawan')->get();
+            }
+
+            $barangList = collect([]);
+            if ($subcon) {
+                $barangList = $subcon->barang()->where('tb_barang.is_active', true)->orderBy('nama_barang')->get();
+            }
+            if ($barangList->isEmpty()) {
+                $barangList = Barang::where('is_active', true)->orderBy('nama_barang')->get();
+            }
+
+            $lokasiList = collect([]);
+        }
 
         $selectedKaryawanObj = $selectedKaryawan ? collect($karyawanList)->firstWhere('id', $selectedKaryawan) : null;
         $selectedBarangObj   = $selectedBarang ? $barangList->firstWhere('id', $selectedBarang) : null;
-        $selectedLokasiObj   = $selectedLokasi ? $lokasiList->firstWhere('id', $selectedLokasi) : null;
+        $selectedLokasiObj   = ($user->is_admin && $selectedLokasi) ? $lokasiList->firstWhere('id', $selectedLokasi) : null;
 
         return view('pages.laporan-subcon', compact(
             'pengerjaan',
@@ -190,6 +276,7 @@ class PengerjaanController extends Controller
             'karyawanList',
             'barangList',
             'lokasiList',
+            'subcon',
             'tanggalMulai',
             'tanggalAkhir',
             'selectedKaryawan',
@@ -210,112 +297,6 @@ class PengerjaanController extends Controller
     }
 
     /**
-     * Halaman Publik Formulir Input Pengerjaan Barang (Tanpa Perlu Login)
-     */
-    public function formPublic()
-    {
-        $karyawanList = DB::table('tb_karyawan as k')
-            ->join('tb_user as u', 'u.id', '=', 'k.user_id')
-            ->where('k.is_active', true)
-            ->select(
-                'k.id',
-                'u.name as nama_karyawan',
-                'k.no_karyawan',
-                'k.telepon',
-                DB::raw('(SELECT p.lokasi_subcon_id FROM tb_pengerjaan p WHERE p.karyawan_id = k.id ORDER BY p.tanggal DESC, p.id DESC LIMIT 1) as last_lokasi_id')
-            )
-            ->orderBy('u.name')
-            ->get();
-
-        $barangList = Barang::where('is_active', true)->orderBy('nama_barang')->get();
-        $lokasiList = LokasiSubcon::where('is_active', true)->orderBy('nama_lokasi')->get();
-
-        return view('pages.form-pengerjaan-public', compact(
-            'karyawanList',
-            'barangList',
-            'lokasiList'
-        ));
-    }
-
-    /**
-     * Simpan pengerjaan dari Formulir Publik (Tanpa Login)
-     */
-    public function storePublic(Request $request)
-    {
-        $request->validate([
-            'karyawan_id'      => 'required|exists:tb_karyawan,id',
-            'barang_id'        => 'required|exists:tb_barang,id',
-            'lokasi_subcon_id' => 'required|exists:tb_lokasi_subcon,id',
-            'tanggal'          => 'required|date',
-            'jumlah'           => 'required|integer|min:1',
-            'keterangan'       => 'nullable|string',
-        ]);
-
-        try {
-            Pengerjaan::create([
-                'karyawan_id'      => $request->karyawan_id,
-                'barang_id'        => $request->barang_id,
-                'lokasi_subcon_id' => $request->lokasi_subcon_id,
-                'tanggal'          => $request->tanggal,
-                'jumlah'           => $request->jumlah,
-                'keterangan'       => $request->keterangan,
-            ]);
-
-            return redirect()->back()->with('form_success', 'Data pengerjaan barang berhasil dicatat!');
-        } catch (\Throwable $e) {
-            Log::error('StorePublicPengerjaan error', ['message' => $e->getMessage()]);
-            return redirect()->back()->withInput()->with('error', 'Gagal menyimpan data pengerjaan barang.');
-        }
-    }
-
-    /**
-     * Simpan pengerjaan baru (Logged In)
-     */
-    public function store(Request $request)
-    {
-        $user = auth()->user();
-
-        $rules = [
-            'barang_id'        => 'required|exists:tb_barang,id',
-            'lokasi_subcon_id' => 'required|exists:tb_lokasi_subcon,id',
-            'tanggal'          => 'required|date',
-            'jumlah'           => 'required|integer|min:1',
-            'keterangan'       => 'nullable|string',
-        ];
-
-        // Admin harus memilih karyawan, karyawan biasa otomatis dari session atau input
-        if ($user->is_admin) {
-            $rules['karyawan_id'] = 'required|exists:tb_karyawan,id';
-        }
-
-        $request->validate($rules);
-
-        $karyawanId = $user->is_admin
-            ? $request->karyawan_id
-            : ($user->karyawan?->id ?? $request->karyawan_id);
-
-        if (!$karyawanId) {
-            return redirect()->back()->with('error', 'Data karyawan tidak ditemukan. Hubungi admin.');
-        }
-
-        try {
-            Pengerjaan::create([
-                'karyawan_id'      => $karyawanId,
-                'barang_id'        => $request->barang_id,
-                'lokasi_subcon_id' => $request->lokasi_subcon_id,
-                'tanggal'          => $request->tanggal,
-                'jumlah'           => $request->jumlah,
-                'keterangan'       => $request->keterangan,
-            ]);
-
-            return redirect()->back()->with('success', 'Pengerjaan barang berhasil ditambahkan');
-        } catch (\Throwable $e) {
-            Log::error('CreatePengerjaan error', ['message' => $e->getMessage()]);
-            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan pengerjaan barang.');
-        }
-    }
-
-    /**
      * Hapus data pengerjaan
      */
     public function destroy($id)
@@ -323,9 +304,9 @@ class PengerjaanController extends Controller
         $user       = auth()->user();
         $pengerjaan = Pengerjaan::findOrFail($id);
 
-        // Karyawan hanya bisa menghapus data milik sendiri
+        // Akun Subcon hanya bisa menghapus data subcon miliknya
         if (!$user->is_admin) {
-            if ($user->karyawan?->id !== $pengerjaan->karyawan_id) {
+            if ($user->lokasiSubcon?->id !== $pengerjaan->lokasi_subcon_id) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Anda tidak memiliki akses untuk menghapus data ini.',

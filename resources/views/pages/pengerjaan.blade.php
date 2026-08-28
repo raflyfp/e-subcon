@@ -6,6 +6,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="content mb-1">Formulir Pengerjaan Barang</h1>
+            <p class="text-muted mb-0">Input pencatatan kuantitas pengerjaan barang subcon</p>
         </div>
         <div>
             <a href="{{ url('laporan-subcon') }}" class="btn btn-outline-primary">
@@ -17,18 +18,22 @@
     {{-- Flat & Simple Google Form Style Card --}}
     <div class="card border mb-4" style="max-width: 800px; margin: 0 auto; border-top: 6px solid #2563eb !important;">
         <div class="card-header bg-white py-3 border-bottom">
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <div>
                     <h5 class="mb-1 text-dark fw-bold">
                         <i class="ti ti-edit text-primary me-2"></i>Formulir Input Pengerjaan Barang
                     </h5>
-                    <small class="text-muted">Silakan isi formulir di bawah ini dengan lengkap dan benar</small>
+                    <small class="text-muted">Silakan pilih karyawan pelaksana dan data barang yang dikerjakan</small>
                 </div>
                 <div>
                     @if (auth()->user()->is_admin)
-                        <span class="badge bg-danger-subtle text-danger border">Admin Input</span>
+                        <span class="badge bg-danger-subtle text-danger border px-3 py-2">
+                            <i class="ti ti-shield me-1"></i> Admin IT Input
+                        </span>
                     @else
-                        <span class="badge bg-primary-subtle text-primary border">{{ auth()->user()->name }}</span>
+                        <span class="badge bg-primary-subtle text-primary border px-3 py-2 fs-6">
+                            <i class="ti ti-building me-1"></i> Subcon: <strong>{{ $subcon->nama_lokasi ?? auth()->user()->name }}</strong>
+                        </span>
                     @endif
                 </div>
             </div>
@@ -38,47 +43,54 @@
             <form method="POST" action="{{ route('pengerjaan.store') }}" id="formPengerjaanAuth">
                 @csrf
 
-                {{-- 1. Karyawan --}}
+                {{-- 1. Lokasi Subcon (HANYA DITAMPILKAN JIKA ADMIN) --}}
                 @if (auth()->user()->is_admin)
                     <div class="mb-4 p-3 bg-light rounded border">
-                        <label class="form-label fw-bold" for="auth_karyawan_id">
-                            1. Karyawan yang Mengerjakan <span class="text-danger">*</span>
+                        <label class="form-label fw-bold" for="auth_lokasi_subcon_id">
+                            1. Lokasi Subcon <span class="text-danger">*</span>
                         </label>
-                        <p class="text-muted small mb-2">Pilih karyawan yang bertanggung jawab atas pengerjaan ini:</p>
+                        <p class="text-muted small mb-2">Pilih lokasi tempat pengerjaan barang dilakukan:</p>
 
-                        <select class="form-select form-select-lg" name="karyawan_id" id="auth_karyawan_id" required>
-                            <option value="">-- Pilih Karyawan --</option>
-                            @foreach ($karyawanList as $k)
-                                <option value="{{ $k->id }}" data-nama="{{ $k->nama_karyawan }}"
-                                    data-nokaryawan="{{ $k->no_karyawan }}" data-lastlokasi="{{ $k->last_lokasi_id }}"
-                                    {{ old('karyawan_id') == $k->id ? 'selected' : '' }}>
-                                    {{ $k->nama_karyawan }} ({{ $k->no_karyawan }})
+                        <select class="form-select form-select-lg" name="lokasi_subcon_id" id="auth_lokasi_subcon_id" required>
+                            <option value="">-- Pilih Lokasi Subcon --</option>
+                            @foreach ($lokasiList as $l)
+                                <option value="{{ $l->id }}" {{ old('lokasi_subcon_id') == $l->id ? 'selected' : '' }}>
+                                    {{ $l->nama_lokasi }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
-                @else
-                    <div class="mb-4 p-3 bg-light rounded border d-flex align-items-center justify-content-between">
-                        <div>
-                            <small class="text-muted d-block">Nama Karyawan Pelaksana:</small>
-                            <strong class="fs-6 text-dark">{{ auth()->user()->name }}</strong>
-                            @if (auth()->user()->karyawan)
-                                <span class="badge bg-secondary ms-2">{{ auth()->user()->karyawan->no_karyawan }}</span>
-                            @endif
-                        </div>
-                        <span class="text-success small fw-medium">
-                            <i class="ti ti-check me-1"></i> Akun Anda Aktif
-                        </span>
-                    </div>
                 @endif
 
-                {{-- 2. Barang --}}
+                {{-- 2. Karyawan Pelaksana --}}
+                <div class="mb-4 p-3 bg-light rounded border">
+                    <label class="form-label fw-bold" for="auth_karyawan_id">
+                        {{ auth()->user()->is_admin ? '2.' : '1.' }} Karyawan yang Mengerjakan <span class="text-danger">*</span>
+                    </label>
+                    <p class="text-muted small mb-2">
+                        @if (auth()->user()->is_admin)
+                            Pilih karyawan pelaksana pengerjaan barang:
+                        @else
+                            Pilih nama karyawan dalam subcon <strong>{{ $subcon->nama_lokasi ?? auth()->user()->name }}</strong>:
+                        @endif
+                    </p>
+
+                    <select class="form-select form-select-lg" name="karyawan_id" id="auth_karyawan_id" required>
+                        <option value="">-- Pilih Karyawan --</option>
+                        @foreach ($karyawanList as $k)
+                            <option value="{{ $k->id }}" {{ old('karyawan_id') == $k->id ? 'selected' : '' }}>
+                                {{ $k->nama_karyawan }} ({{ $k->no_karyawan }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- 3. Barang yang Dikerjakan --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_barang_id">
-                        {{ auth()->user()->is_admin ? '2.' : '1.' }} Barang yang Dikerjakan <span
-                            class="text-danger">*</span>
+                        {{ auth()->user()->is_admin ? '3.' : '2.' }} Barang yang Dikerjakan <span class="text-danger">*</span>
                     </label>
-                    <p class="text-muted small mb-2">Pilih kode / nama barang yang dikerjakan dari master barang:</p>
+                    <p class="text-muted small mb-2">Pilih kode / nama barang yang dikerjakan:</p>
 
                     <select class="form-select form-select-lg" name="barang_id" id="auth_barang_id" required>
                         <option value="">-- Pilih Barang --</option>
@@ -90,25 +102,7 @@
                     </select>
                 </div>
 
-                {{-- 3. Lokasi Subcon --}}
-                <div class="mb-4 p-3 bg-light rounded border">
-                    <label class="form-label fw-bold" for="auth_lokasi_subcon_id">
-                        {{ auth()->user()->is_admin ? '3.' : '2.' }} Lokasi Subcon <span class="text-danger">*</span>
-                    </label>
-                    <p class="text-muted small mb-2">Pilih lokasi tempat pengerjaan barang dilakukan:</p>
-
-                    <select class="form-select form-select-lg" name="lokasi_subcon_id" id="auth_lokasi_subcon_id" required>
-                        <option value="">-- Pilih Lokasi Subcon --</option>
-                        @foreach ($lokasiList as $l)
-                            <option value="{{ $l->id }}"
-                                {{ old('lokasi_subcon_id', $currentKaryawan?->last_lokasi_id) == $l->id ? 'selected' : '' }}>
-                                {{ $l->nama_lokasi }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                {{-- 4. Tanggal --}}
+                {{-- 4. Tanggal Pengerjaan --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_tanggal">
                         {{ auth()->user()->is_admin ? '4.' : '3.' }} Tanggal Pengerjaan <span class="text-danger">*</span>
@@ -121,11 +115,10 @@
                         ({{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}).</small>
                 </div>
 
-                {{-- 5. Jumlah --}}
+                {{-- 5. Jumlah Pengerjaan Selesai --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_jumlah">
-                        {{ auth()->user()->is_admin ? '5.' : '4.' }} Jumlah Barang Selesai (Unit) <span
-                            class="text-danger">*</span>
+                        {{ auth()->user()->is_admin ? '5.' : '4.' }} Jumlah Barang Selesai (Unit) <span class="text-danger">*</span>
                     </label>
                     <p class="text-muted small mb-2">Masukkan kuantitas unit produk yang berhasil diselesaikan:</p>
 
@@ -176,21 +169,11 @@
 
     <script>
         $(document).ready(function() {
-            // Inisialisasi Select2: Search dulu baru muncul pilihan
             $('#auth_karyawan_id, #auth_barang_id, #auth_lokasi_subcon_id').select2({
                 theme: 'bootstrap-5',
                 width: '100%',
-                minimumInputLength: 1,
-                language: {
-                    inputTooShort: function() {
-                        return "Ketik minimal 1 huruf/angka untuk mencari...";
-                    },
-                    noResults: function() {
-                        return "Tidak ditemukan data yang cocok";
-                    },
-                    searching: function() {
-                        return "Mencari data...";
-                    }
+                placeholder: function() {
+                    return $(this).data('placeholder') || 'Pilih data...';
                 }
             });
 
@@ -199,15 +182,6 @@
                 setTimeout(() => {
                     document.querySelector('.select2-search__field')?.focus();
                 }, 50);
-            });
-
-            // Auto-fill Lokasi saat Karyawan dipilih (Admin)
-            $('#auth_karyawan_id').on('change', function() {
-                const selectedOpt = $(this).find(':selected');
-                const lastLokasi = selectedOpt.data('lastlokasi');
-                if (lastLokasi) {
-                    $('#auth_lokasi_subcon_id').val(lastLokasi).trigger('change');
-                }
             });
         });
     </script>

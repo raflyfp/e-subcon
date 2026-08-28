@@ -5,6 +5,7 @@
                 <th>No</th>
                 <th>No. Karyawan</th>
                 <th>Nama Karyawan</th>
+                <th>Penempatan Subcon</th>
                 <th>Telepon</th>
                 <th class="no-export">Action</th>
             </tr>
@@ -15,7 +16,16 @@
                     style="{{ $item->is_active == 0 ? 'background-color: #ffeef0 !important; color: #b02a37 !important;' : '' }}">
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $item->no_karyawan }}</td>
-                    <td>{{ $item->nama_karyawan }}</td>
+                    <td class="text-start fw-bold">{{ $item->nama_karyawan }}</td>
+                    <td>
+                        @if ($item->lokasiSubcon)
+                            <span class="badge bg-primary-subtle text-primary border">
+                                <i class="ti ti-building me-1"></i>{{ $item->lokasiSubcon->nama_lokasi }}
+                            </span>
+                        @else
+                            <span class="badge bg-secondary-subtle text-secondary border">Belum Ditempatkan</span>
+                        @endif
+                    </td>
                     <td>{{ $item->telepon ?? '-' }}</td>
                     <td class="no-export">
                         <div class="d-flex gap-2 justify-content-center">
@@ -24,7 +34,7 @@
                                 data-id="{{ $item->id }}"
                                 data-no_karyawan="{{ $item->no_karyawan }}"
                                 data-nama="{{ $item->nama_karyawan }}"
-                                data-username="{{ $item->username }}"
+                                data-lokasi_subcon_id="{{ $item->lokasi_subcon_id }}"
                                 data-telepon="{{ $item->telepon }}"
                                 data-is_active="{{ $item->is_active }}"
                                 title="Edit Karyawan">
@@ -43,7 +53,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="text-center">Data karyawan kosong</td>
+                    <td colspan="6" class="text-center">Data karyawan kosong</td>
                 </tr>
             @endforelse
         </tbody>
@@ -81,7 +91,7 @@
             $('#formUpdate').attr('action', "{{ url('master-karyawan') }}/" + id);
             $('#no_karyawan_update').val($(this).data('no_karyawan'));
             $('#nama_update').val($(this).data('nama'));
-            $('#username_update').val($(this).data('username'));
+            $('#lokasi_subcon_update').val($(this).data('lokasi_subcon_id'));
             $('#telepon_update').val($(this).data('telepon'));
         });
 

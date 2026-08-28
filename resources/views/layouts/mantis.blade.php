@@ -73,12 +73,14 @@
     </div>
     <!-- [ Pre-loader ] End -->
     @php
-        // Cek status keaktifan user yang sedang login: jika status karyawan is_active = 0, maka akun ditangguhkan (suspend)
+        // Cek status keaktifan user yang sedang login: jika status subcon is_active = 0, maka akun ditangguhkan (suspend)
         $isSuspended =
             auth()->check() &&
             !auth()->user()->is_admin &&
-            auth()->user()->karyawan &&
-            auth()->user()->karyawan->is_active == 0;
+            (
+                (auth()->user()->lokasiSubcon && auth()->user()->lokasiSubcon->is_active == 0) ||
+                (auth()->user()->karyawan && auth()->user()->karyawan->is_active == 0)
+            );
     @endphp
 
     @if ($isSuspended)

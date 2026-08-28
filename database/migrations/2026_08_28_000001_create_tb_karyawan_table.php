@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('tb_karyawan', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('tb_user')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('tb_user')->onDelete('cascade');
             $table->string('no_karyawan', 50)->unique();
             $table->string('telepon', 20)->nullable();
             $table->boolean('is_active')->default(true);

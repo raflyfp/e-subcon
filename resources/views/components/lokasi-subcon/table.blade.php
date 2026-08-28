@@ -3,18 +3,37 @@
         <thead>
             <tr class="text-center">
                 <th>No</th>
-                <th>Nama Lokasi</th>
+                <th>Nama Subcon</th>
+                <th>Akun Login (Username)</th>
                 <th>Alamat</th>
+                <th>Barang Dikerjakan</th>
                 <th class="no-export">Action</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($lokasi as $item)
+                @php
+                    $barangIds = $item->barang->pluck('id')->toArray();
+                @endphp
                 <tr class="text-center {{ !$item->is_active ? 'inactive-row' : '' }}"
                     style="{{ !$item->is_active ? 'background-color: #ffeef0 !important; color: #b02a37 !important;' : '' }}">
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $item->nama_lokasi }}</td>
+                    <td class="fw-bold text-start">{{ $item->nama_lokasi }}</td>
+                    <td>
+                        @if ($item->user)
+                            <span class="badge bg-primary-subtle text-primary border px-2 py-1">
+                                <i class="ti ti-user me-1"></i>{{ $item->user->username }}
+                            </span>
+                        @else
+                            <span class="badge bg-warning-subtle text-warning border">Belum ada akun</span>
+                        @endif
+                    </td>
                     <td class="text-start">{{ $item->alamat ?? '-' }}</td>
+                    <td>
+                        <span class="badge bg-info-subtle text-info border">
+                            {{ count($barangIds) }} Barang
+                        </span>
+                    </td>
                     <td class="no-export">
                         <div class="d-flex gap-2 justify-content-center">
                             <button type="button" class="btn btn-warning btn-sm btn-edit-lokasi" data-bs-toggle="modal"
@@ -22,6 +41,8 @@
                                 data-id="{{ $item->id }}"
                                 data-nama="{{ $item->nama_lokasi }}"
                                 data-alamat="{{ $item->alamat }}"
+                                data-username="{{ $item->user?->username ?? '' }}"
+                                data-barangids="{{ json_encode($barangIds) }}"
                                 title="Edit Lokasi">
                                 <i class="ti ti-pencil"></i>
                             </button>
@@ -38,7 +59,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="text-center">Data lokasi subcon kosong</td>
+                    <td colspan="6" class="text-center">Data lokasi subcon kosong</td>
                 </tr>
             @endforelse
         </tbody>
@@ -76,6 +97,16 @@
             $('#formUpdateLokasi').attr('action', "{{ url('master-lokasi-subcon') }}/" + id);
             $('#nama_lokasi_update').val($(this).data('nama'));
             $('#alamat_update').val($(this).data('alamat'));
+            $('#username_update').val($(this).data('username'));
+            $('#password_update').val('');
+
+            let barangIds = $(this).data('barangids') || [];
+            $('.chk-barang-update').prop('checked', false);
+            if (Array.isArray(barangIds)) {
+                barangIds.forEach(function(bid) {
+                    $('#brg_edit_' + bid).prop('checked', true);
+                });
+            }
         });
 
         // Toggle status
