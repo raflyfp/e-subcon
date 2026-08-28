@@ -130,6 +130,7 @@ class PengerjaanController extends Controller
         $rules = [
             'karyawan_id'      => 'required|exists:tb_karyawan,id',
             'barang_id'        => 'required|exists:tb_barang,id',
+            'jenis_pekerjaan'  => 'nullable|string|max:100',
             'tanggal'          => 'required|date',
             'jumlah'           => 'required|integer|min:1',
             'keterangan'       => 'nullable|string',
@@ -153,6 +154,7 @@ class PengerjaanController extends Controller
                 'karyawan_id'      => $request->karyawan_id,
                 'barang_id'        => $request->barang_id,
                 'lokasi_subcon_id' => $lokasiSubconId,
+                'jenis_pekerjaan'  => $request->jenis_pekerjaan,
                 'tanggal'          => $request->tanggal,
                 'jumlah'           => $request->jumlah,
                 'keterangan'       => $request->keterangan,
@@ -193,6 +195,7 @@ class PengerjaanController extends Controller
                 ->select(
                     'p.id',
                     'p.tanggal',
+                    'p.jenis_pekerjaan',
                     'k.nama_karyawan',
                     'k.no_karyawan',
                     'b.kode_barang',

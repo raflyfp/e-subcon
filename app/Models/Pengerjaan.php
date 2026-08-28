@@ -12,6 +12,7 @@ class Pengerjaan extends Model
         'karyawan_id',
         'barang_id',
         'lokasi_subcon_id',
+        'jenis_pekerjaan',
         'tanggal',
         'jumlah',
         'keterangan',

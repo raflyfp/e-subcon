@@ -213,12 +213,13 @@
                                             <tr class="text-center"
                                                 style="background-color: #f8fafc; color: #0f172a; font-weight: 600; border-color: #94a3b8;">
                                                 <th style="width: 45px; border: 1px solid #94a3b8;">No</th>
-                                                <th style="width: 120px; border: 1px solid #94a3b8;">Tanggal</th>
+                                                <th style="width: 110px; border: 1px solid #94a3b8;">Tanggal</th>
                                                 @if (auth()->user()->is_admin)
                                                     <th style="border: 1px solid #94a3b8;">Karyawan</th>
                                                 @endif
                                                 <th style="border: 1px solid #94a3b8;">Lokasi Subcon</th>
-                                                <th style="width: 160px; border: 1px solid #94a3b8;">Jumlah Selesai</th>
+                                                <th style="width: 140px; border: 1px solid #94a3b8;">Jenis Pekerjaan</th>
+                                                <th style="width: 150px; border: 1px solid #94a3b8;">Jumlah Selesai</th>
                                                 <th style="border: 1px solid #94a3b8;">Keterangan</th>
                                             </tr>
                                         </thead>
@@ -233,6 +234,13 @@
                                                             {{ $item->nama_karyawan }} ({{ $item->no_karyawan }})</td>
                                                     @endif
                                                     <td style="border: 1px solid #cbd5e1;">{{ $item->nama_lokasi }}</td>
+                                                    <td class="text-center" style="border: 1px solid #cbd5e1;">
+                                                        @if ($item->jenis_pekerjaan)
+                                                            <span class="badge bg-light text-dark border px-2 py-1">{{ $item->jenis_pekerjaan }}</span>
+                                                        @else
+                                                            <span class="text-muted">-</span>
+                                                        @endif
+                                                    </td>
                                                     <td class="text-end fw-bold text-dark pe-3"
                                                         style="border: 1px solid #cbd5e1;">
                                                         {{ number_format($item->jumlah, 0, ',', '.') }} {{ $item->satuan ?? $satuan }}
@@ -245,7 +253,7 @@
                                         <tfoot>
                                             <tr class="fw-bold"
                                                 style="background-color: #f1f5f9; border: 1px solid #94a3b8;">
-                                                <td colspan="{{ auth()->user()->is_admin ? 4 : 3 }}"
+                                                <td colspan="{{ auth()->user()->is_admin ? 5 : 4 }}"
                                                     class="text-end pe-3">
                                                     Total Subtotal :</td>
                                                 <td class="text-end fw-bold text-primary pe-3">
@@ -442,11 +450,11 @@
 
             const reportHeaderHtml = `
                 <table border="0">
-                    <tr><td colspan="6" style="font-size:16px; font-weight:bold;">e-Subcon — PT. Sinaraya Nugraha</td></tr>
-                    <tr><td colspan="6" style="font-size:14px; font-weight:bold;">Laporan Pengerjaan Barang Subcon</td></tr>
-                    <tr><td colspan="6" style="font-size:12px; font-weight:bold;">Periode: ` + tglMulai + ` s/d ` +
+                    <tr><td colspan="7" style="font-size:16px; font-weight:bold;">e-Subcon — PT. Sinaraya Nugraha</td></tr>
+                    <tr><td colspan="7" style="font-size:14px; font-weight:bold;">Laporan Pengerjaan Barang Subcon</td></tr>
+                    <tr><td colspan="7" style="font-size:12px; font-weight:bold;">Periode: ` + tglMulai + ` s/d ` +
                 tglAkhir + `</td></tr>
-                    <tr><td colspan="6"></td></tr>
+                    <tr><td colspan="7"></td></tr>
                 </table>
             `;
 
@@ -459,7 +467,7 @@
                     tablesHtml +=
                         `
                         <table border="0">
-                            <tr><td colspan="6" style="background-color:#e0f2fe; font-size:13px; font-weight:bold; color:#0369a1; border:0.5pt solid #94a3b8;">` +
+                            <tr><td colspan="7" style="background-color:#e0f2fe; font-size:13px; font-weight:bold; color:#0369a1; border:0.5pt solid #94a3b8;">` +
                         headerText + `</td></tr>
                         </table>
                     ` + table.outerHTML + `<br/>`;

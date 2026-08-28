@@ -102,10 +102,32 @@
                     </select>
                 </div>
 
-                {{-- 4. Tanggal Pengerjaan --}}
+                {{-- 4. Jenis Pekerjaan --}}
+                <div class="mb-4 p-3 bg-light rounded border">
+                    <label class="form-label fw-bold" for="auth_jenis_pekerjaan">
+                        {{ auth()->user()->is_admin ? '4.' : '3.' }} Jenis Pekerjaan
+                    </label>
+                    <p class="text-muted small mb-2">Masukkan jenis proses / aktivitas pekerjaan (opsional):</p>
+
+                    <input type="text" class="form-control form-control-lg" name="jenis_pekerjaan" id="auth_jenis_pekerjaan"
+                        placeholder="Contoh: Assembling, Finishing, Cutting, Sewing, Packing..." value="{{ old('jenis_pekerjaan') }}"
+                        list="jenisPekerjaanList">
+                    <datalist id="jenisPekerjaanList">
+                        <option value="Assembling">
+                        <option value="Finishing">
+                        <option value="Cutting">
+                        <option value="Sewing">
+                        <option value="Polishing">
+                        <option value="Packaging">
+                        <option value="Quality Check">
+                        <option value="Repair / Rework">
+                    </datalist>
+                </div>
+
+                {{-- 5. Tanggal Pengerjaan --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_tanggal">
-                        {{ auth()->user()->is_admin ? '4.' : '3.' }} Tanggal Pengerjaan <span class="text-danger">*</span>
+                        {{ auth()->user()->is_admin ? '5.' : '4.' }} Tanggal Pengerjaan <span class="text-danger">*</span>
                     </label>
                     <p class="text-muted small mb-2">Tanggal pengerjaan otomatis terisi hari ini:</p>
 
@@ -115,10 +137,10 @@
                         ({{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}).</small>
                 </div>
 
-                {{-- 5. Jumlah Pengerjaan Selesai --}}
+                {{-- 6. Jumlah Pengerjaan Selesai --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_jumlah">
-                        {{ auth()->user()->is_admin ? '5.' : '4.' }} Jumlah Barang Selesai <span id="label_satuan_text" class="text-primary">(PCS)</span> <span class="text-danger">*</span>
+                        {{ auth()->user()->is_admin ? '6.' : '5.' }} Jumlah Barang Selesai <span id="label_satuan_text" class="text-primary">(PCS)</span> <span class="text-danger">*</span>
                     </label>
                     <p class="text-muted small mb-2">Masukkan kuantitas produk yang berhasil diselesaikan:</p>
 
@@ -130,10 +152,10 @@
                     </div>
                 </div>
 
-                {{-- 6. Keterangan --}}
+                {{-- 7. Keterangan --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_keterangan">
-                        {{ auth()->user()->is_admin ? '6.' : '5.' }} Catatan / Keterangan (Opsional)
+                        {{ auth()->user()->is_admin ? '7.' : '6.' }} Catatan / Keterangan (Opsional)
                     </label>
                     <p class="text-muted small mb-2">Tuliskan keterangan tambahan bila ada kendala atau catatan khusus:</p>
 
