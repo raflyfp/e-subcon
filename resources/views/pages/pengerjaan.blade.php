@@ -6,7 +6,6 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="content mb-1">Formulir Pengerjaan Barang</h1>
-            <p class="text-muted mb-0">Catat hasil pengerjaan barang harian dengan cepat dan akurat</p>
         </div>
         <div>
             <a href="{{ url('laporan-subcon') }}" class="btn btn-outline-primary">
@@ -46,14 +45,12 @@
                             1. Karyawan yang Mengerjakan <span class="text-danger">*</span>
                         </label>
                         <p class="text-muted small mb-2">Pilih karyawan yang bertanggung jawab atas pengerjaan ini:</p>
-                        
+
                         <select class="form-select form-select-lg" name="karyawan_id" id="auth_karyawan_id" required>
                             <option value="">-- Pilih Karyawan --</option>
                             @foreach ($karyawanList as $k)
-                                <option value="{{ $k->id }}"
-                                    data-nama="{{ $k->nama_karyawan }}"
-                                    data-nokaryawan="{{ $k->no_karyawan }}"
-                                    data-lastlokasi="{{ $k->last_lokasi_id }}"
+                                <option value="{{ $k->id }}" data-nama="{{ $k->nama_karyawan }}"
+                                    data-nokaryawan="{{ $k->no_karyawan }}" data-lastlokasi="{{ $k->last_lokasi_id }}"
                                     {{ old('karyawan_id') == $k->id ? 'selected' : '' }}>
                                     {{ $k->nama_karyawan }} ({{ $k->no_karyawan }})
                                 </option>
@@ -78,7 +75,8 @@
                 {{-- 2. Barang --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_barang_id">
-                        {{ auth()->user()->is_admin ? '2.' : '1.' }} Barang yang Dikerjakan <span class="text-danger">*</span>
+                        {{ auth()->user()->is_admin ? '2.' : '1.' }} Barang yang Dikerjakan <span
+                            class="text-danger">*</span>
                     </label>
                     <p class="text-muted small mb-2">Pilih kode / nama barang yang dikerjakan dari master barang:</p>
 
@@ -119,19 +117,22 @@
 
                     <input type="date" class="form-control form-control-lg" name="tanggal" id="auth_tanggal"
                         value="{{ date('Y-m-d') }}" readonly style="background-color: #f1f5f9; cursor: not-allowed;">
-                    <small class="text-muted mt-2 d-block"><i class="ti ti-lock me-1"></i>Tanggal terkunci otomatis hari ini ({{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}).</small>
+                    <small class="text-muted mt-2 d-block"><i class="ti ti-lock me-1"></i>Tanggal terkunci otomatis hari ini
+                        ({{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}).</small>
                 </div>
 
                 {{-- 5. Jumlah --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_jumlah">
-                        {{ auth()->user()->is_admin ? '5.' : '4.' }} Jumlah Barang Selesai (Unit) <span class="text-danger">*</span>
+                        {{ auth()->user()->is_admin ? '5.' : '4.' }} Jumlah Barang Selesai (Unit) <span
+                            class="text-danger">*</span>
                     </label>
                     <p class="text-muted small mb-2">Masukkan kuantitas unit produk yang berhasil diselesaikan:</p>
 
                     <div class="input-group input-group-lg">
                         <input type="number" class="form-control form-control-lg" name="jumlah" id="auth_jumlah"
-                            min="1" placeholder="Masukkan jumlah unit (contoh: 50)" value="{{ old('jumlah') }}" required>
+                            min="1" placeholder="Masukkan jumlah unit (contoh: 50)" value="{{ old('jumlah') }}"
+                            required>
                         <span class="input-group-text bg-white fw-bold text-muted">Unit / Pcs</span>
                     </div>
                 </div>
@@ -169,7 +170,8 @@
 @push('scripts')
     <!-- Select2 CSS & JS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
@@ -208,8 +210,6 @@
                 }
             });
         });
-
-
     </script>
 
     @if (session('success'))

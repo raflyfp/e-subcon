@@ -8,11 +8,11 @@
             <h1 class="content mb-1">Laporan Subcon</h1>
             <p class="text-muted mb-0">Laporan rekapitulasi data pengerjaan barang subcon</p>
         </div>
-        <div>
+        {{-- <div>
             <a href="{{ url('pengerjaan') }}" class="btn btn-outline-primary btn-sm">
                 <i class="ti ti-edit me-1"></i> Formulir Pengerjaan
             </a>
-        </div>
+        </div> --}}
     </div>
 
     <div class="row g-4">
@@ -140,7 +140,17 @@
                             </span> --}}
                         </div>
 
-                        <div class="d-flex gap-2">
+                        <div class="d-flex gap-2 align-items-center">
+                            {{-- Tombol Navigasi Scroll --}}
+                            {{-- <div class="btn-group btn-group-sm me-1">
+                                <button type="button" class="btn btn-outline-secondary fw-semibold" onclick="scrollToTop()" title="Scroll ke Atas">
+                                    <i class="ti ti-arrow-up me-1"></i> Atas
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary fw-semibold" onclick="scrollToBottom()" title="Scroll ke Bawah">
+                                    <i class="ti ti-arrow-down me-1"></i> Bawah
+                                </button>
+                            </div> --}}
+
                             {{-- Tombol Print --}}
                             <button type="button" class="btn btn-outline-dark btn-sm fw-semibold"
                                 onclick="printReportSheet()">
@@ -158,125 +168,126 @@
                     </div>
                 </div>
 
-                {{-- Lembar Dokumen Laporan (Printable & Exportable Sheet) --}}
-                <div class="card border bg-white shadow-sm p-4 p-md-5" id="printable-report-sheet"
-                    style="min-height: 600px; color: #000;">
+                {{-- Frame Container Hasil Laporan dengan Scroll Internal --}}
+                <div class="report-scroll-frame border rounded bg-white shadow-sm" id="reportViewerFrame"
+                    style="max-height: 70vh; overflow-y: auto; overflow-x: auto; position: relative;">
+                    <div class="p-4 p-md-5" id="printable-report-sheet" style="color: #000; min-width: 680px;">
 
-                    {{-- Header Dokumen Laporan --}}
-                    <div class="report-header mb-4 pb-2 border-bottom">
-                        <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.02em;">PT. Sinaraya
-                            Nugraha</h4>
-                        <h5 class="fw-bold mb-1 text-dark">Laporan Pengerjaan Barang Subcon</h5>
-                        <div class="fw-bold text-dark fs-6 mb-2">
-                            Periode : {{ $tanggalMulai ? \Carbon\Carbon::parse($tanggalMulai)->format('Y-m-d') : 'Awal' }}
-                            s/d {{ $tanggalAkhir ? \Carbon\Carbon::parse($tanggalAkhir)->format('Y-m-d') : 'Sekarang' }}
-                        </div>
-                        <div class="small fw-semibold text-secondary pt-1">
-                            <span><strong>Barang :</strong>
-                                {{ $selectedBarangObj ? '[' . $selectedBarangObj->kode_barang . '] ' . $selectedBarangObj->nama_barang : 'SEMUA BARANG' }}</span>
-                            <span class="mx-2">|</span>
-                            <span><strong>Lokasi :</strong>
-                                {{ $selectedLokasiObj ? $selectedLokasiObj->nama_lokasi : 'SEMUA LOKASI' }}</span>
-                            @if (auth()->user()->is_admin)
+                        {{-- Header Dokumen Laporan --}}
+                        <div class="report-header mb-4 pb-2 border-bottom">
+                            <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.02em;">PT. Sinaraya Nugraha</h4>
+                            <h5 class="fw-bold mb-1 text-dark">Laporan Pengerjaan Barang Subcon</h5>
+                            <div class="fw-bold text-dark fs-6 mb-2">
+                                Periode :
+                                {{ $tanggalMulai ? \Carbon\Carbon::parse($tanggalMulai)->format('Y-m-d') : 'Awal' }}
+                                s/d
+                                {{ $tanggalAkhir ? \Carbon\Carbon::parse($tanggalAkhir)->format('Y-m-d') : 'Sekarang' }}
+                            </div>
+                            <div class="small fw-semibold text-secondary pt-1">
+                                <span><strong>Barang :</strong>
+                                    {{ $selectedBarangObj ? '[' . $selectedBarangObj->kode_barang . '] ' . $selectedBarangObj->nama_barang : 'SEMUA BARANG' }}</span>
                                 <span class="mx-2">|</span>
-                                <span><strong>Karyawan :</strong>
-                                    {{ $selectedKaryawanObj ? $selectedKaryawanObj->nama_karyawan . ' (' . $selectedKaryawanObj->no_karyawan . ')' : 'SEMUA KARYAWAN' }}</span>
-                            @endif
+                                <span><strong>Lokasi :</strong>
+                                    {{ $selectedLokasiObj ? $selectedLokasiObj->nama_lokasi : 'SEMUA LOKASI' }}</span>
+                                @if (auth()->user()->is_admin)
+                                    <span class="mx-2">|</span>
+                                    <span><strong>Karyawan :</strong>
+                                        {{ $selectedKaryawanObj ? $selectedKaryawanObj->nama_karyawan . ' (' . $selectedKaryawanObj->no_karyawan . ')' : 'SEMUA KARYAWAN' }}</span>
+                                @endif
+                            </div>
                         </div>
-                    </div>
 
-                    {{-- Tabel-Tabel Terpisah Per Kode Barang --}}
-                    @php
-                        $groupedPengerjaan = $pengerjaan->groupBy('kode_barang');
-                    @endphp
-
-                    @forelse ($groupedPengerjaan as $kodeBarang => $items)
+                        {{-- Tabel-Tabel Terpisah Per Kode Barang --}}
                         @php
-                            $firstItem = $items->first();
-                            $subtotal = $items->sum('jumlah');
+                            $groupedPengerjaan = $pengerjaan->groupBy('kode_barang');
                         @endphp
 
-                        <div class="barang-report-block mb-4" style="page-break-inside: avoid;">
-                            {{-- Header Tabel Per Barang --}}
-                            <div class="d-flex justify-content-between align-items-center px-3 py-2 border rounded-top"
-                                style="background-color: #e0f2fe; color: #0369a1; font-weight: 700; border-color: #94a3b8 !important;">
-                                <div>
-                                    <i class="ti ti-package me-1"></i>
-                                    <span class="fs-6">[{{ $kodeBarang }}] {{ $firstItem->nama_barang }}</span>
+                        @forelse ($groupedPengerjaan as $kodeBarang => $items)
+                            @php
+                                $firstItem = $items->first();
+                                $subtotal = $items->sum('jumlah');
+                            @endphp
+
+                            <div class="barang-report-block mb-4" style="page-break-inside: avoid;">
+                                {{-- Header Tabel Per Barang --}}
+                                <div class="d-flex justify-content-between align-items-center px-3 py-2 border rounded-top"
+                                    style="background-color: #e0f2fe; color: #0369a1; font-weight: 700; border-color: #94a3b8 !important;">
+                                    <div>
+                                        <i class="ti ti-package me-1"></i>
+                                        <span class="fs-6">[{{ $kodeBarang }}] {{ $firstItem->nama_barang }}</span>
+                                    </div>
                                 </div>
-                                {{-- <div class="text-end">
-                                    <span class="badge bg-primary px-2 py-1 fs-6">Total: {{ number_format($subtotal, 0, ',', '.') }} Unit</span>
-                                    <span class="badge bg-secondary px-2 py-1 fs-6 ms-1">{{ $items->count() }} Data</span>
-                                </div> --}}
-                            </div>
 
-                            {{-- Tabel Rincian Data untuk Barang Ini --}}
-                            <div class="table-responsive">
-                                <table class="table table-bordered align-middle w-100 report-table mb-0"
-                                    style="border-color: #94a3b8; font-size: 0.92rem; border-top: 0;">
-                                    <thead>
-                                        <tr class="text-center"
-                                            style="background-color: #f8fafc; color: #0f172a; font-weight: 600; border-color: #94a3b8;">
-                                            <th style="width: 45px; border: 1px solid #94a3b8;">No</th>
-                                            <th style="width: 120px; border: 1px solid #94a3b8;">Tanggal</th>
-                                            @if (auth()->user()->is_admin)
-                                                <th style="border: 1px solid #94a3b8;">Karyawan</th>
-                                            @endif
-                                            <th style="border: 1px solid #94a3b8;">Lokasi Subcon</th>
-                                            <th style="width: 140px; border: 1px solid #94a3b8;">Jumlah Selesai</th>
-                                            <th style="border: 1px solid #94a3b8;">Keterangan</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($items as $item)
-                                            <tr class="text-center" style="border: 1px solid #cbd5e1;">
-                                                <td style="border: 1px solid #cbd5e1;">{{ $loop->iteration }}</td>
-                                                <td style="border: 1px solid #cbd5e1;">
-                                                    {{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y') }}</td>
+                                {{-- Tabel Rincian Data untuk Barang Ini --}}
+                                <div class="table-responsive">
+                                    <table class="table table-bordered align-middle w-100 report-table mb-0"
+                                        style="border-color: #94a3b8; font-size: 0.92rem; border-top: 0;">
+                                        <thead>
+                                            <tr class="text-center"
+                                                style="background-color: #f8fafc; color: #0f172a; font-weight: 600; border-color: #94a3b8;">
+                                                <th style="width: 45px; border: 1px solid #94a3b8;">No</th>
+                                                <th style="width: 120px; border: 1px solid #94a3b8;">Tanggal</th>
                                                 @if (auth()->user()->is_admin)
-                                                    <td class="text-start" style="border: 1px solid #cbd5e1;">
-                                                        {{ $item->nama_karyawan }} ({{ $item->no_karyawan }})</td>
+                                                    <th style="border: 1px solid #94a3b8;">Karyawan</th>
                                                 @endif
-                                                <td style="border: 1px solid #cbd5e1;">{{ $item->nama_lokasi }}</td>
-                                                <td class="text-end fw-bold text-dark pe-3"
-                                                    style="border: 1px solid #cbd5e1;">
-                                                    {{ number_format($item->jumlah, 0, ',', '.') }} Unit
-                                                </td>
-                                                <td class="text-start" style="border: 1px solid #cbd5e1;">
-                                                    {{ $item->keterangan ?: '-' }}</td>
+                                                <th style="border: 1px solid #94a3b8;">Lokasi Subcon</th>
+                                                <th style="width: 140px; border: 1px solid #94a3b8;">Jumlah Selesai</th>
+                                                <th style="border: 1px solid #94a3b8;">Keterangan</th>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                    <tfoot>
-                                        <tr class="fw-bold" style="background-color: #f1f5f9; border: 1px solid #94a3b8;">
-                                            <td colspan="{{ auth()->user()->is_admin ? 4 : 3 }}" class="text-end pe-3">
-                                                Total :</td>
-                                            <td class="text-end fw-bold text-primary pe-3">
-                                                {{ number_format($subtotal, 0, ',', '.') }} Unit</td>
-                                            <td style="border: 1px solid #94a3b8;"></td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($items as $item)
+                                                <tr class="text-center" style="border: 1px solid #cbd5e1;">
+                                                    <td style="border: 1px solid #cbd5e1;">{{ $loop->iteration }}</td>
+                                                    <td style="border: 1px solid #cbd5e1;">
+                                                        {{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y') }}</td>
+                                                    @if (auth()->user()->is_admin)
+                                                        <td class="text-start" style="border: 1px solid #cbd5e1;">
+                                                            {{ $item->nama_karyawan }} ({{ $item->no_karyawan }})</td>
+                                                    @endif
+                                                    <td style="border: 1px solid #cbd5e1;">{{ $item->nama_lokasi }}</td>
+                                                    <td class="text-end fw-bold text-dark pe-3"
+                                                        style="border: 1px solid #cbd5e1;">
+                                                        {{ number_format($item->jumlah, 0, ',', '.') }} Unit
+                                                    </td>
+                                                    <td class="text-start" style="border: 1px solid #cbd5e1;">
+                                                        {{ $item->keterangan ?: '-' }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="fw-bold"
+                                                style="background-color: #f1f5f9; border: 1px solid #94a3b8;">
+                                                <td colspan="{{ auth()->user()->is_admin ? 4 : 3 }}"
+                                                    class="text-end pe-3">
+                                                    Total :</td>
+                                                <td class="text-end fw-bold text-primary pe-3">
+                                                    {{ number_format($subtotal, 0, ',', '.') }} Unit</td>
+                                                <td style="border: 1px solid #94a3b8;"></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="text-center py-5 text-muted border rounded p-4 bg-light">
+                                <i class="ti ti-alert-circle fs-2 d-block mb-2 text-secondary"></i>
+                                Tidak ada data pengerjaan barang pada periode / filter ini.
+                            </div>
+                        @endforelse
+
+                        {{-- Footer Lembar Laporan --}}
+                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 text-muted small"
+                            style="border-top: 1px dashed #cbd5e1;">
+                            <div>
+                                Dicetak oleh: <strong>{{ auth()->user()->name }}</strong>
+                            </div>
+                            <div>
+                                Waktu cetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB
                             </div>
                         </div>
-                    @empty
-                        <div class="text-center py-5 text-muted border rounded p-4 bg-light">
-                            <i class="ti ti-alert-circle fs-2 d-block mb-2 text-secondary"></i>
-                            Tidak ada data pengerjaan barang pada periode / filter ini.
-                        </div>
-                    @endforelse
 
-                    {{-- Footer Lembar Laporan --}}
-                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 text-muted small"
-                        style="border-top: 1px dashed #cbd5e1;">
-                        <div>
-                            Dicetak oleh: <strong>{{ auth()->user()->name }}</strong>
-                        </div>
-                        <div>
-                            Waktu cetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB
-                        </div>
                     </div>
-
                 </div>
             @endif
 
@@ -284,8 +295,27 @@
 
     </div>
 
-    {{-- CSS Khusus untuk Print Media --}}
+    {{-- Styling Scroll Frame & Print Media --}}
     <style>
+        .report-scroll-frame::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .report-scroll-frame::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .report-scroll-frame::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .report-scroll-frame::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
         @media print {
             body {
                 background: #ffffff !important;
@@ -315,9 +345,12 @@
                 flex: 0 0 100% !important;
             }
 
-            .card {
+            .card,
+            .report-scroll-frame {
                 border: none !important;
                 box-shadow: none !important;
+                max-height: none !important;
+                overflow: visible !important;
                 padding: 0 !important;
             }
 
@@ -325,6 +358,7 @@
                 border: none !important;
                 box-shadow: none !important;
                 padding: 0 !important;
+                min-width: auto !important;
             }
 
             .barang-report-block {
@@ -366,6 +400,37 @@
                 width: '100%'
             });
         });
+
+        // Scroll Navigation Functions (Scroll di dalam frame hasil laporan)
+        function scrollToTop() {
+            const frame = document.getElementById('reportViewerFrame');
+            if (frame) {
+                frame.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            } else {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        function scrollToBottom() {
+            const frame = document.getElementById('reportViewerFrame');
+            if (frame) {
+                frame.scrollTo({
+                    top: frame.scrollHeight,
+                    behavior: 'smooth'
+                });
+            } else {
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+        }
 
         // Print Laporan Sheet
         function printReportSheet() {

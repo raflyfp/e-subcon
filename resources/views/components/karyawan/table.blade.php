@@ -24,6 +24,7 @@
                                 data-id="{{ $item->id }}"
                                 data-no_karyawan="{{ $item->no_karyawan }}"
                                 data-nama="{{ $item->nama_karyawan }}"
+                                data-username="{{ $item->username }}"
                                 data-telepon="{{ $item->telepon }}"
                                 data-is_active="{{ $item->is_active }}"
                                 title="Edit Karyawan">
@@ -80,6 +81,7 @@
             $('#formUpdate').attr('action', "{{ url('master-karyawan') }}/" + id);
             $('#no_karyawan_update').val($(this).data('no_karyawan'));
             $('#nama_update').val($(this).data('nama'));
+            $('#username_update').val($(this).data('username'));
             $('#telepon_update').val($(this).data('telepon'));
         });
 
