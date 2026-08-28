@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
+use App\Models\LokasiSubcon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -13,11 +14,14 @@ class MasterBarangController extends Controller
      */
     public function index()
     {
-        $barang = Barang::orderBy('is_active', 'desc')
+        $barang = Barang::with('lokasiSubcon')
+            ->orderBy('is_active', 'desc')
             ->orderBy('nama_barang', 'asc')
             ->get();
 
-        return view('pages.barang', compact('barang'));
+        $subconList = LokasiSubcon::where('is_active', true)->orderBy('nama_lokasi')->get();
+
+        return view('pages.barang', compact('barang', 'subconList'));
     }
 
     /**
@@ -26,14 +30,18 @@ class MasterBarangController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'kode_barang' => 'required|unique:tb_barang,kode_barang',
-            'nama_barang' => 'required|string',
+            'kode_barang'      => 'required|unique:tb_barang,kode_barang',
+            'nama_barang'      => 'required|string|max:255',
+            'satuan'           => 'required|string|max:50',
+            'lokasi_subcon_id' => 'nullable|exists:tb_lokasi_subcon,id',
         ]);
 
         try {
             Barang::create([
-                'kode_barang' => $request->kode_barang,
-                'nama_barang' => $request->nama_barang,
+                'kode_barang'      => $request->kode_barang,
+                'nama_barang'      => $request->nama_barang,
+                'satuan'           => strtoupper(trim($request->satuan)),
+                'lokasi_subcon_id' => $request->lokasi_subcon_id ?: null,
             ]);
 
             return redirect()->back()->with('success', 'Barang berhasil ditambahkan');
@@ -49,14 +57,18 @@ class MasterBarangController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'kode_barang' => 'required|unique:tb_barang,kode_barang,' . $id,
-            'nama_barang' => 'required|string',
+            'kode_barang'      => 'required|unique:tb_barang,kode_barang,' . $id,
+            'nama_barang'      => 'required|string|max:255',
+            'satuan'           => 'required|string|max:50',
+            'lokasi_subcon_id' => 'nullable|exists:tb_lokasi_subcon,id',
         ]);
 
         $barang = Barang::findOrFail($id);
         $barang->update([
-            'kode_barang' => $request->kode_barang,
-            'nama_barang' => $request->nama_barang,
+            'kode_barang'      => $request->kode_barang,
+            'nama_barang'      => $request->nama_barang,
+            'satuan'           => strtoupper(trim($request->satuan)),
+            'lokasi_subcon_id' => $request->lokasi_subcon_id ?: null,
         ]);
 
         return redirect()->back()->with('success', 'Data barang berhasil diupdate');

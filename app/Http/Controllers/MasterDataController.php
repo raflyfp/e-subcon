@@ -16,8 +16,7 @@ class MasterDataController extends Controller
     public function index()
     {
         $user = DB::table('tb_user')
-            ->select('id', 'username', 'name')
-            ->where('is_admin', 0)
+            ->select('id', 'username', 'name', 'is_admin')
             ->orderBy('id', 'asc')
             ->get();
 
@@ -25,18 +24,13 @@ class MasterDataController extends Controller
     }
 
     /**
-     * Data AJAX untuk dropdown user yang belum terdaftar sebagai karyawan
+     * Data AJAX untuk dropdown user
      */
     public function getData()
     {
         return response()->json([
-            'user' => User::select('tb_user.id', 'tb_user.username', 'tb_user.name')
-                ->where('tb_user.is_admin', 0)
-                ->whereNotExists(function ($query) {
-                    $query->select(DB::raw(1))
-                        ->from('tb_karyawan')
-                        ->whereColumn('tb_karyawan.user_id', 'tb_user.id');
-                })
+            'user' => User::select('id', 'username', 'name')
+                ->where('is_admin', 0)
                 ->get(),
         ]);
     }

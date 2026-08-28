@@ -22,13 +22,11 @@ class MasterLokasiSubconController extends Controller
             ->orderBy('nama_lokasi', 'asc')
             ->get();
 
-        $barangList = Barang::where('is_active', true)->orderBy('nama_barang')->get();
-
-        return view('pages.lokasi-subcon', compact('lokasi', 'barangList'));
+        return view('pages.lokasi-subcon', compact('lokasi'));
     }
 
     /**
-     * Tambah lokasi subcon baru beserta Akun Login dan Barang
+     * Tambah lokasi subcon baru beserta Akun Login
      */
     public function store(Request $request)
     {
@@ -37,8 +35,6 @@ class MasterLokasiSubconController extends Controller
             'alamat'      => 'nullable|string',
             'username'    => 'required|string|max:100|unique:tb_user,username',
             'password'    => 'required|string|min:4',
-            'barang_ids'  => 'nullable|array',
-            'barang_ids.*'=> 'exists:tb_barang,id',
         ]);
 
         DB::beginTransaction();
@@ -52,17 +48,12 @@ class MasterLokasiSubconController extends Controller
             ]);
 
             // 2. Buat Lokasi Subcon
-            $lokasi = LokasiSubcon::create([
+            LokasiSubcon::create([
                 'user_id'     => $user->id,
                 'nama_lokasi' => $request->nama_lokasi,
                 'alamat'      => $request->alamat,
                 'is_active'   => true,
             ]);
-
-            // 3. Hubungkan Barang jika dipilih
-            if ($request->has('barang_ids')) {
-                $lokasi->barang()->sync($request->barang_ids);
-            }
 
             DB::commit();
 
@@ -75,7 +66,7 @@ class MasterLokasiSubconController extends Controller
     }
 
     /**
-     * Update data lokasi subcon, akun login, dan barang
+     * Update data lokasi subcon dan akun login
      */
     public function update(Request $request, $id)
     {
@@ -87,8 +78,6 @@ class MasterLokasiSubconController extends Controller
             'alamat'      => 'nullable|string',
             'username'    => 'nullable|string|max:100|unique:tb_user,username,' . ($userId ?? 'NULL'),
             'password'    => 'nullable|string|min:4',
-            'barang_ids'  => 'nullable|array',
-            'barang_ids.*'=> 'exists:tb_barang,id',
         ]);
 
         DB::beginTransaction();
@@ -122,13 +111,6 @@ class MasterLokasiSubconController extends Controller
                 'nama_lokasi' => $request->nama_lokasi,
                 'alamat'      => $request->alamat,
             ]);
-
-            // 3. Sinkronisasi Barang
-            if ($request->has('barang_ids')) {
-                $lokasi->barang()->sync($request->barang_ids);
-            } else {
-                $lokasi->barang()->sync([]);
-            }
 
             DB::commit();
 

@@ -52,7 +52,7 @@ class PengerjaanController extends Controller
             $pengerjaanBulanIni = Pengerjaan::where('lokasi_subcon_id', $subconId)->where('tanggal', '>=', $monthStart)->sum('jumlah');
             $totalKaryawan      = Karyawan::where('lokasi_subcon_id', $subconId)->where('is_active', true)->count();
             
-            $assignedBarangCount = $subcon->barang()->where('tb_barang.is_active', true)->count();
+            $assignedBarangCount = $subcon->barang()->where('is_active', true)->count();
             $totalBarang        = $assignedBarangCount > 0 ? $assignedBarangCount : Barang::where('is_active', true)->count();
         }
 
@@ -75,7 +75,7 @@ class PengerjaanController extends Controller
         if ($user->is_admin) {
             // Admin dapat memilih seluruh karyawan, barang, dan lokasi subcon
             $karyawanList = Karyawan::where('is_active', true)->orderBy('nama_karyawan')->get();
-            $barangList   = Barang::where('is_active', true)->orderBy('nama_barang')->get();
+            $barangList   = Barang::with('lokasiSubcon')->where('is_active', true)->orderBy('nama_barang')->get();
             $lokasiList   = LokasiSubcon::where('is_active', true)->orderBy('nama_lokasi')->get();
             $subcon       = null;
 
@@ -104,7 +104,7 @@ class PengerjaanController extends Controller
         // Ambil barang yang ditugaskan ke subcon ini (fallback ke semua barang aktif jika belum diatur)
         $barangList = collect([]);
         if ($subcon) {
-            $barangList = $subcon->barang()->where('tb_barang.is_active', true)->orderBy('nama_barang')->get();
+            $barangList = $subcon->barang()->where('is_active', true)->orderBy('nama_barang')->get();
         }
         if ($barangList->isEmpty()) {
             $barangList = Barang::where('is_active', true)->orderBy('nama_barang')->get();
@@ -197,6 +197,7 @@ class PengerjaanController extends Controller
                     'k.no_karyawan',
                     'b.kode_barang',
                     'b.nama_barang',
+                    'b.satuan',
                     'l.nama_lokasi',
                     'p.jumlah',
                     'p.keterangan'
@@ -257,7 +258,7 @@ class PengerjaanController extends Controller
 
             $barangList = collect([]);
             if ($subcon) {
-                $barangList = $subcon->barang()->where('tb_barang.is_active', true)->orderBy('nama_barang')->get();
+                $barangList = $subcon->barang()->where('is_active', true)->orderBy('nama_barang')->get();
             }
             if ($barangList->isEmpty()) {
                 $barangList = Barang::where('is_active', true)->orderBy('nama_barang')->get();

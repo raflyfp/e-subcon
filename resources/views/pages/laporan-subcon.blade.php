@@ -8,11 +8,6 @@
             <h1 class="content mb-1">Laporan Subcon</h1>
             <p class="text-muted mb-0">Laporan rekapitulasi data pengerjaan barang subcon</p>
         </div>
-        {{-- <div>
-            <a href="{{ url('pengerjaan') }}" class="btn btn-outline-primary btn-sm">
-                <i class="ti ti-edit me-1"></i> Formulir Pengerjaan
-            </a>
-        </div> --}}
     </div>
 
     <div class="row g-4">
@@ -76,7 +71,7 @@
                                 <option value="">-- Semua Barang --</option>
                                 @foreach ($barangList as $b)
                                     <option value="{{ $b->id }}" {{ $selectedBarang == $b->id ? 'selected' : '' }}>
-                                        [{{ $b->kode_barang }}] {{ $b->nama_barang }}
+                                        [{{ $b->kode_barang }}] {{ $b->nama_barang }} ({{ $b->satuan ?? 'PCS' }})
                                     </option>
                                 @endforeach
                             </select>
@@ -136,28 +131,9 @@
                 <div class="card mb-3 border-0 shadow-sm">
                     <div class="card-body p-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2">
-                            {{-- <span class="badge bg-primary px-3 py-2 fs-6">
-                                Total: {{ number_format($pengerjaan->sum('jumlah'), 0, ',', '.') }} Unit
-                            </span>
-                            <span class="badge bg-secondary px-3 py-2 fs-6">
-                                {{ $pengerjaan->count() }} Transaksi
-                            </span>
-                            <span class="badge bg-info px-3 py-2 fs-6">
-                                {{ $pengerjaan->pluck('kode_barang')->unique()->count() }} Jenis Barang
-                            </span> --}}
                         </div>
 
                         <div class="d-flex gap-2 align-items-center">
-                            {{-- Tombol Navigasi Scroll --}}
-                            {{-- <div class="btn-group btn-group-sm me-1">
-                                <button type="button" class="btn btn-outline-secondary fw-semibold" onclick="scrollToTop()" title="Scroll ke Atas">
-                                    <i class="ti ti-arrow-up me-1"></i> Atas
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary fw-semibold" onclick="scrollToBottom()" title="Scroll ke Bawah">
-                                    <i class="ti ti-arrow-down me-1"></i> Bawah
-                                </button>
-                            </div> --}}
-
                             {{-- Tombol Print --}}
                             <button type="button" class="btn btn-outline-dark btn-sm fw-semibold"
                                 onclick="printReportSheet()">
@@ -192,7 +168,7 @@
                             </div>
                             <div class="small fw-semibold text-secondary pt-1">
                                 <span><strong>Barang :</strong>
-                                    {{ $selectedBarangObj ? '[' . $selectedBarangObj->kode_barang . '] ' . $selectedBarangObj->nama_barang : 'SEMUA BARANG' }}</span>
+                                    {{ $selectedBarangObj ? '[' . $selectedBarangObj->kode_barang . '] ' . $selectedBarangObj->nama_barang . ' (' . ($selectedBarangObj->satuan ?? 'PCS') . ')' : 'SEMUA BARANG' }}</span>
                                 <span class="mx-2">|</span>
                                 <span><strong>Lokasi :</strong>
                                     {{ $selectedLokasiObj ? $selectedLokasiObj->nama_lokasi : 'SEMUA LOKASI' }}</span>
@@ -212,6 +188,7 @@
                         @forelse ($groupedPengerjaan as $kodeBarang => $items)
                             @php
                                 $firstItem = $items->first();
+                                $satuan = $firstItem->satuan ?? 'PCS';
                                 $subtotal = $items->sum('jumlah');
                             @endphp
 
@@ -222,6 +199,9 @@
                                     <div>
                                         <i class="ti ti-package me-1"></i>
                                         <span class="fs-6">[{{ $kodeBarang }}] {{ $firstItem->nama_barang }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-primary px-2 py-1">Satuan: {{ $satuan }}</span>
                                     </div>
                                 </div>
 
@@ -238,7 +218,7 @@
                                                     <th style="border: 1px solid #94a3b8;">Karyawan</th>
                                                 @endif
                                                 <th style="border: 1px solid #94a3b8;">Lokasi Subcon</th>
-                                                <th style="width: 140px; border: 1px solid #94a3b8;">Jumlah Selesai</th>
+                                                <th style="width: 160px; border: 1px solid #94a3b8;">Jumlah Selesai</th>
                                                 <th style="border: 1px solid #94a3b8;">Keterangan</th>
                                             </tr>
                                         </thead>
@@ -255,7 +235,7 @@
                                                     <td style="border: 1px solid #cbd5e1;">{{ $item->nama_lokasi }}</td>
                                                     <td class="text-end fw-bold text-dark pe-3"
                                                         style="border: 1px solid #cbd5e1;">
-                                                        {{ number_format($item->jumlah, 0, ',', '.') }} Unit
+                                                        {{ number_format($item->jumlah, 0, ',', '.') }} {{ $item->satuan ?? $satuan }}
                                                     </td>
                                                     <td class="text-start" style="border: 1px solid #cbd5e1;">
                                                         {{ $item->keterangan ?: '-' }}</td>
@@ -267,9 +247,9 @@
                                                 style="background-color: #f1f5f9; border: 1px solid #94a3b8;">
                                                 <td colspan="{{ auth()->user()->is_admin ? 4 : 3 }}"
                                                     class="text-end pe-3">
-                                                    Total :</td>
+                                                    Total Subtotal :</td>
                                                 <td class="text-end fw-bold text-primary pe-3">
-                                                    {{ number_format($subtotal, 0, ',', '.') }} Unit</td>
+                                                    {{ number_format($subtotal, 0, ',', '.') }} {{ $satuan }}</td>
                                                 <td style="border: 1px solid #94a3b8;"></td>
                                             </tr>
                                         </tfoot>
@@ -407,37 +387,6 @@
                 width: '100%'
             });
         });
-
-        // Scroll Navigation Functions (Scroll di dalam frame hasil laporan)
-        function scrollToTop() {
-            const frame = document.getElementById('reportViewerFrame');
-            if (frame) {
-                frame.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            } else {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            }
-        }
-
-        function scrollToBottom() {
-            const frame = document.getElementById('reportViewerFrame');
-            if (frame) {
-                frame.scrollTo({
-                    top: frame.scrollHeight,
-                    behavior: 'smooth'
-                });
-            } else {
-                window.scrollTo({
-                    top: document.body.scrollHeight,
-                    behavior: 'smooth'
-                });
-            }
-        }
 
         // Print Laporan Sheet
         function printReportSheet() {

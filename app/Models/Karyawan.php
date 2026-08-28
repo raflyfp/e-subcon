@@ -8,16 +8,16 @@ class Karyawan extends Model
 {
     protected $table = 'tb_karyawan';
 
-    protected $fillable = ['user_id', 'nama_karyawan', 'lokasi_subcon_id', 'no_karyawan', 'telepon', 'is_active'];
+    protected $fillable = [
+        'nama_karyawan',
+        'lokasi_subcon_id',
+        'no_karyawan',
+        'is_active',
+    ];
 
     protected $casts = [
         'is_active' => 'boolean',
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id', 'id');
-    }
 
     public function lokasiSubcon()
     {

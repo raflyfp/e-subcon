@@ -35,11 +35,6 @@
                         <small class="text-muted">Karyawan akan muncul pada formulir pengerjaan akun subcon ini.</small>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">No. Telepon / WhatsApp</label>
-                        <input type="text" class="form-control" name="telepon" placeholder="Contoh: 081234567890" value="{{ old('telepon') }}">
-                    </div>
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>

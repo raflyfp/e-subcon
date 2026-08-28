@@ -26,7 +26,7 @@ class LokasiSubcon extends Model
 
     public function barang()
     {
-        return $this->belongsToMany(Barang::class, 'tb_lokasi_subcon_barang', 'lokasi_subcon_id', 'barang_id')->withTimestamps();
+        return $this->hasMany(Barang::class, 'lokasi_subcon_id', 'id');
     }
 
     public function pengerjaan()

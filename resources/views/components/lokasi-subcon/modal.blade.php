@@ -1,6 +1,6 @@
 {{-- Modal Tambah Lokasi Subcon --}}
 <div class="modal fade" id="tambah_lokasi" tabindex="-1" aria-labelledby="tambahLokasiLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="tambahLokasiLabel">
@@ -12,16 +12,14 @@
                 @csrf
                 <div class="modal-body">
 
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label fw-semibold">Nama Lokasi Subcon <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="nama_lokasi" placeholder="Contoh: Subcon 1 / Subcon Alpha" required>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nama Lokasi Subcon <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="nama_lokasi" placeholder="Contoh: Subcon 1 / Subcon Alpha" required>
+                    </div>
 
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label fw-semibold">Alamat</label>
-                            <textarea class="form-control" name="alamat" rows="2" placeholder="Masukkan Alamat Pabrik / Lokasi (opsional)"></textarea>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Alamat</label>
+                        <textarea class="form-control" name="alamat" rows="2" placeholder="Masukkan Alamat Pabrik / Lokasi (opsional)"></textarea>
                     </div>
 
                     {{-- Akun Login Subcon --}}
@@ -37,25 +35,6 @@
                                 <label class="form-label small fw-semibold">Password <span class="text-danger">*</span></label>
                                 <input type="password" class="form-control" name="password" placeholder="Minimal 4 karakter" required>
                             </div>
-                        </div>
-                    </div>
-
-                    {{-- Pilihan Barang yang Dikerjakan --}}
-                    <div class="p-3 bg-light rounded border">
-                        <h6 class="fw-bold mb-2 text-dark"><i class="ti ti-box me-1 text-primary"></i>Daftar Barang yang Dikerjakan</h6>
-                        <p class="text-muted small mb-2">Pilih barang master yang boleh dikerjakan di Subcon ini (pilihan di formulir pengerjaan akan disesuaikan dengan ini):</p>
-                        
-                        <div class="row g-2" style="max-height: 180px; overflow-y: auto;">
-                            @foreach ($barangList as $b)
-                                <div class="col-md-6">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="barang_ids[]" value="{{ $b->id }}" id="brg_add_{{ $b->id }}">
-                                        <label class="form-check-label small" for="brg_add_{{ $b->id }}">
-                                            <strong>[{{ $b->kode_barang }}]</strong> {{ $b->nama_barang }}
-                                        </label>
-                                    </div>
-                                </div>
-                            @endforeach
                         </div>
                     </div>
 

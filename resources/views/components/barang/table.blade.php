@@ -5,6 +5,8 @@
                 <th>No</th>
                 <th>Kode Barang</th>
                 <th>Nama Barang</th>
+                <th>Satuan</th>
+                <th>Lokasi Subcon</th>
                 <th class="no-export">Action</th>
             </tr>
         </thead>
@@ -13,8 +15,22 @@
                 <tr class="text-center {{ !$item->is_active ? 'inactive-row' : '' }}"
                     style="{{ !$item->is_active ? 'background-color: #ffeef0 !important; color: #b02a37 !important;' : '' }}">
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $item->kode_barang }}</td>
-                    <td>{{ $item->nama_barang }}</td>
+                    <td class="fw-bold">{{ $item->kode_barang }}</td>
+                    <td class="text-start">{{ $item->nama_barang }}</td>
+                    <td>
+                        <span class="badge bg-secondary-subtle text-dark border px-2 py-1">
+                            {{ $item->satuan ?? 'PCS' }}
+                        </span>
+                    </td>
+                    <td>
+                        @if ($item->lokasiSubcon)
+                            <span class="badge bg-primary-subtle text-primary border">
+                                <i class="ti ti-building me-1"></i>{{ $item->lokasiSubcon->nama_lokasi }}
+                            </span>
+                        @else
+                            <span class="badge bg-light text-muted border">Semua / Umum</span>
+                        @endif
+                    </td>
                     <td class="no-export">
                         <div class="d-flex gap-2 justify-content-center">
                             <button type="button" class="btn btn-warning btn-sm btn-edit-barang" data-bs-toggle="modal"
@@ -22,6 +38,8 @@
                                 data-id="{{ $item->id }}"
                                 data-kode="{{ $item->kode_barang }}"
                                 data-nama="{{ $item->nama_barang }}"
+                                data-satuan="{{ $item->satuan ?? 'PCS' }}"
+                                data-lokasi_subcon_id="{{ $item->lokasi_subcon_id }}"
                                 title="Edit Barang">
                                 <i class="ti ti-pencil"></i>
                             </button>
@@ -38,7 +56,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="text-center">Data barang kosong</td>
+                    <td colspan="6" class="text-center">Data barang kosong</td>
                 </tr>
             @endforelse
         </tbody>
@@ -76,6 +94,8 @@
             $('#formUpdateBarang').attr('action', "{{ url('master-barang') }}/" + id);
             $('#kode_barang_update').val($(this).data('kode'));
             $('#nama_barang_update').val($(this).data('nama'));
+            $('#satuan_update').val($(this).data('satuan'));
+            $('#lokasi_subcon_id_update').val($(this).data('lokasi_subcon_id') || '');
         });
 
         // Toggle status

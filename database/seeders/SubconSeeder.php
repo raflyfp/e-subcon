@@ -61,22 +61,54 @@ class SubconSeeder extends Seeder
         );
         $subcon2->update(['user_id' => $userSubcon2->id]);
 
-        // 4. Hubungkan Karyawan ke Subcon
-        Karyawan::where('id', 1)->update([
-            'lokasi_subcon_id' => $subcon1->id,
-            'nama_karyawan'    => 'ALDO',
-        ]);
+        // 4. Karyawan per Subcon
+        Karyawan::firstOrCreate(
+            ['no_karyawan' => '001'],
+            [
+                'nama_karyawan'    => 'ALDO',
+                'lokasi_subcon_id' => $subcon1->id,
+                'is_active'        => true,
+            ]
+        );
 
-        Karyawan::where('id', 2)->update([
-            'lokasi_subcon_id' => $subcon2->id,
-            'nama_karyawan'    => 'GUSTA',
-        ]);
+        Karyawan::firstOrCreate(
+            ['no_karyawan' => '002'],
+            [
+                'nama_karyawan'    => 'GUSTA',
+                'lokasi_subcon_id' => $subcon2->id,
+                'is_active'        => true,
+            ]
+        );
 
-        // 5. Hubungkan Barang ke Subcon
-        $allBarangIds = Barang::pluck('id')->toArray();
-        if (!empty($allBarangIds)) {
-            $subcon1->barang()->sync($allBarangIds);
-            $subcon2->barang()->sync(array_slice($allBarangIds, 0, 2));
-        }
+        // 5. Barang per Subcon
+        Barang::firstOrCreate(
+            ['kode_barang' => 'BRG-01'],
+            [
+                'nama_barang'      => 'Barang A',
+                'satuan'           => 'PCS',
+                'lokasi_subcon_id' => $subcon1->id,
+                'is_active'        => true,
+            ]
+        );
+
+        Barang::firstOrCreate(
+            ['kode_barang' => 'BRG-02'],
+            [
+                'nama_barang'      => 'Barang B',
+                'satuan'           => 'UNIT',
+                'lokasi_subcon_id' => $subcon1->id,
+                'is_active'        => true,
+            ]
+        );
+
+        Barang::firstOrCreate(
+            ['kode_barang' => 'BRG-03'],
+            [
+                'nama_barang'      => 'Barang C',
+                'satuan'           => 'LEMBAR',
+                'lokasi_subcon_id' => $subcon2->id,
+                'is_active'        => true,
+            ]
+        );
     }
 }

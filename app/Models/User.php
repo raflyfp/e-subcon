@@ -30,11 +30,6 @@ class User extends Authenticatable
         ];
     }
 
-    public function karyawan()
-    {
-        return $this->hasOne(Karyawan::class, 'user_id', 'id');
-    }
-
     public function lokasiSubcon()
     {
         return $this->hasOne(LokasiSubcon::class, 'user_id', 'id');

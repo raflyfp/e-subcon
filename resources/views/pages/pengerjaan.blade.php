@@ -95,8 +95,8 @@
                     <select class="form-select form-select-lg" name="barang_id" id="auth_barang_id" required>
                         <option value="">-- Pilih Barang --</option>
                         @foreach ($barangList as $b)
-                            <option value="{{ $b->id }}" {{ old('barang_id') == $b->id ? 'selected' : '' }}>
-                                [{{ $b->kode_barang }}] {{ $b->nama_barang }}
+                            <option value="{{ $b->id }}" data-satuan="{{ $b->satuan ?? 'PCS' }}" {{ old('barang_id') == $b->id ? 'selected' : '' }}>
+                                [{{ $b->kode_barang }}] {{ $b->nama_barang }} (Satuan: {{ $b->satuan ?? 'PCS' }})
                             </option>
                         @endforeach
                     </select>
@@ -118,15 +118,15 @@
                 {{-- 5. Jumlah Pengerjaan Selesai --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_jumlah">
-                        {{ auth()->user()->is_admin ? '5.' : '4.' }} Jumlah Barang Selesai (Unit) <span class="text-danger">*</span>
+                        {{ auth()->user()->is_admin ? '5.' : '4.' }} Jumlah Barang Selesai <span id="label_satuan_text" class="text-primary">(PCS)</span> <span class="text-danger">*</span>
                     </label>
-                    <p class="text-muted small mb-2">Masukkan kuantitas unit produk yang berhasil diselesaikan:</p>
+                    <p class="text-muted small mb-2">Masukkan kuantitas produk yang berhasil diselesaikan:</p>
 
                     <div class="input-group input-group-lg">
                         <input type="number" class="form-control form-control-lg" name="jumlah" id="auth_jumlah"
-                            min="1" placeholder="Masukkan jumlah unit (contoh: 50)" value="{{ old('jumlah') }}"
+                            min="1" placeholder="Masukkan jumlah (contoh: 50)" value="{{ old('jumlah') }}"
                             required>
-                        <span class="input-group-text bg-white fw-bold text-muted">Unit / Pcs</span>
+                        <span class="input-group-text bg-white fw-bold text-primary" id="span_satuan_addon">PCS</span>
                     </div>
                 </div>
 
@@ -176,6 +176,17 @@
                     return $(this).data('placeholder') || 'Pilih data...';
                 }
             });
+
+            // Update label satuan secara dinamis saat barang dipilih
+            function updateSatuanDisplay() {
+                let selectedOption = $('#auth_barang_id').find(':selected');
+                let satuan = selectedOption.data('satuan') || 'PCS';
+                $('#label_satuan_text').text('(' + satuan + ')');
+                $('#span_satuan_addon').text(satuan);
+            }
+
+            $('#auth_barang_id').on('change', updateSatuanDisplay);
+            updateSatuanDisplay();
 
             // Fokus otomatis ke search field saat dibuka
             $(document).on('select2:open', () => {

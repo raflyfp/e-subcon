@@ -6,15 +6,12 @@
                 <th>Nama Subcon</th>
                 <th>Akun Login (Username)</th>
                 <th>Alamat</th>
-                <th>Barang Dikerjakan</th>
+                <th>Barang Terdaftar</th>
                 <th class="no-export">Action</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($lokasi as $item)
-                @php
-                    $barangIds = $item->barang->pluck('id')->toArray();
-                @endphp
                 <tr class="text-center {{ !$item->is_active ? 'inactive-row' : '' }}"
                     style="{{ !$item->is_active ? 'background-color: #ffeef0 !important; color: #b02a37 !important;' : '' }}">
                     <td>{{ $loop->iteration }}</td>
@@ -31,7 +28,7 @@
                     <td class="text-start">{{ $item->alamat ?? '-' }}</td>
                     <td>
                         <span class="badge bg-info-subtle text-info border">
-                            {{ count($barangIds) }} Barang
+                            {{ $item->barang->count() }} Barang
                         </span>
                     </td>
                     <td class="no-export">
@@ -42,7 +39,6 @@
                                 data-nama="{{ $item->nama_lokasi }}"
                                 data-alamat="{{ $item->alamat }}"
                                 data-username="{{ $item->user?->username ?? '' }}"
-                                data-barangids="{{ json_encode($barangIds) }}"
                                 title="Edit Lokasi">
                                 <i class="ti ti-pencil"></i>
                             </button>
@@ -99,14 +95,6 @@
             $('#alamat_update').val($(this).data('alamat'));
             $('#username_update').val($(this).data('username'));
             $('#password_update').val('');
-
-            let barangIds = $(this).data('barangids') || [];
-            $('.chk-barang-update').prop('checked', false);
-            if (Array.isArray(barangIds)) {
-                barangIds.forEach(function(bid) {
-                    $('#brg_edit_' + bid).prop('checked', true);
-                });
-            }
         });
 
         // Toggle status

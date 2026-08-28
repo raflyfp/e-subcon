@@ -6,7 +6,6 @@
                 <th>No. Karyawan</th>
                 <th>Nama Karyawan</th>
                 <th>Penempatan Subcon</th>
-                <th>Telepon</th>
                 <th class="no-export">Action</th>
             </tr>
         </thead>
@@ -26,7 +25,6 @@
                             <span class="badge bg-secondary-subtle text-secondary border">Belum Ditempatkan</span>
                         @endif
                     </td>
-                    <td>{{ $item->telepon ?? '-' }}</td>
                     <td class="no-export">
                         <div class="d-flex gap-2 justify-content-center">
                             <button type="button" class="btn btn-warning btn-sm btn-edit" data-bs-toggle="modal"
@@ -35,7 +33,6 @@
                                 data-no_karyawan="{{ $item->no_karyawan }}"
                                 data-nama="{{ $item->nama_karyawan }}"
                                 data-lokasi_subcon_id="{{ $item->lokasi_subcon_id }}"
-                                data-telepon="{{ $item->telepon }}"
                                 data-is_active="{{ $item->is_active }}"
                                 title="Edit Karyawan">
                                 <i class="ti ti-pencil"></i>
@@ -53,7 +50,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="text-center">Data karyawan kosong</td>
+                    <td colspan="5" class="text-center">Data karyawan kosong</td>
                 </tr>
             @endforelse
         </tbody>
@@ -92,7 +89,6 @@
             $('#no_karyawan_update').val($(this).data('no_karyawan'));
             $('#nama_update').val($(this).data('nama'));
             $('#lokasi_subcon_update').val($(this).data('lokasi_subcon_id'));
-            $('#telepon_update').val($(this).data('telepon'));
         });
 
         // Reset button state when modal closes
