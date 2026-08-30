@@ -13,59 +13,6 @@ use Illuminate\Support\Facades\Log;
 class PengerjaanController extends Controller
 {
     /**
-     * Dashboard — ringkasan data pengerjaan
-     */
-    public function dashboard()
-    {
-        $user  = auth()->user();
-        $today = now()->toDateString();
-        $monthStart = now()->startOfMonth()->toDateString();
-
-        if ($user->is_admin) {
-            // Admin: lihat ringkasan seluruh data sistem
-            $pengerjaanHariIni  = Pengerjaan::where('tanggal', $today)->sum('jumlah');
-            $pengerjaanBulanIni = Pengerjaan::where('tanggal', '>=', $monthStart)->sum('jumlah');
-            $totalSubcon        = LokasiSubcon::where('is_active', true)->count();
-            $totalKaryawan      = Karyawan::where('is_active', true)->count();
-            $totalBarang        = Barang::where('is_active', true)->count();
-
-            return view('pages.dashboard', compact(
-                'pengerjaanHariIni',
-                'pengerjaanBulanIni',
-                'totalSubcon',
-                'totalKaryawan',
-                'totalBarang'
-            ));
-        }
-
-        // Akun Subcon: lihat ringkasan khusus subcon tersebut
-        $subcon = $user->lokasiSubcon;
-        $subconId = $subcon?->id;
-
-        $pengerjaanHariIni  = 0;
-        $pengerjaanBulanIni = 0;
-        $totalKaryawan      = 0;
-        $totalBarang        = 0;
-
-        if ($subconId) {
-            $pengerjaanHariIni  = Pengerjaan::where('lokasi_subcon_id', $subconId)->where('tanggal', $today)->sum('jumlah');
-            $pengerjaanBulanIni = Pengerjaan::where('lokasi_subcon_id', $subconId)->where('tanggal', '>=', $monthStart)->sum('jumlah');
-            $totalKaryawan      = Karyawan::where('lokasi_subcon_id', $subconId)->where('is_active', true)->count();
-            
-            $assignedBarangCount = $subcon->barang()->where('is_active', true)->count();
-            $totalBarang        = $assignedBarangCount > 0 ? $assignedBarangCount : Barang::where('is_active', true)->count();
-        }
-
-        return view('pages.dashboard', compact(
-            'pengerjaanHariIni',
-            'pengerjaanBulanIni',
-            'totalKaryawan',
-            'totalBarang',
-            'subcon'
-        ));
-    }
-
-    /**
      * Halaman Formulir Input Pengerjaan Barang (Wajib Login)
      */
     public function index()

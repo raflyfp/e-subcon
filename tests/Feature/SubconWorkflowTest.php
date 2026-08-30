@@ -152,4 +152,45 @@ class SubconWorkflowTest extends TestCase
             'jumlah'           => 50,
         ]);
     }
+
+    /**
+     * Test: Dashboard menampilkan monitoring pengisian karyawan dan navigasi tanggal
+     */
+    public function test_dashboard_monitoring_and_date_navigation(): void
+    {
+        $user = User::where('username', 'subcon1')->first();
+        $subcon = $user->lokasiSubcon;
+        $karyawan = Karyawan::where('lokasi_subcon_id', $subcon->id)->first();
+        $barang = Barang::where('lokasi_subcon_id', $subcon->id)->first();
+
+        // 1. Kunjungi dashboard default (hari ini)
+        $response = $this->actingAs($user)->get('/dashboard');
+        $response->assertStatus(200);
+        $response->assertSee('Status Pengisian Form Karyawan');
+        $response->assertSee('Isi Formulir Pengerjaan');
+        $response->assertSee($karyawan->nama_karyawan);
+        $response->assertSee('Belum Isi');
+
+        // 2. Tambah pengerjaan untuk hari ini
+        Pengerjaan::create([
+            'karyawan_id'      => $karyawan->id,
+            'barang_id'        => $barang->id,
+            'lokasi_subcon_id' => $subcon->id,
+            'jenis_pekerjaan'  => 'Folding',
+            'tanggal'          => now()->toDateString(),
+            'jumlah'           => 75,
+        ]);
+
+        // 3. Kunjungi dashboard lagi - harus terupdate menjadi 'Sudah Isi'
+        $responseToday = $this->actingAs($user)->get('/dashboard');
+        $responseToday->assertStatus(200);
+        $responseToday->assertSee('Sudah Isi');
+        $responseToday->assertSee('75');
+
+        // 4. Navigasi ke tanggal kemarin (seharusnya 'Belum Isi')
+        $yesterday = now()->subDay()->toDateString();
+        $responseYesterday = $this->actingAs($user)->get('/dashboard?tanggal=' . $yesterday);
+        $responseYesterday->assertStatus(200);
+        $responseYesterday->assertSee('Belum Isi');
+    }
 }

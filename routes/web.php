@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MasterBarangController;
 use App\Http\Controllers\MasterDataController;
 use App\Http\Controllers\MasterKaryawanController;
@@ -70,7 +71,7 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/dashboard', [PengerjaanController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/password', [UserController::class, 'password'])->name('password')->middleware('throttle:10,1');
     Route::get('/reset_password', [UserController::class, 'ChangePassword'])->name('password.change')->middleware('throttle:10,1');
 
