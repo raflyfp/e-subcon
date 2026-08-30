@@ -194,15 +194,10 @@
 
                             <div class="barang-report-block mb-4" style="page-break-inside: avoid;">
                                 {{-- Header Tabel Per Barang --}}
-                                <div class="d-flex justify-content-between align-items-center px-3 py-2 border rounded-top"
+                                <div class="px-3 py-2 border rounded-top"
                                     style="background-color: #e0f2fe; color: #0369a1; font-weight: 700; border-color: #94a3b8 !important;">
-                                    <div>
-                                        <i class="ti ti-package me-1"></i>
-                                        <span class="fs-6">[{{ $kodeBarang }}] {{ $firstItem->nama_barang }}</span>
-                                    </div>
-                                    <div>
-                                        <span class="badge bg-primary px-2 py-1">Satuan: {{ $satuan }}</span>
-                                    </div>
+                                    <i class="ti ti-package me-1"></i>
+                                    <span class="fs-6">[{{ $kodeBarang }}] {{ $firstItem->nama_barang }}</span>
                                 </div>
 
                                 {{-- Tabel Rincian Data untuk Barang Ini --}}
@@ -218,8 +213,9 @@
                                                     <th style="border: 1px solid #94a3b8;">Karyawan</th>
                                                 @endif
                                                 <th style="border: 1px solid #94a3b8;">Lokasi Subcon</th>
-                                                <th style="width: 140px; border: 1px solid #94a3b8;">Jenis Pekerjaan</th>
-                                                <th style="width: 150px; border: 1px solid #94a3b8;">Jumlah Selesai</th>
+                                                <th style="width: 130px; border: 1px solid #94a3b8;">Jenis Pekerjaan</th>
+                                                <th style="width: 130px; border: 1px solid #94a3b8;">Jumlah Selesai</th>
+                                                <th style="width: 80px; border: 1px solid #94a3b8;">Satuan</th>
                                                 <th style="border: 1px solid #94a3b8;">Keterangan</th>
                                             </tr>
                                         </thead>
@@ -235,15 +231,14 @@
                                                     @endif
                                                     <td style="border: 1px solid #cbd5e1;">{{ $item->nama_lokasi }}</td>
                                                     <td class="text-center" style="border: 1px solid #cbd5e1;">
-                                                        @if ($item->jenis_pekerjaan)
-                                                            <span class="badge bg-light text-dark border px-2 py-1">{{ $item->jenis_pekerjaan }}</span>
-                                                        @else
-                                                            <span class="text-muted">-</span>
-                                                        @endif
+                                                        {{ $item->jenis_pekerjaan ?: '-' }}
                                                     </td>
                                                     <td class="text-end fw-bold text-dark pe-3"
                                                         style="border: 1px solid #cbd5e1;">
-                                                        {{ number_format($item->jumlah, 0, ',', '.') }} {{ $item->satuan ?? $satuan }}
+                                                        {{ number_format($item->jumlah, 0, ',', '.') }}
+                                                    </td>
+                                                    <td class="text-center" style="border: 1px solid #cbd5e1;">
+                                                        {{ $item->satuan ?? $satuan }}
                                                     </td>
                                                     <td class="text-start" style="border: 1px solid #cbd5e1;">
                                                         {{ $item->keterangan ?: '-' }}</td>
@@ -257,7 +252,9 @@
                                                     class="text-end pe-3">
                                                     Total Subtotal :</td>
                                                 <td class="text-end fw-bold text-primary pe-3">
-                                                    {{ number_format($subtotal, 0, ',', '.') }} {{ $satuan }}</td>
+                                                    {{ number_format($subtotal, 0, ',', '.') }}</td>
+                                                <td class="text-center fw-bold text-primary">
+                                                    {{ $satuan }}</td>
                                                 <td style="border: 1px solid #94a3b8;"></td>
                                             </tr>
                                         </tfoot>
@@ -450,11 +447,11 @@
 
             const reportHeaderHtml = `
                 <table border="0">
-                    <tr><td colspan="7" style="font-size:16px; font-weight:bold;">e-Subcon — PT. Sinaraya Nugraha</td></tr>
-                    <tr><td colspan="7" style="font-size:14px; font-weight:bold;">Laporan Pengerjaan Barang Subcon</td></tr>
-                    <tr><td colspan="7" style="font-size:12px; font-weight:bold;">Periode: ` + tglMulai + ` s/d ` +
+                    <tr><td colspan="8" style="font-size:16px; font-weight:bold;">e-Subcon — PT. Sinaraya Nugraha</td></tr>
+                    <tr><td colspan="8" style="font-size:14px; font-weight:bold;">Laporan Pengerjaan Barang Subcon</td></tr>
+                    <tr><td colspan="8" style="font-size:12px; font-weight:bold;">Periode: ` + tglMulai + ` s/d ` +
                 tglAkhir + `</td></tr>
-                    <tr><td colspan="7"></td></tr>
+                    <tr><td colspan="8"></td></tr>
                 </table>
             `;
 
@@ -467,7 +464,7 @@
                     tablesHtml +=
                         `
                         <table border="0">
-                            <tr><td colspan="7" style="background-color:#e0f2fe; font-size:13px; font-weight:bold; color:#0369a1; border:0.5pt solid #94a3b8;">` +
+                            <tr><td colspan="8" style="background-color:#e0f2fe; font-size:13px; font-weight:bold; color:#0369a1; border:0.5pt solid #94a3b8;">` +
                         headerText + `</td></tr>
                         </table>
                     ` + table.outerHTML + `<br/>`;

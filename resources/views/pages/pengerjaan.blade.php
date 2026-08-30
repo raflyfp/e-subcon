@@ -3,16 +3,9 @@
 
 @section('content')
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="content mb-1">Formulir Pengerjaan Barang</h1>
-            <p class="text-muted mb-0">Input pencatatan kuantitas pengerjaan barang subcon</p>
-        </div>
-        <div>
-            <a href="{{ url('laporan-subcon') }}" class="btn btn-outline-primary">
-                <i class="ti ti-file-analytics me-1"></i> Buka Laporan Subcon
-            </a>
-        </div>
+    <div class="mb-4">
+        <h1 class="content mb-1">Formulir Pengerjaan Barang</h1>
+        <p class="text-muted mb-0">Input pencatatan kuantitas pengerjaan barang subcon</p>
     </div>
 
     {{-- Flat & Simple Google Form Style Card --}}
