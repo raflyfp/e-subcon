@@ -3,14 +3,13 @@
 
 @section('content')
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-            <h1 class="content mb-1">Laporan Subcon</h1>
-            <p class="text-muted mb-0">Laporan rekapitulasi data pengerjaan barang subcon</p>
+    <div class="col-12">
+        <div class="mb-3">
+            <h3 class="fw-bold mb-1 text-dark fs-4">Laporan Subcon</h3>
+            <p class="text-muted small mb-0">Laporan rekapitulasi data pengerjaan barang subcon</p>
         </div>
-    </div>
 
-    <div class="row g-4">
+        <div class="row g-3 g-md-4">
 
         {{-- ========================================================================= --}}
         {{-- SEBELAH KIRI: PANEL FILTER LAPORAN                                        --}}
@@ -154,7 +153,7 @@
                 {{-- Frame Container Hasil Laporan dengan Scroll Internal --}}
                 <div class="report-scroll-frame border rounded bg-white shadow-sm" id="reportViewerFrame"
                     style="max-height: 70vh; overflow-y: auto; overflow-x: auto; position: relative;">
-                    <div class="p-4 p-md-5" id="printable-report-sheet" style="color: #000; min-width: 680px;">
+                    <div class="p-3 p-md-4" id="printable-report-sheet" style="color: #000; min-width: 680px;">
 
                         {{-- Header Dokumen Laporan --}}
                         <div class="report-header mb-4 pb-2 border-bottom">
@@ -280,6 +279,7 @@
 
         </div>
 
+    </div>
     </div>
 
     {{-- Styling Scroll Frame & Print Media --}}
