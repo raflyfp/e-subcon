@@ -88,7 +88,9 @@
                     <select class="form-select form-select-lg" name="barang_id" id="auth_barang_id" required>
                         <option value="">-- Pilih Barang --</option>
                         @foreach ($barangList as $b)
-                            <option value="{{ $b->id }}" data-satuan="{{ $b->satuan ?? 'PCS' }}" {{ old('barang_id') == $b->id ? 'selected' : '' }}>
+                            <option value="{{ $b->id }}" data-satuan="{{ $b->satuan ?? 'PCS' }}"
+                                data-kode="{{ $b->kode_barang }}" data-nama="{{ $b->nama_barang }}"
+                                {{ old('barang_id') == $b->id ? 'selected' : '' }}>
                                 [{{ $b->kode_barang }}] {{ $b->nama_barang }} (Satuan: {{ $b->satuan ?? 'PCS' }})
                             </option>
                         @endforeach
@@ -207,13 +209,39 @@
                 }
             });
 
-            // Validasi submit client side
+            // Validasi & Konfirmasi submit form
+            let isConfirmed = false;
+
             $('#formPengerjaanAuth').on('submit', function(e) {
+                if (isConfirmed) {
+                    return true;
+                }
+
+                e.preventDefault();
+
+                let form = this;
+                let barangId = $('#auth_barang_id').val();
                 let qty = parseInt($('#auth_jumlah').val()) || 0;
                 let anyChecked = $('.check-single-jenis:checked').length > 0;
+                let selectedJenis = $('.check-single-jenis:checked').val() || '';
+                let satuan = $('.span_satuan_addon').first().text() || 'PCS';
+
+                let selectedBarangOption = $('#auth_barang_id').find(':selected');
+                let kodeBarang = selectedBarangOption.data('kode') || '';
+                let namaBarang = selectedBarangOption.data('nama') || '';
+                let displayBarang = (kodeBarang && namaBarang) ? `[${kodeBarang}] ${namaBarang}` : (selectedBarangOption.text().trim() || '-');
+
+                if (!barangId) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Barang Belum Dipilih',
+                        text: 'Silakan pilih barang yang dikerjakan terlebih dahulu.'
+                    });
+                    $('#auth_barang_id').select2('open');
+                    return false;
+                }
 
                 if (qty <= 0) {
-                    e.preventDefault();
                     Swal.fire({
                         icon: 'warning',
                         title: 'Jumlah Kuantitas Kosong',
@@ -224,7 +252,6 @@
                 }
 
                 if (!anyChecked) {
-                    e.preventDefault();
                     Swal.fire({
                         icon: 'warning',
                         title: 'Pilihan Kosong',
@@ -232,6 +259,27 @@
                     });
                     return false;
                 }
+
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    html: `<div class="text-start p-3 bg-light rounded border mb-2" style="font-size: 0.95rem; line-height: 1.6;">` +
+                          `<strong>Nama Barang:</strong> ${displayBarang}<br>` +
+                          `<strong>Jenis Pekerjaan:</strong> ${selectedJenis}<br>` +
+                          `<strong>Jumlah Selesai:</strong> ${qty} ${satuan}` +
+                          `</div>` +
+                          `<small class="text-muted">Pastikan data di atas sudah benar sebelum disimpan.</small>`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#2563eb',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Simpan!',
+                    cancelButtonText: 'Periksa Kembali'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        isConfirmed = true;
+                        form.submit();
+                    }
+                });
             });
 
             // Fokus otomatis ke search field saat dibuka

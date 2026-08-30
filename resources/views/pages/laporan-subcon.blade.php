@@ -209,9 +209,7 @@
                                                 style="background-color: #f8fafc; color: #0f172a; font-weight: 600; border-color: #94a3b8;">
                                                 <th style="width: 45px; border: 1px solid #94a3b8;">No</th>
                                                 <th style="width: 110px; border: 1px solid #94a3b8;">Tanggal</th>
-                                                @if (auth()->user()->is_admin)
-                                                    <th style="border: 1px solid #94a3b8;">Karyawan</th>
-                                                @endif
+                                                <th style="border: 1px solid #94a3b8;">Karyawan</th>
                                                 <th style="border: 1px solid #94a3b8;">Lokasi Subcon</th>
                                                 <th style="width: 130px; border: 1px solid #94a3b8;">Jenis Pekerjaan</th>
                                                 <th style="width: 130px; border: 1px solid #94a3b8;">Jumlah Selesai</th>
@@ -225,10 +223,8 @@
                                                     <td style="border: 1px solid #cbd5e1;">{{ $loop->iteration }}</td>
                                                     <td style="border: 1px solid #cbd5e1;">
                                                         {{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y') }}</td>
-                                                    @if (auth()->user()->is_admin)
-                                                        <td class="text-start" style="border: 1px solid #cbd5e1;">
-                                                            {{ $item->nama_karyawan }} ({{ $item->no_karyawan }})</td>
-                                                    @endif
+                                                    <td class="text-start" style="border: 1px solid #cbd5e1;">
+                                                        {{ $item->nama_karyawan }} ({{ $item->no_karyawan }})</td>
                                                     <td style="border: 1px solid #cbd5e1;">{{ $item->nama_lokasi }}</td>
                                                     <td class="text-center" style="border: 1px solid #cbd5e1;">
                                                         {{ $item->jenis_pekerjaan ?: '-' }}
@@ -248,9 +244,8 @@
                                         <tfoot>
                                             <tr class="fw-bold"
                                                 style="background-color: #f1f5f9; border: 1px solid #94a3b8;">
-                                                <td colspan="{{ auth()->user()->is_admin ? 5 : 4 }}"
-                                                    class="text-end pe-3">
-                                                    Total Subtotal :</td>
+                                                <td colspan="5" class="text-end pe-3">
+                                                    Total :</td>
                                                 <td class="text-end fw-bold text-primary pe-3">
                                                     {{ number_format($subtotal, 0, ',', '.') }}</td>
                                                 <td class="text-center fw-bold text-primary">
@@ -445,15 +440,12 @@
             const tglAkhir = document.getElementById('filter_tanggal_akhir').value || 'Sekarang';
             const filename = 'Laporan_Subcon_' + tglMulai + '_sd_' + tglAkhir + '.xls';
 
-            const reportHeaderHtml = `
-                <table border="0">
-                    <tr><td colspan="8" style="font-size:16px; font-weight:bold;">e-Subcon — PT. Sinaraya Nugraha</td></tr>
-                    <tr><td colspan="8" style="font-size:14px; font-weight:bold;">Laporan Pengerjaan Barang Subcon</td></tr>
-                    <tr><td colspan="8" style="font-size:12px; font-weight:bold;">Periode: ` + tglMulai + ` s/d ` +
-                tglAkhir + `</td></tr>
-                    <tr><td colspan="8"></td></tr>
-                </table>
-            `;
+            let reportHeaderHtml = '<table border="0">' +
+                '<tr><td colspan="8" style="font-size:16px; font-weight:bold;">e-Subcon \u2014 PT. Sinaraya Nugraha<\/td><\/tr>' +
+                '<tr><td colspan="8" style="font-size:14px; font-weight:bold;">Laporan Pengerjaan Barang Subcon<\/td><\/tr>' +
+                '<tr><td colspan="8" style="font-size:12px; font-weight:bold;">Periode: ' + tglMulai + ' s/d ' + tglAkhir + '<\/td><\/tr>' +
+                '<tr><td colspan="8"><\/td><\/tr>' +
+                '<\/table>';
 
             let tablesHtml = '';
             const blocks = document.querySelectorAll('.barang-report-block');
@@ -461,32 +453,28 @@
                 const headerText = block.querySelector('.rounded-top')?.innerText.trim() || '';
                 const table = block.querySelector('table');
                 if (table) {
-                    tablesHtml +=
-                        `
-                        <table border="0">
-                            <tr><td colspan="8" style="background-color:#e0f2fe; font-size:13px; font-weight:bold; color:#0369a1; border:0.5pt solid #94a3b8;">` +
-                        headerText + `</td></tr>
-                        </table>
-                    ` + table.outerHTML + `<br/>`;
+                    tablesHtml += '<table border="0">' +
+                        '<tr><td colspan="8" style="background-color:#e0f2fe; font-size:13px; font-weight:bold; color:#0369a1; border:0.5pt solid #94a3b8;">' +
+                        headerText + '<\/td><\/tr>' +
+                        '<\/table>' +
+                        table.outerHTML + '<br/>';
                 }
             });
 
-            const fullExcelHtml = `
-                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-                <head>
-                    <meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8"/>
-                    <style>
-                        table { border-collapse: collapse; margin-bottom: 15px; }
-                        th, td { border: 0.5pt solid #000000; padding: 5px; }
-                        th { background-color: #f8fafc; font-weight: bold; }
-                    </style>
-                </head>
-                <body>
-                    ` + reportHeaderHtml + `
-                    ` + tablesHtml + `
-                </body>
-                </html>
-            `;
+            const fullExcelHtml = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">' +
+                '<head>' +
+                '<meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8"/>' +
+                '<style>' +
+                'table { border-collapse: collapse; margin-bottom: 15px; }' +
+                'th, td { border: 0.5pt solid #000000; padding: 5px; }' +
+                'th { background-color: #f8fafc; font-weight: bold; }' +
+                '<\/style>' +
+                '<\/head>' +
+                '<body>' +
+                reportHeaderHtml +
+                tablesHtml +
+                '<\/body>' +
+                '<\/html>';
 
             const blob = new Blob([fullExcelHtml], {
                 type: 'application/vnd.ms-excel;charset=utf-8'
