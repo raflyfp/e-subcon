@@ -12,25 +12,12 @@
         </thead>
         <tbody>
             @forelse ($barang as $item)
-                <tr class="text-center {{ !$item->is_active ? 'inactive-row' : '' }}"
-                    style="{{ !$item->is_active ? 'background-color: #ffeef0 !important; color: #b02a37 !important;' : '' }}">
+                <tr class="text-center">
                     <td>{{ $loop->iteration }}</td>
-                    <td class="fw-bold">{{ $item->kode_barang }}</td>
+                    <td>{{ $item->kode_barang }}</td>
                     <td class="text-start">{{ $item->nama_barang }}</td>
-                    <td>
-                        <span class="badge bg-secondary-subtle text-dark border px-2 py-1">
-                            {{ $item->satuan ?? 'PCS' }}
-                        </span>
-                    </td>
-                    <td>
-                        @if ($item->lokasiSubcon)
-                            <span class="badge bg-primary-subtle text-primary border">
-                                <i class="ti ti-building me-1"></i>{{ $item->lokasiSubcon->nama_lokasi }}
-                            </span>
-                        @else
-                            <span class="badge bg-light text-muted border">Semua / Umum</span>
-                        @endif
-                    </td>
+                    <td>{{ $item->satuan ?? 'PCS' }}</td>
+                    <td>{{ $item->lokasiSubcon->nama_lokasi ?? 'Semua / Umum' }}</td>
                     <td class="no-export">
                         <div class="d-flex gap-2 justify-content-center">
                             <button type="button" class="btn btn-warning btn-sm btn-edit-barang" data-bs-toggle="modal"
@@ -61,12 +48,6 @@
             @endforelse
         </tbody>
     </table>
-    <div class="mt-3 text-muted ps-2"
-        style="font-size: 0.875rem; border-left: 3px solid #ffccd5; background-color: #fff9fa; padding: 6px 12px; border-radius: 4px;">
-        <span
-            style="display: inline-block; width: 12px; height: 12px; background-color: #ffeef0; border: 1px solid #ffccd5; vertical-align: middle; margin-right: 5px; border-radius: 2px;"></span>
-        <strong>Note:</strong> Baris berwarna merah muda menandakan Barang Nonaktif.
-    </div>
 </div>
 
 @push('scripts')

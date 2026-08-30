@@ -6,31 +6,16 @@
                 <th>Nama Subcon</th>
                 <th>Akun Login (Username)</th>
                 <th>Alamat</th>
-                <th>Barang Terdaftar</th>
                 <th class="no-export">Action</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($lokasi as $item)
-                <tr class="text-center {{ !$item->is_active ? 'inactive-row' : '' }}"
-                    style="{{ !$item->is_active ? 'background-color: #ffeef0 !important; color: #b02a37 !important;' : '' }}">
+                <tr class="text-center">
                     <td>{{ $loop->iteration }}</td>
-                    <td class="fw-bold text-start">{{ $item->nama_lokasi }}</td>
-                    <td>
-                        @if ($item->user)
-                            <span class="badge bg-primary-subtle text-primary border px-2 py-1">
-                                <i class="ti ti-user me-1"></i>{{ $item->user->username }}
-                            </span>
-                        @else
-                            <span class="badge bg-warning-subtle text-warning border">Belum ada akun</span>
-                        @endif
-                    </td>
+                    <td class="text-start">{{ $item->nama_lokasi }}</td>
+                    <td>{{ $item->user?->username ?? '-' }}</td>
                     <td class="text-start">{{ $item->alamat ?? '-' }}</td>
-                    <td>
-                        <span class="badge bg-info-subtle text-info border">
-                            {{ $item->barang->count() }} Barang
-                        </span>
-                    </td>
                     <td class="no-export">
                         <div class="d-flex gap-2 justify-content-center">
                             <button type="button" class="btn btn-warning btn-sm btn-edit-lokasi" data-bs-toggle="modal"
@@ -55,17 +40,11 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="text-center">Data lokasi subcon kosong</td>
+                    <td colspan="5" class="text-center">Data lokasi subcon kosong</td>
                 </tr>
             @endforelse
         </tbody>
     </table>
-    <div class="mt-3 text-muted ps-2"
-        style="font-size: 0.875rem; border-left: 3px solid #ffccd5; background-color: #fff9fa; padding: 6px 12px; border-radius: 4px;">
-        <span
-            style="display: inline-block; width: 12px; height: 12px; background-color: #ffeef0; border: 1px solid #ffccd5; vertical-align: middle; margin-right: 5px; border-radius: 2px;"></span>
-        <strong>Note:</strong> Baris berwarna merah muda menandakan Lokasi Nonaktif.
-    </div>
 </div>
 
 @push('scripts')
