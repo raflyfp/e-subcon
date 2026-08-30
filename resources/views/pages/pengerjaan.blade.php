@@ -102,32 +102,10 @@
                     </select>
                 </div>
 
-                {{-- 4. Jenis Pekerjaan --}}
-                <div class="mb-4 p-3 bg-light rounded border">
-                    <label class="form-label fw-bold" for="auth_jenis_pekerjaan">
-                        {{ auth()->user()->is_admin ? '4.' : '3.' }} Jenis Pekerjaan
-                    </label>
-                    <p class="text-muted small mb-2">Masukkan jenis proses / aktivitas pekerjaan (opsional):</p>
-
-                    <input type="text" class="form-control form-control-lg" name="jenis_pekerjaan" id="auth_jenis_pekerjaan"
-                        placeholder="Contoh: Assembling, Finishing, Cutting, Sewing, Packing..." value="{{ old('jenis_pekerjaan') }}"
-                        list="jenisPekerjaanList">
-                    <datalist id="jenisPekerjaanList">
-                        <option value="Assembling">
-                        <option value="Finishing">
-                        <option value="Cutting">
-                        <option value="Sewing">
-                        <option value="Polishing">
-                        <option value="Packaging">
-                        <option value="Quality Check">
-                        <option value="Repair / Rework">
-                    </datalist>
-                </div>
-
-                {{-- 5. Tanggal Pengerjaan --}}
+                {{-- 4. Tanggal Pengerjaan --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_tanggal">
-                        {{ auth()->user()->is_admin ? '5.' : '4.' }} Tanggal Pengerjaan <span class="text-danger">*</span>
+                        {{ auth()->user()->is_admin ? '4.' : '3.' }} Tanggal Pengerjaan <span class="text-danger">*</span>
                     </label>
                     <p class="text-muted small mb-2">Tanggal pengerjaan otomatis terisi hari ini:</p>
 
@@ -137,25 +115,44 @@
                         ({{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}).</small>
                 </div>
 
-                {{-- 6. Jumlah Pengerjaan Selesai --}}
+                {{-- 5. Jumlah Pengerjaan Selesai (dengan Pilihan Jenis Pekerjaan di Bawahnya) --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_jumlah">
-                        {{ auth()->user()->is_admin ? '6.' : '5.' }} Jumlah Barang Selesai <span id="label_satuan_text" class="text-primary">(PCS)</span> <span class="text-danger">*</span>
+                        {{ auth()->user()->is_admin ? '5.' : '4.' }} Jumlah Barang Selesai <span id="label_satuan_text" class="text-primary">(PCS)</span> <span class="text-danger">*</span>
                     </label>
-                    <p class="text-muted small mb-2">Masukkan kuantitas produk yang berhasil diselesaikan:</p>
+                    <p class="text-muted small mb-2">Masukkan kuantitas barang yang diselesaikan dan pilih jenis pekerjaannya:</p>
 
-                    <div class="input-group input-group-lg">
+                    {{-- 1 Input Jumlah Barang Selesai --}}
+                    <div class="input-group input-group-lg mb-3">
                         <input type="number" class="form-control form-control-lg" name="jumlah" id="auth_jumlah"
                             min="1" placeholder="Masukkan jumlah (contoh: 50)" value="{{ old('jumlah') }}"
                             required>
-                        <span class="input-group-text bg-white fw-bold text-primary" id="span_satuan_addon">PCS</span>
+                        <span class="input-group-text bg-white fw-bold text-primary span_satuan_addon" id="span_satuan_addon">PCS</span>
+                    </div>
+
+                    {{-- Pilihan Jenis Pekerjaan (Checkbox Tunggal - Awalnya Kosong) --}}
+                    <div class="d-flex gap-4 p-3 bg-white rounded border">
+                        <div class="form-check">
+                            <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan" id="check_folding" value="Folding"
+                                {{ old('jenis_pekerjaan') == 'Folding' ? 'checked' : '' }}>
+                            <label class="form-check-label fw-bold" for="check_folding" style="cursor: pointer;">
+                                Folding
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan" id="check_packing" value="Packing"
+                                {{ old('jenis_pekerjaan') == 'Packing' ? 'checked' : '' }}>
+                            <label class="form-check-label fw-bold" for="check_packing" style="cursor: pointer;">
+                                Packing
+                            </label>
+                        </div>
                     </div>
                 </div>
 
-                {{-- 7. Keterangan --}}
+                {{-- 6. Keterangan --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_keterangan">
-                        {{ auth()->user()->is_admin ? '7.' : '6.' }} Catatan / Keterangan (Opsional)
+                        {{ auth()->user()->is_admin ? '6.' : '5.' }} Catatan / Keterangan (Opsional)
                     </label>
                     <p class="text-muted small mb-2">Tuliskan keterangan tambahan bila ada kendala atau catatan khusus:</p>
 
@@ -204,11 +201,45 @@
                 let selectedOption = $('#auth_barang_id').find(':selected');
                 let satuan = selectedOption.data('satuan') || 'PCS';
                 $('#label_satuan_text').text('(' + satuan + ')');
-                $('#span_satuan_addon').text(satuan);
+                $('.span_satuan_addon').text(satuan);
             }
 
             $('#auth_barang_id').on('change', updateSatuanDisplay);
             updateSatuanDisplay();
+
+            // Checkbox single-selection (jika salah satu dicentang, yang lain uncheck)
+            $('.check-single-jenis').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('.check-single-jenis').not(this).prop('checked', false);
+                }
+            });
+
+            // Validasi submit client side
+            $('#formPengerjaanAuth').on('submit', function(e) {
+                let qty = parseInt($('#auth_jumlah').val()) || 0;
+                let anyChecked = $('.check-single-jenis:checked').length > 0;
+
+                if (qty <= 0) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Jumlah Kuantitas Kosong',
+                        text: 'Masukkan kuantitas barang selesai yang valid (minimal 1).'
+                    });
+                    $('#auth_jumlah').focus();
+                    return false;
+                }
+
+                if (!anyChecked) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Pilihan Kosong',
+                        text: 'Silakan centang salah satu jenis pekerjaan (Folding atau Packing).'
+                    });
+                    return false;
+                }
+            });
 
             // Fokus otomatis ke search field saat dibuka
             $(document).on('select2:open', () => {

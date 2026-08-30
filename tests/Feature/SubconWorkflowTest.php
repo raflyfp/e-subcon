@@ -121,4 +121,35 @@ class SubconWorkflowTest extends TestCase
             $this->assertNotEquals($subcon2->nama_lokasi, $row->nama_lokasi);
         }
     }
+
+    /**
+     * Test: Subcon can submit pengerjaan with checkbox jenis_pekerjaan
+     */
+    public function test_subcon_can_store_with_checkbox_jenis_pekerjaan(): void
+    {
+        $user = User::where('username', 'subcon1')->first();
+        $subcon = $user->lokasiSubcon;
+        $karyawan = Karyawan::where('lokasi_subcon_id', $subcon->id)->first();
+        $barang = Barang::where('lokasi_subcon_id', $subcon->id)->first();
+
+        $postData = [
+            'karyawan_id'     => $karyawan->id,
+            'barang_id'       => $barang->id,
+            'tanggal'         => now()->toDateString(),
+            'jenis_pekerjaan' => ['Folding'],
+            'jumlah'          => 50,
+            'keterangan'      => 'Pengerjaan Folding 50 PCS',
+        ];
+
+        $postResponse = $this->actingAs($user)->post('/pengerjaan/tambah', $postData);
+        $postResponse->assertSessionHas('success');
+
+        $this->assertDatabaseHas('tb_pengerjaan', [
+            'karyawan_id'      => $karyawan->id,
+            'barang_id'        => $barang->id,
+            'lokasi_subcon_id' => $subcon->id,
+            'jenis_pekerjaan'  => 'Folding',
+            'jumlah'           => 50,
+        ]);
+    }
 }
