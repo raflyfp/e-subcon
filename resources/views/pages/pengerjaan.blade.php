@@ -71,7 +71,7 @@
                     <select class="form-select form-select-lg" name="karyawan_id" id="auth_karyawan_id" required>
                         <option value="">-- Pilih Karyawan --</option>
                         @foreach ($karyawanList as $k)
-                            <option value="{{ $k->id }}" {{ old('karyawan_id') == $k->id ? 'selected' : '' }}>
+                            <option value="{{ $k->id }}" data-lokasi="{{ $k->lokasi_subcon_id }}" {{ old('karyawan_id') == $k->id ? 'selected' : '' }}>
                                 {{ $k->nama_karyawan }} ({{ $k->no_karyawan }})
                             </option>
                         @endforeach
@@ -201,6 +201,34 @@
 
             $('#auth_barang_id').on('change', updateSatuanDisplay);
             updateSatuanDisplay();
+
+            // Filter karyawan berdasarkan lokasi yang dipilih (khusus admin)
+            $('#auth_lokasi_subcon_id').on('change', function() {
+                let selectedLokasi = $(this).val();
+                let karyawanSelect = $('#auth_karyawan_id');
+
+                karyawanSelect.find('option').each(function() {
+                    let optionLokasi = $(this).data('lokasi');
+                    if (!$(this).val()) {
+                        $(this).show();
+                        return;
+                    }
+                    if (!selectedLokasi || optionLokasi == selectedLokasi) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+
+                let currentVal = karyawanSelect.val();
+                let currentOption = karyawanSelect.find(`option[value="${currentVal}"]`);
+                if (currentVal && selectedLokasi && currentOption.data('lokasi') != selectedLokasi) {
+                    karyawanSelect.val('').trigger('change');
+                }
+            });
+            if ($('#auth_lokasi_subcon_id').length && $('#auth_lokasi_subcon_id').val()) {
+                $('#auth_lokasi_subcon_id').trigger('change');
+            }
 
             // Checkbox single-selection (jika salah satu dicentang, yang lain uncheck)
             $('.check-single-jenis').on('change', function() {

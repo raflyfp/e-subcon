@@ -38,15 +38,11 @@ class PengerjaanController extends Controller
         $subcon = $user->lokasiSubcon;
         $subconId = $subcon?->id;
 
-        // Ambil karyawan yang terdaftar pada subcon ini (fallback ke semua karyawan aktif jika belum diatur)
+        // Ambil karyawan yang terdaftar pada subcon ini
         $karyawanList = Karyawan::where('lokasi_subcon_id', $subconId)
             ->where('is_active', true)
             ->orderBy('nama_karyawan')
             ->get();
-
-        if ($karyawanList->isEmpty()) {
-            $karyawanList = Karyawan::where('is_active', true)->orderBy('nama_karyawan')->get();
-        }
 
         // Ambil barang yang ditugaskan ke subcon ini (fallback ke semua barang aktif jika belum diatur)
         $barangList = collect([]);
@@ -185,8 +181,9 @@ class PengerjaanController extends Controller
             } else {
                 $subcon = $user->lokasiSubcon;
                 if ($subcon) {
-                    // Akun subcon HANYA bisa melihat pengerjaan di subcon miliknya
-                    $query->where('p.lokasi_subcon_id', $subcon->id);
+                    // Akun subcon HANYA bisa melihat pengerjaan di subcon miliknya dan karyawan dari subcon tersebut
+                    $query->where('p.lokasi_subcon_id', $subcon->id)
+                          ->where('k.lokasi_subcon_id', $subcon->id);
                 } else {
                     $query->whereRaw('1 = 0');
                 }
@@ -208,9 +205,6 @@ class PengerjaanController extends Controller
             $subconId = $subcon?->id;
 
             $karyawanList = Karyawan::where('lokasi_subcon_id', $subconId)->where('is_active', true)->orderBy('nama_karyawan')->get();
-            if ($karyawanList->isEmpty()) {
-                $karyawanList = Karyawan::where('is_active', true)->orderBy('nama_karyawan')->get();
-            }
 
             $barangList = collect([]);
             if ($subcon) {
@@ -225,7 +219,9 @@ class PengerjaanController extends Controller
 
         $selectedKaryawanObj = $selectedKaryawan ? collect($karyawanList)->firstWhere('id', $selectedKaryawan) : null;
         $selectedBarangObj   = $selectedBarang ? $barangList->firstWhere('id', $selectedBarang) : null;
-        $selectedLokasiObj   = ($user->is_admin && $selectedLokasi) ? $lokasiList->firstWhere('id', $selectedLokasi) : null;
+        $selectedLokasiObj   = $user->is_admin
+            ? ($selectedLokasi ? $lokasiList->firstWhere('id', $selectedLokasi) : null)
+            : $subcon;
 
         return view('pages.laporan-subcon', compact(
             'pengerjaan',
