@@ -151,6 +151,38 @@ class SubconWorkflowTest extends TestCase
             'jenis_pekerjaan'  => 'Folding',
             'jumlah'           => 50,
         ]);
+
+        // Test Sewing
+        $this->actingAs($user)->post('/pengerjaan/tambah', [
+            'karyawan_id'     => $karyawan->id,
+            'barang_id'       => $barang->id,
+            'tanggal'         => now()->toDateString(),
+            'jenis_pekerjaan' => 'Sewing',
+            'jumlah'          => 25,
+            'keterangan'      => 'Pengerjaan Sewing',
+        ])->assertSessionHas('success');
+
+        $this->assertDatabaseHas('tb_pengerjaan', [
+            'karyawan_id'     => $karyawan->id,
+            'jenis_pekerjaan' => 'Sewing',
+            'jumlah'          => 25,
+        ]);
+
+        // Test Cutting
+        $this->actingAs($user)->post('/pengerjaan/tambah', [
+            'karyawan_id'     => $karyawan->id,
+            'barang_id'       => $barang->id,
+            'tanggal'         => now()->toDateString(),
+            'jenis_pekerjaan' => 'Cutting',
+            'jumlah'          => 30,
+            'keterangan'      => 'Pengerjaan Cutting',
+        ])->assertSessionHas('success');
+
+        $this->assertDatabaseHas('tb_pengerjaan', [
+            'karyawan_id'     => $karyawan->id,
+            'jenis_pekerjaan' => 'Cutting',
+            'jumlah'          => 30,
+        ]);
     }
 
     /**

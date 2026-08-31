@@ -90,6 +90,7 @@
                         @foreach ($barangList as $b)
                             <option value="{{ $b->id }}" data-satuan="{{ $b->satuan ?? 'PCS' }}"
                                 data-kode="{{ $b->kode_barang }}" data-nama="{{ $b->nama_barang }}"
+                                data-lokasi="{{ $b->lokasi_subcon_id ?? '' }}"
                                 {{ old('barang_id') == $b->id ? 'selected' : '' }}>
                                 [{{ $b->kode_barang }}] {{ $b->nama_barang }} (Satuan: {{ $b->satuan ?? 'PCS' }})
                             </option>
@@ -126,7 +127,7 @@
                     </div>
 
                     {{-- Pilihan Jenis Pekerjaan (Checkbox Tunggal - Awalnya Kosong) --}}
-                    <div class="d-flex gap-4 p-3 bg-white rounded border">
+                    <div class="d-flex gap-4 p-3 bg-white rounded border flex-wrap">
                         <div class="form-check">
                             <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan" id="check_folding" value="Folding"
                                 {{ old('jenis_pekerjaan') == 'Folding' ? 'checked' : '' }}>
@@ -139,6 +140,20 @@
                                 {{ old('jenis_pekerjaan') == 'Packing' ? 'checked' : '' }}>
                             <label class="form-check-label fw-bold" for="check_packing" style="cursor: pointer;">
                                 Packing
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan" id="check_sewing" value="Sewing"
+                                {{ old('jenis_pekerjaan') == 'Sewing' ? 'checked' : '' }}>
+                            <label class="form-check-label fw-bold" for="check_sewing" style="cursor: pointer;">
+                                Sewing
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan" id="check_cutting" value="Cutting"
+                                {{ old('jenis_pekerjaan') == 'Cutting' ? 'checked' : '' }}>
+                            <label class="form-check-label fw-bold" for="check_cutting" style="cursor: pointer;">
+                                Cutting
                             </label>
                         </div>
                     </div>
@@ -202,30 +217,51 @@
             $('#auth_barang_id').on('change', updateSatuanDisplay);
             updateSatuanDisplay();
 
-            // Filter karyawan berdasarkan lokasi yang dipilih (khusus admin)
+            // Simpan referensi opsi asli untuk Karyawan dan Barang agar Select2 dapat memfilter dengan sempurna
+            let allKaryawanOptions = $('#auth_karyawan_id option').clone();
+            let allBarangOptions   = $('#auth_barang_id option').clone();
+
+            // Filter karyawan dan barang berdasarkan lokasi subcon yang dipilih (khusus admin)
             $('#auth_lokasi_subcon_id').on('change', function() {
                 let selectedLokasi = $(this).val();
-                let karyawanSelect = $('#auth_karyawan_id');
 
-                karyawanSelect.find('option').each(function() {
-                    let optionLokasi = $(this).data('lokasi');
-                    if (!$(this).val()) {
-                        $(this).show();
-                        return;
-                    }
-                    if (!selectedLokasi || optionLokasi == selectedLokasi) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
+                // 1. Filter Karyawan
+                let currentKaryawan = $('#auth_karyawan_id').val();
+                $('#auth_karyawan_id').empty();
+                allKaryawanOptions.each(function() {
+                    let optVal = $(this).val();
+                    let optLokasi = $(this).data('lokasi');
+                    if (!optVal || !selectedLokasi || String(optLokasi) === String(selectedLokasi)) {
+                        $('#auth_karyawan_id').append($(this).clone());
                     }
                 });
-
-                let currentVal = karyawanSelect.val();
-                let currentOption = karyawanSelect.find(`option[value="${currentVal}"]`);
-                if (currentVal && selectedLokasi && currentOption.data('lokasi') != selectedLokasi) {
-                    karyawanSelect.val('').trigger('change');
+                if (currentKaryawan && $('#auth_karyawan_id').find(`option[value="${currentKaryawan}"]`).length) {
+                    $('#auth_karyawan_id').val(currentKaryawan);
+                } else {
+                    $('#auth_karyawan_id').val('');
                 }
+                $('#auth_karyawan_id').trigger('change.select2');
+
+                // 2. Filter Barang
+                let currentBarang = $('#auth_barang_id').val();
+                $('#auth_barang_id').empty();
+                allBarangOptions.each(function() {
+                    let optVal = $(this).val();
+                    let optLokasi = $(this).data('lokasi');
+                    // Tampilkan jika opsi kosong, lokasi belum dipilih, lokasi cocok, atau barang bersifat umum (optLokasi kosong)
+                    if (!optVal || !selectedLokasi || String(optLokasi) === String(selectedLokasi) || !optLokasi) {
+                        $('#auth_barang_id').append($(this).clone());
+                    }
+                });
+                if (currentBarang && $('#auth_barang_id').find(`option[value="${currentBarang}"]`).length) {
+                    $('#auth_barang_id').val(currentBarang);
+                } else {
+                    $('#auth_barang_id').val('');
+                }
+                $('#auth_barang_id').trigger('change.select2');
+                updateSatuanDisplay();
             });
+
             if ($('#auth_lokasi_subcon_id').length && $('#auth_lokasi_subcon_id').val()) {
                 $('#auth_lokasi_subcon_id').trigger('change');
             }
@@ -283,7 +319,7 @@
                     Swal.fire({
                         icon: 'warning',
                         title: 'Pilihan Kosong',
-                        text: 'Silakan centang salah satu jenis pekerjaan (Folding atau Packing).'
+                        text: 'Silakan centang salah satu jenis pekerjaan (Folding, Packing, Sewing, atau Cutting).'
                     });
                     return false;
                 }
