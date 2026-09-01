@@ -25,7 +25,8 @@
                         </span>
                     @else
                         <span class="badge bg-primary-subtle text-primary border px-3 py-2 fs-6">
-                            <i class="ti ti-building me-1"></i> Subcon: <strong>{{ $subcon->nama_lokasi ?? auth()->user()->name }}</strong>
+                            <i class="ti ti-building me-1"></i> Subcon:
+                            <strong>{{ $subcon->nama_lokasi ?? auth()->user()->name }}</strong>
                         </span>
                     @endif
                 </div>
@@ -44,10 +45,12 @@
                         </label>
                         <p class="text-muted small mb-2">Pilih lokasi tempat pengerjaan barang dilakukan:</p>
 
-                        <select class="form-select form-select-lg" name="lokasi_subcon_id" id="auth_lokasi_subcon_id" required>
+                        <select class="form-select form-select-lg" name="lokasi_subcon_id" id="auth_lokasi_subcon_id"
+                            required>
                             <option value="">-- Pilih Lokasi Subcon --</option>
                             @foreach ($lokasiList as $l)
-                                <option value="{{ $l->id }}" {{ old('lokasi_subcon_id') == $l->id ? 'selected' : '' }}>
+                                <option value="{{ $l->id }}"
+                                    {{ old('lokasi_subcon_id') == $l->id ? 'selected' : '' }}>
                                     {{ $l->nama_lokasi }}
                                 </option>
                             @endforeach
@@ -58,20 +61,23 @@
                 {{-- 2. Karyawan Pelaksana --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_karyawan_id">
-                        {{ auth()->user()->is_admin ? '2.' : '1.' }} Karyawan yang Mengerjakan <span class="text-danger">*</span>
+                        {{ auth()->user()->is_admin ? '2.' : '1.' }} Karyawan yang Mengerjakan <span
+                            class="text-danger">*</span>
                     </label>
                     <p class="text-muted small mb-2">
                         @if (auth()->user()->is_admin)
                             Pilih karyawan pelaksana pengerjaan barang:
                         @else
-                            Pilih nama karyawan dalam subcon <strong>{{ $subcon->nama_lokasi ?? auth()->user()->name }}</strong>:
+                            Pilih nama karyawan dalam subcon
+                            <strong>{{ $subcon->nama_lokasi ?? auth()->user()->name }}</strong>:
                         @endif
                     </p>
 
                     <select class="form-select form-select-lg" name="karyawan_id" id="auth_karyawan_id" required>
                         <option value="">-- Pilih Karyawan --</option>
                         @foreach ($karyawanList as $k)
-                            <option value="{{ $k->id }}" data-lokasi="{{ $k->lokasi_subcon_id }}" {{ old('karyawan_id') == $k->id ? 'selected' : '' }}>
+                            <option value="{{ $k->id }}" data-lokasi="{{ $k->lokasi_subcon_id }}"
+                                {{ old('karyawan_id') == $k->id ? 'selected' : '' }}>
                                 {{ $k->nama_karyawan }} ({{ $k->no_karyawan }})
                             </option>
                         @endforeach
@@ -81,7 +87,8 @@
                 {{-- 3. Barang yang Dikerjakan --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_barang_id">
-                        {{ auth()->user()->is_admin ? '3.' : '2.' }} Barang yang Dikerjakan <span class="text-danger">*</span>
+                        {{ auth()->user()->is_admin ? '3.' : '2.' }} Barang yang Dikerjakan <span
+                            class="text-danger">*</span>
                     </label>
                     <p class="text-muted small mb-2">Pilih kode / nama barang yang dikerjakan:</p>
 
@@ -114,43 +121,49 @@
                 {{-- 5. Jumlah Pengerjaan Selesai (dengan Pilihan Jenis Pekerjaan di Bawahnya) --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_jumlah">
-                        {{ auth()->user()->is_admin ? '5.' : '4.' }} Jumlah Barang Selesai <span id="label_satuan_text" class="text-primary">(PCS)</span> <span class="text-danger">*</span>
+                        {{ auth()->user()->is_admin ? '5.' : '4.' }} Jumlah Barang Selesai <span id="label_satuan_text"
+                            class="text-primary">(PCS)</span> <span class="text-danger">*</span>
                     </label>
-                    <p class="text-muted small mb-2">Masukkan kuantitas barang yang diselesaikan dan pilih jenis pekerjaannya:</p>
+                    <p class="text-muted small mb-2">Masukkan kuantitas barang yang diselesaikan dan pilih jenis
+                        pekerjaannya:</p>
 
                     {{-- 1 Input Jumlah Barang Selesai --}}
                     <div class="input-group input-group-lg mb-3">
                         <input type="number" class="form-control form-control-lg" name="jumlah" id="auth_jumlah"
-                            min="1" placeholder="Masukkan jumlah (contoh: 50)" value="{{ old('jumlah') }}"
-                            required>
-                        <span class="input-group-text bg-white fw-bold text-primary span_satuan_addon" id="span_satuan_addon">PCS</span>
+                            min="1" placeholder="Masukkan jumlah (contoh: 50)" value="{{ old('jumlah') }}" required>
+                        <span class="input-group-text bg-white fw-bold text-primary span_satuan_addon"
+                            id="span_satuan_addon">PCS</span>
                     </div>
 
                     {{-- Pilihan Jenis Pekerjaan (Checkbox Tunggal - Awalnya Kosong) --}}
                     <div class="d-flex gap-4 p-3 bg-white rounded border flex-wrap">
                         <div class="form-check">
-                            <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan" id="check_folding" value="Folding"
+                            <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan"
+                                id="check_folding" value="Folding"
                                 {{ old('jenis_pekerjaan') == 'Folding' ? 'checked' : '' }}>
                             <label class="form-check-label fw-bold" for="check_folding" style="cursor: pointer;">
                                 Folding
                             </label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan" id="check_packing" value="Packing"
+                            <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan"
+                                id="check_packing" value="Packing"
                                 {{ old('jenis_pekerjaan') == 'Packing' ? 'checked' : '' }}>
                             <label class="form-check-label fw-bold" for="check_packing" style="cursor: pointer;">
                                 Packing
                             </label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan" id="check_sewing" value="Sewing"
+                            <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan"
+                                id="check_sewing" value="Sewing"
                                 {{ old('jenis_pekerjaan') == 'Sewing' ? 'checked' : '' }}>
                             <label class="form-check-label fw-bold" for="check_sewing" style="cursor: pointer;">
                                 Sewing
                             </label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan" id="check_cutting" value="Cutting"
+                            <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan"
+                                id="check_cutting" value="Cutting"
                                 {{ old('jenis_pekerjaan') == 'Cutting' ? 'checked' : '' }}>
                             <label class="form-check-label fw-bold" for="check_cutting" style="cursor: pointer;">
                                 Cutting
@@ -219,7 +232,7 @@
 
             // Simpan referensi opsi asli untuk Karyawan dan Barang agar Select2 dapat memfilter dengan sempurna
             let allKaryawanOptions = $('#auth_karyawan_id option').clone();
-            let allBarangOptions   = $('#auth_barang_id option').clone();
+            let allBarangOptions = $('#auth_barang_id option').clone();
 
             // Filter karyawan dan barang berdasarkan lokasi subcon yang dipilih (khusus admin)
             $('#auth_lokasi_subcon_id').on('change', function() {
@@ -231,11 +244,13 @@
                 allKaryawanOptions.each(function() {
                     let optVal = $(this).val();
                     let optLokasi = $(this).data('lokasi');
-                    if (!optVal || !selectedLokasi || String(optLokasi) === String(selectedLokasi)) {
+                    if (!optVal || !selectedLokasi || String(optLokasi) === String(
+                        selectedLokasi)) {
                         $('#auth_karyawan_id').append($(this).clone());
                     }
                 });
-                if (currentKaryawan && $('#auth_karyawan_id').find(`option[value="${currentKaryawan}"]`).length) {
+                if (currentKaryawan && $('#auth_karyawan_id').find(`option[value="${currentKaryawan}"]`)
+                    .length) {
                     $('#auth_karyawan_id').val(currentKaryawan);
                 } else {
                     $('#auth_karyawan_id').val('');
@@ -249,7 +264,8 @@
                     let optVal = $(this).val();
                     let optLokasi = $(this).data('lokasi');
                     // Tampilkan jika opsi kosong, lokasi belum dipilih, lokasi cocok, atau barang bersifat umum (optLokasi kosong)
-                    if (!optVal || !selectedLokasi || String(optLokasi) === String(selectedLokasi) || !optLokasi) {
+                    if (!optVal || !selectedLokasi || String(optLokasi) === String(
+                        selectedLokasi) || !optLokasi) {
                         $('#auth_barang_id').append($(this).clone());
                     }
                 });
@@ -293,7 +309,8 @@
                 let selectedBarangOption = $('#auth_barang_id').find(':selected');
                 let kodeBarang = selectedBarangOption.data('kode') || '';
                 let namaBarang = selectedBarangOption.data('nama') || '';
-                let displayBarang = (kodeBarang && namaBarang) ? `[${kodeBarang}] ${namaBarang}` : (selectedBarangOption.text().trim() || '-');
+                let displayBarang = (kodeBarang && namaBarang) ? `[${kodeBarang}] ${namaBarang}` : (
+                    selectedBarangOption.text().trim() || '-');
 
                 if (!barangId) {
                     Swal.fire({
@@ -327,11 +344,11 @@
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
                     html: `<div class="text-start p-3 bg-light rounded border mb-2" style="font-size: 0.95rem; line-height: 1.6;">` +
-                          `<strong>Nama Barang:</strong> ${displayBarang}<br>` +
-                          `<strong>Jenis Pekerjaan:</strong> ${selectedJenis}<br>` +
-                          `<strong>Jumlah Selesai:</strong> ${qty} ${satuan}` +
-                          `</div>` +
-                          `<small class="text-muted">Pastikan data di atas sudah benar sebelum disimpan.</small>`,
+                        `<strong>Nama Barang:</strong> ${displayBarang}<br>` +
+                        `<strong>Jenis Pekerjaan:</strong> ${selectedJenis}<br>` +
+                        `<strong>Jumlah Selesai:</strong> ${qty} ${satuan}` +
+                        `</div>` +
+                        `<small class="text-muted">Pastikan data di atas sudah benar sebelum disimpan.</small>`,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#2563eb',

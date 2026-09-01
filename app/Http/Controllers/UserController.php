@@ -18,7 +18,12 @@ class UserController extends Controller
 
         if (Auth::attempt($credentials, $request->remember)) {
             $request->session()->regenerate();
-            return redirect()->route('dashboard');
+
+            if (auth()->user()->is_admin) {
+                return redirect()->route('dashboard');
+            }
+
+            return redirect()->route('pengerjaan.index');
         }
 
         return back()->with('error', 'Username atau password salah');

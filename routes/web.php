@@ -34,10 +34,13 @@ Route::get('/refresh-csrf', function () {
     return response()->json(['csrf_token' => csrf_token()]);
 })->name('refresh-csrf')->middleware('web');
 
-// Halaman utama: jika belum login langsung ke login, jika sudah login ke dashboard
+// Halaman utama: jika belum login langsung ke login, jika sudah login ke dashboard (admin) atau form pengerjaan (subcon)
 Route::get('/', function () {
     if (Auth::check()) {
-        return redirect()->route('dashboard');
+        if (Auth::user()->is_admin) {
+            return redirect()->route('dashboard');
+        }
+        return redirect()->route('pengerjaan.index');
     }
     return redirect()->route('login');
 })->name('home');
@@ -48,7 +51,10 @@ Route::get('/form-pengerjaan', function() {
 
 Route::get('/login', function () {
     if (Auth::check()) {
-        return redirect()->route('dashboard');
+        if (Auth::user()->is_admin) {
+            return redirect()->route('dashboard');
+        }
+        return redirect()->route('pengerjaan.index');
     }
     return view('pages.login');
 })->name('login')->middleware('throttle:10,1');
