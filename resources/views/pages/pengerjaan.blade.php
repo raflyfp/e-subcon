@@ -357,8 +357,32 @@
                     cancelButtonText: 'Periksa Kembali'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        isConfirmed = true;
-                        form.submit();
+                        Swal.fire({
+                            title: 'Menyimpan Data...',
+                            text: 'Mohon tunggu sebentar',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        // Tarik CSRF token terbaru dari server sebelum form dikirimkan
+                        $.ajax({
+                            url: "{{ route('refresh-csrf') }}",
+                            type: "GET",
+                            dataType: "json",
+                            timeout: 3000,
+                            success: function(data) {
+                                if (data.csrf_token) {
+                                    $('input[name="_token"]').val(data.csrf_token);
+                                }
+                            },
+                            complete: function() {
+                                isConfirmed = true;
+                                form.submit();
+                            }
+                        });
                     }
                 });
             });

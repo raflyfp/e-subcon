@@ -69,6 +69,15 @@
                                     required>
                             </div>
 
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input input-primary" type="checkbox" id="remember" name="remember" value="1" checked>
+                                    <label class="form-check-label text-muted small" for="remember" style="cursor: pointer;">
+                                        Tetap masuk / Ingat saya di perangkat ini
+                                    </label>
+                                </div>
+                            </div>
+
                             <div class="d-grid mt-4 mb-3">
                                 <button type="submit" id="btn-login" class="btn btn-primary btn-lg fw-semibold">
                                     <i class="ti ti-login me-1"></i> Masuk ke Sistem

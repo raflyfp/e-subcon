@@ -21,6 +21,7 @@ class User extends Authenticatable
 
     protected $hidden = [
         'password',
+        'remember_token',
     ];
 
     protected function casts(): array
@@ -28,6 +29,15 @@ class User extends Authenticatable
         return [
             'is_admin' => 'boolean',
         ];
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($user) {
+            if (empty($user->remember_token)) {
+                $user->remember_token = \Illuminate\Support\Str::random(60);
+            }
+        });
     }
 
     public function lokasiSubcon()

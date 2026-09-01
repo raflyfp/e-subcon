@@ -225,4 +225,79 @@ class SubconWorkflowTest extends TestCase
         $responseYesterday->assertStatus(200);
         $responseYesterday->assertSee('Belum Isi');
     }
+
+    /**
+     * Test: Redirect setelah login dan akses root sesuai role
+     */
+    public function test_login_redirects_based_on_user_role(): void
+    {
+        // 1. User Subcon login -> redirect ke formulir pengerjaan
+        $subconUser = User::where('username', 'subcon1')->first();
+        $responseSubconLogin = $this->post('/login', [
+            'username' => 'subcon1',
+            'password' => '12345',
+            'remember' => '1',
+        ]);
+        $responseSubconLogin->assertRedirect(route('pengerjaan.index'));
+        $subconUser->refresh();
+        $this->assertNotEmpty($subconUser->remember_token);
+
+        // Akses root / saat subcon terautentikasi -> redirect ke pengerjaan
+        $responseSubconHome = $this->actingAs($subconUser)->get('/');
+        $responseSubconHome->assertRedirect(route('pengerjaan.index'));
+
+        // 2. User Admin login -> redirect ke dashboard
+        $adminUser = User::where('is_admin', true)->first();
+        $this->assertNotNull($adminUser);
+
+        $responseAdminLogin = $this->post('/login', [
+            'username' => $adminUser->username,
+            'password' => 'admin123',
+        ]);
+        $responseAdminLogin->assertRedirect(route('dashboard'));
+
+        // Akses root / saat admin terautentikasi -> redirect ke dashboard
+        $responseAdminHome = $this->actingAs($adminUser)->get('/');
+        $responseAdminHome->assertRedirect(route('dashboard'));
+    }
+
+    /**
+     * Test: Multi device login dengan remember me pada akun yang sama tetap aman dan konsisten
+     */
+    public function test_multi_device_remember_me_on_same_account(): void
+    {
+        $subconUser = User::where('username', 'subcon1')->first();
+        $this->assertNotNull($subconUser);
+
+        // Device 1 login dengan remember
+        $resDev1 = $this->post('/login', [
+            'username' => 'subcon1',
+            'password' => '12345',
+            'remember' => '1',
+        ]);
+        $resDev1->assertRedirect(route('pengerjaan.index'));
+        $subconUser->refresh();
+        $tokenAfterDev1 = $subconUser->remember_token;
+        $this->assertNotEmpty($tokenAfterDev1);
+
+        // Device 2 login dengan remember ke akun yang sama
+        $resDev2 = $this->post('/login', [
+            'username' => 'subcon1',
+            'password' => '12345',
+            'remember' => '1',
+        ]);
+        $resDev2->assertRedirect(route('pengerjaan.index'));
+        $subconUser->refresh();
+        $tokenAfterDev2 = $subconUser->remember_token;
+
+        // Token tidak ditimpa/berubah, kedua device berbagi token aman yang sama
+        $this->assertEquals($tokenAfterDev1, $tokenAfterDev2);
+
+        // Device 1 melakukan logout menggunakan logoutCurrentDevice
+        $this->actingAs($subconUser)->post('/logout');
+
+        // Pastikan token remember di database TIDAK hangus/berubah sehingga Device 2 tetap bisa bertahan
+        $subconUser->refresh();
+        $this->assertEquals($tokenAfterDev1, $subconUser->remember_token);
+    }
 }

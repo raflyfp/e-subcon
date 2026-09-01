@@ -16,7 +16,9 @@ class UserController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials, $request->remember)) {
+        $remember = $request->boolean('remember');
+
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
             if (auth()->user()->is_admin) {
@@ -31,7 +33,7 @@ class UserController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::logout();
+        Auth::logoutCurrentDevice();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

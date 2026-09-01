@@ -455,7 +455,19 @@
 
 
         document.addEventListener('visibilitychange', function() {
-            if (!document.hidden) CheckSession();
+            if (!document.hidden) {
+                CheckSession();
+                fetch('{{ route('refresh-csrf') }}')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.csrf_token) {
+                            document.querySelectorAll('input[name="_token"]').forEach(input => {
+                                input.value = data.csrf_token;
+                            });
+                        }
+                    })
+                    .catch(() => {});
+            }
         });
 
         ['mousedown', 'keydown', 'touchstart', 'click'].forEach(function(e) {
