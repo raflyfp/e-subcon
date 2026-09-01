@@ -16,6 +16,7 @@ class UserController extends Controller
             'password' => ['required'],
         ]);
 
+        // cek apakah user centang remember me
         $remember = $request->boolean('remember');
 
         if (Auth::attempt($credentials, $remember)) {
@@ -33,6 +34,7 @@ class UserController extends Controller
 
     public function logout(Request $request)
     {
+        // logout user hanya untuk device ini saja sehingga tidak menghapus token remember me di device lain
         Auth::logoutCurrentDevice();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

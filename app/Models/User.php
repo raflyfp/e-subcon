@@ -31,6 +31,7 @@ class User extends Authenticatable
         ];
     }
 
+    //fungsi untuk generate remember token untuk kebutuhan remember me
     protected static function booted()
     {
         static::creating(function ($user) {
