@@ -21,7 +21,7 @@
                 <div>
                     @if (auth()->user()->is_admin)
                         <span class="badge bg-danger-subtle text-danger border px-3 py-2">
-                            <i class="ti ti-shield me-1"></i> Admin IT Input
+                            <i class="ti ti-shield me-1"></i> Admin Input
                         </span>
                     @else
                         <span class="badge bg-primary-subtle text-primary border px-3 py-2 fs-6">
