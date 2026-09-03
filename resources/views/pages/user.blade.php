@@ -29,31 +29,3 @@
         </div>
     </div>
 @endsection
-
-@push('scripts')
-    @if (session('success'))
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil',
-                text: "{{ session('success') }}",
-                timer: 2000, // durasi 2.5 detik
-                showConfirmButton: false,
-                timerProgressBar: true
-            });
-        </script>
-    @endif
-
-    @if (session('error'))
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal',
-                text: "{{ session('error') }}",
-                timer: 2000, // durasi 3 detik
-                showConfirmButton: false,
-                timerProgressBar: true
-            });
-        </script>
-    @endif
-@endpush

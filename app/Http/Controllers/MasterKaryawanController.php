@@ -33,6 +33,12 @@ class MasterKaryawanController extends Controller
             'nama_karyawan'    => 'required|string|max:255',
             'no_karyawan'      => 'required|string|max:50|unique:tb_karyawan,no_karyawan',
             'lokasi_subcon_id' => 'required|exists:tb_lokasi_subcon,id',
+        ], [
+            'nama_karyawan.required'    => 'Nama Karyawan wajib diisi.',
+            'no_karyawan.required'      => 'No / NIK Karyawan wajib diisi.',
+            'no_karyawan.unique'        => 'No / NIK Karyawan sudah terdaftar, silakan gunakan nomor lain.',
+            'lokasi_subcon_id.required' => 'Lokasi Subcon penugasan wajib dipilih.',
+            'lokasi_subcon_id.exists'   => 'Lokasi Subcon yang dipilih tidak valid.',
         ]);
 
         try {
@@ -72,6 +78,12 @@ class MasterKaryawanController extends Controller
             'nama_karyawan'    => 'required|string|max:255',
             'no_karyawan'      => 'required|string|max:50|unique:tb_karyawan,no_karyawan,' . $id,
             'lokasi_subcon_id' => 'required|exists:tb_lokasi_subcon,id',
+        ], [
+            'nama_karyawan.required'    => 'Nama Karyawan wajib diisi.',
+            'no_karyawan.required'      => 'No / NIK Karyawan wajib diisi.',
+            'no_karyawan.unique'        => 'No / NIK Karyawan sudah terdaftar, silakan gunakan nomor lain.',
+            'lokasi_subcon_id.required' => 'Lokasi Subcon penugasan wajib dipilih.',
+            'lokasi_subcon_id.exists'   => 'Lokasi Subcon yang dipilih tidak valid.',
         ]);
 
         try {

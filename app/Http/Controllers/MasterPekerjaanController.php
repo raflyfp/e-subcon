@@ -28,6 +28,9 @@ class MasterPekerjaanController extends Controller
         $request->validate([
             'nama_pekerjaan' => 'required|string|max:100|unique:tb_pekerjaan,nama_pekerjaan',
             'keterangan'     => 'nullable|string',
+        ], [
+            'nama_pekerjaan.required' => 'Nama Jenis Pekerjaan wajib diisi.',
+            'nama_pekerjaan.unique'   => 'Nama Jenis Pekerjaan sudah terdaftar, gunakan nama lain.',
         ]);
 
         try {
@@ -60,6 +63,9 @@ class MasterPekerjaanController extends Controller
         $request->validate([
             'nama_pekerjaan' => 'required|string|max:100|unique:tb_pekerjaan,nama_pekerjaan,' . $id,
             'keterangan'     => 'nullable|string',
+        ], [
+            'nama_pekerjaan.required' => 'Nama Jenis Pekerjaan wajib diisi.',
+            'nama_pekerjaan.unique'   => 'Nama Jenis Pekerjaan sudah terdaftar, gunakan nama lain.',
         ]);
 
         try {

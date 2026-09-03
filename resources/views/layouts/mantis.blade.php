@@ -484,6 +484,65 @@
         setTimeout(CheckSession, LIFETIME_MS);
     </script>
 
+    {{-- Global Alert Notifications (SweetAlert2) --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if ($errors->any())
+                let errorMessages = @json($errors->all());
+                let errorHtml = '<div class="text-start" style="font-size: 0.95rem;"><ul class="mb-0 ps-3">';
+                errorMessages.forEach(function(msg) {
+                    errorHtml += '<li class="mb-1 text-danger">' + msg + '</li>';
+                });
+                errorHtml += '</ul></div>';
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validasi Gagal',
+                    html: errorHtml,
+                    confirmButtonText: 'Tutup',
+                    confirmButtonColor: '#E20114'
+                });
+            @elseif (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: @json(session('error')),
+                    confirmButtonText: 'Tutup',
+                    confirmButtonColor: '#E20114'
+                });
+            @elseif (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: @json(session('success')),
+                    timer: 2500,
+                    showConfirmButton: false,
+                    timerProgressBar: true
+                });
+            @elseif (session('warning'))
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan',
+                    text: @json(session('warning')),
+                    confirmButtonText: 'Tutup'
+                });
+            @elseif (session('info'))
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Informasi',
+                    text: @json(session('info')),
+                    confirmButtonText: 'Tutup'
+                });
+            @elseif (session('unauthorized'))
+                Swal.fire({
+                    icon: @json(session('unauthorized.type', 'warning')),
+                    title: @json(session('unauthorized.title', 'Akses Ditolak')),
+                    text: @json(session('unauthorized.text', 'Anda tidak memiliki akses ke fitur ini.')),
+                    confirmButtonText: 'Mengerti'
+                });
+            @endif
+        });
+    </script>
 
     @stack('scripts')
 </body>

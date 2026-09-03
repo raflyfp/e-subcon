@@ -536,30 +536,4 @@
             });
         });
     </script>
-
-    @if (session('success'))
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: "{{ session('success') }}",
-                confirmButtonColor: '#2563eb',
-                confirmButtonText: 'OK',
-                timer: 2500,
-                timerProgressBar: true
-            });
-        </script>
-    @endif
-
-    @if (session('error'))
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal',
-                text: "{{ session('error') }}",
-                confirmButtonColor: '#dc3545',
-                confirmButtonText: 'Tutup'
-            });
-        </script>
-    @endif
 @endpush

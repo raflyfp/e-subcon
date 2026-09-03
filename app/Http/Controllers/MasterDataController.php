@@ -48,9 +48,16 @@ class MasterDataController extends Controller
         $request->validate([
             'name'        => 'required|string|max:255',
             'username'    => 'required|string|max:100|unique:tb_user,username',
-            'password'    => 'required|min:5',
+            'password'    => 'required|min:4',
             'role'        => 'required|string',
             'permissions' => 'nullable|array',
+        ], [
+            'name.required'     => 'Nama lengkap pengguna wajib diisi.',
+            'username.required' => 'Username wajib diisi.',
+            'username.unique'   => 'Username sudah digunakan oleh akun lain.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min'      => 'Password minimal 4 karakter.',
+            'role.required'     => 'Role pengguna wajib dipilih.',
         ]);
 
         $role = $request->input('role', User::ROLE_ADMIN_BIASA);
@@ -124,9 +131,15 @@ class MasterDataController extends Controller
         $request->validate([
             'name'        => 'required|string|max:255',
             'username'    => 'required|string|max:100|unique:tb_user,username,' . $id,
-            'password'    => 'nullable|min:5',
+            'password'    => 'nullable|min:4',
             'role'        => 'required|string',
             'permissions' => 'nullable|array',
+        ], [
+            'name.required'     => 'Nama lengkap pengguna wajib diisi.',
+            'username.required' => 'Username wajib diisi.',
+            'username.unique'   => 'Username sudah digunakan oleh akun lain.',
+            'password.min'      => 'Password minimal 4 karakter.',
+            'role.required'     => 'Role pengguna wajib dipilih.',
         ]);
 
         $role = $request->input('role', $user->role);

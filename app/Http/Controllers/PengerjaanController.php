@@ -96,7 +96,21 @@ class PengerjaanController extends Controller
             $lokasiSubconId = $subcon->id;
         }
 
-        $request->validate($rules);
+        $messages = [
+            'karyawan_id.required'      => 'Karyawan pelaksana wajib dipilih.',
+            'karyawan_id.exists'        => 'Karyawan yang dipilih tidak valid.',
+            'barang_id.required'        => 'Barang yang dikerjakan wajib dipilih.',
+            'barang_id.exists'          => 'Barang yang dipilih tidak valid.',
+            'lokasi_subcon_id.required' => 'Lokasi Subcon wajib dipilih.',
+            'lokasi_subcon_id.exists'   => 'Lokasi Subcon tidak valid.',
+            'tanggal.required'          => 'Tanggal pengerjaan wajib diisi.',
+            'tanggal.date'              => 'Format tanggal pengerjaan tidak valid.',
+            'jumlah.required'           => 'Jumlah barang selesai wajib diisi.',
+            'jumlah.integer'            => 'Jumlah barang harus berupa angka.',
+            'jumlah.min'                => 'Jumlah barang minimal 1.',
+        ];
+
+        $request->validate($rules, $messages);
 
         // Format jenis_pekerjaan dari checkbox array atau string
         $jenisPekerjaan = $request->input('jenis_pekerjaan');

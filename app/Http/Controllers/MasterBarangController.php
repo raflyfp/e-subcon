@@ -32,14 +32,20 @@ class MasterBarangController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'kode_barang'      => 'required|unique:tb_barang,kode_barang',
+            'kode_barang'      => 'required|string|max:100|unique:tb_barang,kode_barang',
             'nama_barang'      => 'required|string|max:255',
             'satuan'           => 'required|string|max:50',
             'lokasi_subcon_id' => 'required|exists:tb_lokasi_subcon,id',
             'pekerjaan_id'     => 'required|exists:tb_pekerjaan,id',
         ], [
+            'kode_barang.required'      => 'Kode Barang wajib diisi.',
+            'kode_barang.unique'        => 'Kode Barang sudah digunakan, silakan gunakan kode lain.',
+            'nama_barang.required'      => 'Nama Barang wajib diisi.',
+            'satuan.required'           => 'Satuan Barang wajib diisi.',
             'lokasi_subcon_id.required' => 'Penempatan Lokasi Subcon wajib dipilih.',
+            'lokasi_subcon_id.exists'   => 'Lokasi Subcon yang dipilih tidak valid.',
             'pekerjaan_id.required'     => 'Jenis Pekerjaan wajib dipilih.',
+            'pekerjaan_id.exists'       => 'Jenis Pekerjaan yang dipilih tidak valid.',
         ]);
 
         try {
@@ -73,14 +79,20 @@ class MasterBarangController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'kode_barang'      => 'required|unique:tb_barang,kode_barang,' . $id,
+            'kode_barang'      => 'required|string|max:100|unique:tb_barang,kode_barang,' . $id,
             'nama_barang'      => 'required|string|max:255',
             'satuan'           => 'required|string|max:50',
             'lokasi_subcon_id' => 'required|exists:tb_lokasi_subcon,id',
             'pekerjaan_id'     => 'required|exists:tb_pekerjaan,id',
         ], [
+            'kode_barang.required'      => 'Kode Barang wajib diisi.',
+            'kode_barang.unique'        => 'Kode Barang sudah digunakan, silakan gunakan kode lain.',
+            'nama_barang.required'      => 'Nama Barang wajib diisi.',
+            'satuan.required'           => 'Satuan Barang wajib diisi.',
             'lokasi_subcon_id.required' => 'Penempatan Lokasi Subcon wajib dipilih.',
+            'lokasi_subcon_id.exists'   => 'Lokasi Subcon yang dipilih tidak valid.',
             'pekerjaan_id.required'     => 'Jenis Pekerjaan wajib dipilih.',
+            'pekerjaan_id.exists'       => 'Jenis Pekerjaan yang dipilih tidak valid.',
         ]);
 
         $barang = Barang::findOrFail($id);

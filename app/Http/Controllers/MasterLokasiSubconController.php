@@ -35,6 +35,12 @@ class MasterLokasiSubconController extends Controller
             'alamat'      => 'nullable|string',
             'username'    => 'required|string|max:100|unique:tb_user,username',
             'password'    => 'required|string|min:4',
+        ], [
+            'nama_lokasi.required' => 'Nama Lokasi Subcon wajib diisi.',
+            'username.required'    => 'Username login subcon wajib diisi.',
+            'username.unique'      => 'Username sudah digunakan, silakan pilih username lain.',
+            'password.required'    => 'Password akun subcon wajib diisi.',
+            'password.min'         => 'Password minimal 4 karakter.',
         ]);
 
         DB::beginTransaction();
@@ -87,6 +93,10 @@ class MasterLokasiSubconController extends Controller
             'alamat'      => 'nullable|string',
             'username'    => 'nullable|string|max:100|unique:tb_user,username,' . ($userId ?? 'NULL'),
             'password'    => 'nullable|string|min:4',
+        ], [
+            'nama_lokasi.required' => 'Nama Lokasi Subcon wajib diisi.',
+            'username.unique'      => 'Username sudah digunakan, silakan pilih username lain.',
+            'password.min'         => 'Password minimal 4 karakter.',
         ]);
 
         DB::beginTransaction();
