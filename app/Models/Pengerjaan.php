@@ -14,13 +14,38 @@ class Pengerjaan extends Model
         'lokasi_subcon_id',
         'jenis_pekerjaan',
         'tanggal',
+        'jam_mulai',
+        'jam_selesai',
+        'durasi_menit',
         'jumlah',
         'keterangan',
     ];
 
     protected $casts = [
-        'tanggal' => 'date',
+        'tanggal'      => 'date',
+        'durasi_menit' => 'integer',
     ];
+
+    /**
+     * Format durasi menit ke bentuk teks yang mudah dibaca (misal: "1 Jam 30 Menit")
+     */
+    public function getDurasiTextAttribute(): string
+    {
+        if (is_null($this->durasi_menit) || $this->durasi_menit <= 0) {
+            return '-';
+        }
+
+        $jam = intdiv($this->durasi_menit, 60);
+        $menit = $this->durasi_menit % 60;
+
+        if ($jam > 0 && $menit > 0) {
+            return "{$jam} Jam {$menit} Menit";
+        } elseif ($jam > 0) {
+            return "{$jam} Jam";
+        } else {
+            return "{$menit} Menit";
+        }
+    }
 
     public function karyawan()
     {

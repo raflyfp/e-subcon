@@ -141,10 +141,42 @@
                         ({{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}).</small>
                 </div>
 
-                {{-- 6. (Admin) / 5. (Subcon) Jumlah Pengerjaan Selesai --}}
+                {{-- 6. (Admin) / 5. (Subcon) Jam Kerja & Durasi Pengerjaan --}}
+                <div class="mb-4 p-3 bg-light rounded border">
+                    <label class="form-label fw-bold">
+                        {{ auth()->user()->is_admin ? '6.' : '5.' }} Waktu Pengerjaan & Durasi
+                    </label>
+                    <p class="text-muted small mb-2">Pilih jam mulai dan jam selesai pengerjaan (durasi otomatis terhitung):</p>
+
+                    <div class="row g-3 align-items-center">
+                        <div class="col-sm-6">
+                            <label class="form-label small fw-semibold text-muted mb-1" for="auth_jam_mulai">
+                                <i class="ti ti-clock-play text-primary me-1"></i> Jam Mulai
+                            </label>
+                            <input type="time" class="form-control form-control-lg bg-white" name="jam_mulai" id="auth_jam_mulai"
+                                value="{{ old('jam_mulai') }}" style="cursor: pointer;">
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label class="form-label small fw-semibold text-muted mb-1" for="auth_jam_selesai">
+                                <i class="ti ti-clock-stop text-danger me-1"></i> Jam Selesai
+                            </label>
+                            <input type="time" class="form-control form-control-lg bg-white" name="jam_selesai" id="auth_jam_selesai"
+                                value="{{ old('jam_selesai') }}" style="cursor: pointer;">
+                        </div>
+                    </div>
+
+                    <div class="mt-2" id="durasi_badge_container">
+                        <div id="durasi_badge_info" class="text-muted small">
+                            <i class="ti ti-info-circle me-1"></i>Pilih jam mulai & jam selesai untuk menghitung durasi waktu secara otomatis.
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 7. (Admin) / 6. (Subcon) Jumlah Pengerjaan Selesai --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_jumlah">
-                        {{ auth()->user()->is_admin ? '6.' : '5.' }} Jumlah Barang Selesai <span id="label_satuan_text"
+                        {{ auth()->user()->is_admin ? '7.' : '6.' }} Jumlah Barang Selesai <span id="label_satuan_text"
                             class="text-primary">(PCS)</span> <span class="text-danger">*</span>
                     </label>
                     <p class="text-muted small mb-2">Masukkan kuantitas barang yang telah diselesaikan:</p>
@@ -158,10 +190,10 @@
                     </div>
                 </div>
 
-                {{-- 7. (Admin) / 6. (Subcon) Keterangan --}}
+                {{-- 8. (Admin) / 7. (Subcon) Keterangan --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_keterangan">
-                        {{ auth()->user()->is_admin ? '7.' : '6.' }} Catatan / Keterangan (Opsional)
+                        {{ auth()->user()->is_admin ? '8.' : '7.' }} Catatan / Keterangan (Opsional)
                     </label>
                     <p class="text-muted small mb-2">Tuliskan keterangan tambahan bila ada kendala atau catatan khusus:</p>
 
@@ -302,8 +334,67 @@
                 $('#auth_lokasi_subcon_id').trigger('change');
             }
 
-            if ($('.check-single-jenis:checked').length) {
-                filterBarangOptions();
+            let currentDurasiText = '';
+
+            // Fungsi Hitung Durasi Otomatis dari Jam Mulai & Jam Selesai
+            function hitungDurasi() {
+                let mulai = $('#auth_jam_mulai').val();
+                let selesai = $('#auth_jam_selesai').val();
+
+                if (!mulai || !selesai) {
+                    currentDurasiText = '';
+                    $('#durasi_badge_info')
+                        .removeClass('text-success fw-bold')
+                        .addClass('text-muted')
+                        .html('<i class="ti ti-info-circle me-1"></i>Pilih jam mulai & jam selesai untuk menghitung durasi waktu secara otomatis.');
+                    return;
+                }
+
+                let [hMulai, mMulai] = mulai.split(':').map(Number);
+                let [hSelesai, mSelesai] = selesai.split(':').map(Number);
+
+                let menitMulai = hMulai * 60 + mMulai;
+                let menitSelesai = hSelesai * 60 + mSelesai;
+
+                // Tangani kasus lintas hari / tengah malam jika selesai < mulai
+                if (menitSelesai < menitMulai) {
+                    menitSelesai += 24 * 60;
+                }
+
+                let diffMenit = menitSelesai - menitMulai;
+                let hours = Math.floor(diffMenit / 60);
+                let mins = diffMenit % 60;
+
+                let durasiText = '';
+                if (hours > 0 && mins > 0) {
+                    durasiText = `${hours} Jam ${mins} Menit`;
+                } else if (hours > 0) {
+                    durasiText = `${hours} Jam`;
+                } else {
+                    durasiText = `${mins} Menit`;
+                }
+
+                currentDurasiText = durasiText;
+                $('#durasi_badge_info')
+                    .removeClass('text-muted')
+                    .addClass('text-success fw-bold')
+                    .html(`<i class="ti ti-circle-check fs-6 me-1"></i> Durasi terhitung: <u>${durasiText}</u> (${diffMenit} Menit)`);
+            }
+
+            // Buka timepicker popup secara langsung saat input jam mulai / selesai diklik
+            $('#auth_jam_mulai, #auth_jam_selesai').on('click focus', function() {
+                try {
+                    if (typeof this.showPicker === 'function') {
+                        this.showPicker();
+                    }
+                } catch (e) {
+                    // Fallback
+                }
+            });
+
+            $('#auth_jam_mulai, #auth_jam_selesai').on('input change', hitungDurasi);
+            if ($('#auth_jam_mulai').val() && $('#auth_jam_selesai').val()) {
+                hitungDurasi();
             }
 
             // Validasi & Konfirmasi submit form
@@ -322,6 +413,8 @@
                 let barangId = $('#auth_barang_id').val();
                 let qty = parseInt($('#auth_jumlah').val()) || 0;
                 let satuan = $('.span_satuan_addon').first().text() || 'PCS';
+                let jamMulai = $('#auth_jam_mulai').val() || '';
+                let jamSelesai = $('#auth_jam_selesai').val() || '';
 
                 let selectedBarangOption = $('#auth_barang_id').find(':selected');
                 let kodeBarang = selectedBarangOption.data('kode') || '';
@@ -368,11 +461,18 @@
                     return false;
                 }
 
+                let waktuInfoHtml = '';
+                if (jamMulai && jamSelesai) {
+                    let durasiLabel = currentDurasiText ? ` (${currentDurasiText})` : '';
+                    waktuInfoHtml = `<strong>Jam Kerja:</strong> ${jamMulai} - ${jamSelesai}${durasiLabel}<br>`;
+                }
+
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
                     html: `<div class="text-start p-3 bg-light rounded border mb-2" style="font-size: 0.95rem; line-height: 1.6;">` +
                         `<strong>Jenis Pekerjaan:</strong> ${selectedJenis}<br>` +
                         `<strong>Nama Barang:</strong> ${displayBarang}<br>` +
+                        waktuInfoHtml +
                         `<strong>Jumlah Selesai:</strong> ${qty} ${satuan}` +
                         `</div>` +
                         `<small class="text-muted">Pastikan data di atas sudah benar sebelum disimpan.</small>`,

@@ -78,6 +78,8 @@ class PengerjaanController extends Controller
             'karyawan_id'      => 'required|exists:tb_karyawan,id',
             'barang_id'        => 'required|exists:tb_barang,id',
             'tanggal'          => 'required|date',
+            'jam_mulai'        => 'nullable|string',
+            'jam_selesai'      => 'nullable|string',
             'jumlah'           => 'required|integer|min:1',
             'jenis_pekerjaan'  => 'nullable',
             'keterangan'       => 'nullable|string',
@@ -102,6 +104,32 @@ class PengerjaanController extends Controller
             $jenisPekerjaan = implode(', ', array_filter($jenisPekerjaan));
         }
 
+        // Perhitungan otomatis durasi pengerjaan (dalam menit)
+        $jamMulaiInput   = $request->input('jam_mulai');
+        $jamSelesaiInput = $request->input('jam_selesai');
+        $jamMulai        = null;
+        $jamSelesai      = null;
+        $durasiMenit     = null;
+
+        if ($jamMulaiInput && $jamSelesaiInput) {
+            try {
+                $start = \Carbon\Carbon::createFromFormat('H:i', substr($jamMulaiInput, 0, 5));
+                $end   = \Carbon\Carbon::createFromFormat('H:i', substr($jamSelesaiInput, 0, 5));
+                if ($end->lessThan($start)) {
+                    $end->addDay();
+                }
+                $durasiMenit = (int) $start->diffInMinutes($end);
+                $jamMulai    = $start->format('H:i:s');
+                $jamSelesai  = $end->format('H:i:s');
+            } catch (\Throwable $th) {
+                $durasiMenit = null;
+            }
+        } elseif ($jamMulaiInput) {
+            $jamMulai = substr($jamMulaiInput, 0, 5) . ':00';
+        } elseif ($jamSelesaiInput) {
+            $jamSelesai = substr($jamSelesaiInput, 0, 5) . ':00';
+        }
+
         try {
             Pengerjaan::create([
                 'karyawan_id'      => $request->karyawan_id,
@@ -109,6 +137,9 @@ class PengerjaanController extends Controller
                 'lokasi_subcon_id' => $lokasiSubconId,
                 'jenis_pekerjaan'  => $jenisPekerjaan ?: null,
                 'tanggal'          => $request->tanggal,
+                'jam_mulai'        => $jamMulai,
+                'jam_selesai'      => $jamSelesai,
+                'durasi_menit'     => $durasiMenit,
                 'jumlah'           => $request->jumlah,
                 'keterangan'       => $request->keterangan,
             ]);
@@ -148,6 +179,9 @@ class PengerjaanController extends Controller
                 ->select(
                     'p.id',
                     'p.tanggal',
+                    'p.jam_mulai',
+                    'p.jam_selesai',
+                    'p.durasi_menit',
                     'p.jenis_pekerjaan',
                     'k.nama_karyawan',
                     'k.no_karyawan',
