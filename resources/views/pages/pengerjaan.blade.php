@@ -89,7 +89,8 @@
                     <label class="form-label fw-bold">
                         {{ auth()->user()->is_admin ? '3.' : '2.' }} Jenis Pekerjaan <span class="text-danger">*</span>
                     </label>
-                    <p class="text-muted small mb-2">Pilih jenis pekerjaan untuk memfilter daftar barang yang dikerjakan:</p>
+                    <p class="text-muted small mb-2">Pilih jenis pekerjaan untuk memfilter daftar barang yang dikerjakan:
+                    </p>
 
                     <div class="d-flex gap-4 p-3 bg-white rounded border flex-wrap" id="container_jenis_pekerjaan">
                         @foreach ($pekerjaanList as $p)
@@ -97,7 +98,8 @@
                                 <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan"
                                     id="check_{{ strtolower($p->nama_pekerjaan) }}" value="{{ $p->nama_pekerjaan }}"
                                     {{ old('jenis_pekerjaan') == $p->nama_pekerjaan ? 'checked' : '' }}>
-                                <label class="form-check-label fw-bold" for="check_{{ strtolower($p->nama_pekerjaan) }}" style="cursor: pointer;">
+                                <label class="form-check-label fw-bold" for="check_{{ strtolower($p->nama_pekerjaan) }}"
+                                    style="cursor: pointer;">
                                     {{ $p->nama_pekerjaan }}
                                 </label>
                             </div>
@@ -111,7 +113,8 @@
                         {{ auth()->user()->is_admin ? '4.' : '3.' }} Barang yang Dikerjakan <span
                             class="text-danger">*</span>
                     </label>
-                    <p class="text-muted small mb-2">Pilih kode / nama barang yang dikerjakan (terfilter sesuai jenis pekerjaan):</p>
+                    <p class="text-muted small mb-2">Pilih kode / nama barang yang dikerjakan (terfilter sesuai jenis
+                        pekerjaan):</p>
 
                     <select class="form-select form-select-lg" name="barang_id" id="auth_barang_id" required>
                         <option value="">-- Pilih Barang --</option>
@@ -120,7 +123,7 @@
                                 data-kode="{{ $b->kode_barang }}" data-nama="{{ $b->nama_barang }}"
                                 data-lokasi="{{ $b->lokasi_subcon_id ?? '' }}"
                                 data-pekerjaan-id="{{ $b->pekerjaan_id ?? '' }}"
-                                data-jenis-pekerjaan="{{ $b->pekerjaan->nama_pekerjaan ?? $b->jenis_pekerjaan ?? '' }}"
+                                data-jenis-pekerjaan="{{ $b->pekerjaan->nama_pekerjaan ?? ($b->jenis_pekerjaan ?? '') }}"
                                 {{ old('barang_id') == $b->id ? 'selected' : '' }}>
                                 [{{ $b->kode_barang }}] {{ $b->nama_barang }} (Satuan: {{ $b->satuan ?? 'PCS' }})
                             </option>
@@ -146,30 +149,31 @@
                     <label class="form-label fw-bold">
                         {{ auth()->user()->is_admin ? '6.' : '5.' }} Waktu Pengerjaan & Durasi
                     </label>
-                    <p class="text-muted small mb-2">Pilih jam mulai dan jam selesai pengerjaan (durasi otomatis terhitung):</p>
+                    <p class="text-muted small mb-2">Pilih jam mulai dan jam selesai pengerjaan (durasi otomatis terhitung):
+                    </p>
 
                     <div class="row g-3 align-items-center">
                         <div class="col-sm-6">
                             <label class="form-label small fw-semibold text-muted mb-1" for="auth_jam_mulai">
                                 <i class="ti ti-clock-play text-primary me-1"></i> Jam Mulai (WIB)
                             </label>
-                            <input type="time" class="form-control form-control-lg bg-white" name="jam_mulai" id="auth_jam_mulai"
-                                value="{{ old('jam_mulai') }}" style="cursor: pointer;">
+                            <input type="time" class="form-control form-control-lg bg-white" name="jam_mulai"
+                                id="auth_jam_mulai" value="{{ old('jam_mulai') }}" style="cursor: pointer;">
                         </div>
 
                         <div class="col-sm-6">
                             <label class="form-label small fw-semibold text-muted mb-1" for="auth_jam_selesai">
                                 <i class="ti ti-clock-stop text-danger me-1"></i> Jam Selesai (WIB)
                             </label>
-                            <input type="time" class="form-control form-control-lg bg-white" name="jam_selesai" id="auth_jam_selesai"
-                                value="{{ old('jam_selesai') }}" style="cursor: pointer;">
+                            <input type="time" class="form-control form-control-lg bg-white" name="jam_selesai"
+                                id="auth_jam_selesai" value="{{ old('jam_selesai') }}" style="cursor: pointer;">
                         </div>
                     </div>
 
                     <div class="mt-2" id="durasi_badge_container">
-                        <div id="durasi_badge_info" class="text-muted small">
+                        {{-- <div id="durasi_badge_info" class="text-muted small">
                             <i class="ti ti-info-circle me-1"></i>Pilih jam mulai & jam selesai untuk menghitung durasi waktu secara otomatis.
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
 
@@ -184,7 +188,8 @@
                     {{-- Input Jumlah Barang Selesai --}}
                     <div class="input-group input-group-lg">
                         <input type="number" class="form-control form-control-lg" name="jumlah" id="auth_jumlah"
-                            min="1" placeholder="Masukkan jumlah (contoh: 50)" value="{{ old('jumlah') }}" required>
+                            min="1" placeholder="Masukkan jumlah (contoh: 50)" value="{{ old('jumlah') }}"
+                            required>
                         <span class="input-group-text bg-white fw-bold text-primary span_satuan_addon"
                             id="span_satuan_addon">PCS</span>
                     </div>
@@ -273,12 +278,14 @@
                     let optJenis = $(this).data('jenis-pekerjaan');
 
                     // Filter Lokasi: jika tidak ada lokasi dipilih, atau lokasi cocok, atau barang bersifat umum (optLokasi kosong)
-                    let matchLokasi = !selectedLokasi || String(optLokasi) === String(selectedLokasi) || !optLokasi;
+                    let matchLokasi = !selectedLokasi || String(optLokasi) === String(selectedLokasi) || !
+                        optLokasi;
 
                     // Filter Jenis Pekerjaan: jika jenis pekerjaan dipilih, hanya tampilkan yang sesuai jenis pekerjaan tersebut
                     let matchJenis = true;
                     if (selectedJenis) {
-                        matchJenis = optJenis && String(optJenis).trim().toLowerCase() === String(selectedJenis).trim().toLowerCase();
+                        matchJenis = optJenis && String(optJenis).trim().toLowerCase() === String(
+                            selectedJenis).trim().toLowerCase();
                     }
 
                     if (matchLokasi && matchJenis) {
@@ -348,7 +355,9 @@
                     $('#durasi_badge_info')
                         .removeClass('text-success fw-bold')
                         .addClass('text-muted')
-                        .html('<i class="ti ti-info-circle me-1"></i>Pilih jam mulai & jam selesai untuk menghitung durasi waktu secara otomatis.');
+                        .html(
+                            '<i class="ti ti-info-circle me-1"></i>Pilih jam mulai & jam selesai untuk menghitung durasi waktu secara otomatis.'
+                        );
                     return;
                 }
 
@@ -380,7 +389,9 @@
                 $('#durasi_badge_info')
                     .removeClass('text-muted')
                     .addClass('text-success fw-bold')
-                    .html(`<i class="ti ti-circle-check fs-6 me-1"></i> Durasi terhitung: <u>${durasiText}</u> (${diffMenit} Menit)`);
+                    .html(
+                        `<i class="ti ti-circle-check fs-6 me-1"></i> Durasi terhitung: <u>${durasiText}</u> (${diffMenit} Menit)`
+                    );
             }
 
             // Buka timepicker popup secara langsung saat input jam mulai / selesai diklik
@@ -466,7 +477,8 @@
                 let waktuInfoHtml = '';
                 if (jamMulai && jamSelesai) {
                     let durasiLabel = currentDurasiText ? ` (${currentDurasiText})` : '';
-                    waktuInfoHtml = `<strong>Jam Kerja:</strong> ${jamMulai} - ${jamSelesai} WIB${durasiLabel}<br>`;
+                    waktuInfoHtml =
+                        `<strong>Jam Kerja:</strong> ${jamMulai} - ${jamSelesai} WIB${durasiLabel}<br>`;
                 }
 
                 Swal.fire({

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <!-- [Head] start -->
 
 <head>
@@ -77,10 +77,8 @@
         $isSuspended =
             auth()->check() &&
             !auth()->user()->is_admin &&
-            (
-                (auth()->user()->lokasiSubcon && auth()->user()->lokasiSubcon->is_active == 0) ||
-                (auth()->user()->karyawan && auth()->user()->karyawan->is_active == 0)
-            );
+            ((auth()->user()->lokasiSubcon && auth()->user()->lokasiSubcon->is_active == 0) ||
+                (auth()->user()->karyawan && auth()->user()->karyawan->is_active == 0));
     @endphp
 
     @if ($isSuspended)
