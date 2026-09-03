@@ -91,6 +91,26 @@
                             </div>
                         @endif
 
+                        {{-- Sort By Laporan --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="filter_group_by">
+                                <i class="ti ti-sort-ascending me-1 text-primary"></i>Sort By
+                            </label>
+                            <select class="form-select" name="group_by" id="filter_group_by">
+                                <option value="barang" {{ ($groupBy ?? 'barang') === 'barang' ? 'selected' : '' }}>
+                                    Per Kode / Nama Barang
+                                </option>
+                                <option value="karyawan" {{ ($groupBy ?? '') === 'karyawan' ? 'selected' : '' }}>
+                                    Per Karyawan Pelaksana
+                                </option>
+                                @if (auth()->user()->is_admin)
+                                    <option value="subcon" {{ ($groupBy ?? '') === 'subcon' ? 'selected' : '' }}>
+                                        Per Lokasi Subcon
+                                    </option>
+                                @endif
+                            </select>
+                        </div>
+
                         {{-- Submit Buttons --}}
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn btn-primary fw-semibold py-2">
@@ -130,6 +150,18 @@
                 <div class="card mb-3 border-0 shadow-sm">
                     <div class="card-body p-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary-subtle text-primary border px-3 py-2 fs-6">
+                                <i class="ti ti-sort-ascending me-1"></i> Sort By:
+                                <strong>
+                                    @if (($groupBy ?? 'barang') === 'karyawan')
+                                        Per Karyawan
+                                    @elseif (($groupBy ?? 'barang') === 'subcon')
+                                        Per Lokasi Subcon
+                                    @else
+                                        Per Kode Barang
+                                    @endif
+                                </strong>
+                            </span>
                         </div>
 
                         <div class="d-flex gap-2 align-items-center">
@@ -181,27 +213,62 @@
                             </div>
                         </div>
 
-                        {{-- Tabel-Tabel Terpisah Per Kode Barang --}}
+                        {{-- Tabel-Tabel Pengelompokan Data --}}
                         @php
-                            $groupedPengerjaan = $pengerjaan->groupBy('kode_barang');
+                            $currentGroupBy = $groupBy ?? 'barang';
+                            if ($currentGroupBy === 'karyawan') {
+                                $groupedPengerjaan = $pengerjaan->groupBy(function($item) {
+                                    return $item->nama_karyawan . ' (' . $item->no_karyawan . ')';
+                                });
+                            } elseif ($currentGroupBy === 'subcon') {
+                                $groupedPengerjaan = $pengerjaan->groupBy('nama_lokasi');
+                            } else {
+                                $groupedPengerjaan = $pengerjaan->groupBy('kode_barang');
+                            }
                         @endphp
 
-                        @forelse ($groupedPengerjaan as $kodeBarang => $items)
+                        @forelse ($groupedPengerjaan as $groupKey => $items)
                             @php
                                 $firstItem = $items->first();
-                                $satuan = $firstItem->satuan ?? 'PCS';
                                 $subtotal = $items->sum('jumlah');
+                                $totalDurasiMenit = $items->sum('durasi_menit');
+
+                                $totJam = intdiv($totalDurasiMenit, 60);
+                                $totMnt = $totalDurasiMenit % 60;
+                                if ($totJam > 0 && $totMnt > 0) {
+                                    $durasiTotalText = "{$totJam} Jam {$totMnt} Mnt";
+                                } elseif ($totJam > 0) {
+                                    $durasiTotalText = "{$totJam} Jam";
+                                } elseif ($totMnt > 0) {
+                                    $durasiTotalText = "{$totMnt} Menit";
+                                } else {
+                                    $durasiTotalText = "-";
+                                }
                             @endphp
 
                             <div class="barang-report-block mb-4" style="page-break-inside: avoid;">
-                                {{-- Header Tabel Per Barang --}}
-                                <div class="px-3 py-2 border rounded-top"
+                                {{-- Header Tabel Per Kelompok --}}
+                                <div class="px-3 py-2 border rounded-top d-flex justify-content-between align-items-center"
                                     style="background-color: #e0f2fe; color: #0369a1; font-weight: 700; border-color: #94a3b8 !important;">
-                                    <i class="ti ti-package me-1"></i>
-                                    <span class="fs-6">[{{ $kodeBarang }}] {{ $firstItem->nama_barang }}</span>
+                                    <div>
+                                        @if ($currentGroupBy === 'karyawan')
+                                            <i class="ti ti-user me-1"></i>
+                                            <span class="fs-6">{{ $groupKey }}</span>
+                                            <span class="text-muted small fw-normal ms-2">(Lokasi: {{ $firstItem->nama_lokasi }})</span>
+                                        @elseif ($currentGroupBy === 'subcon')
+                                            <i class="ti ti-building me-1"></i>
+                                            <span class="fs-6">Lokasi Subcon: {{ $groupKey }}</span>
+                                        @else
+                                            <i class="ti ti-package me-1"></i>
+                                            <span class="fs-6">[{{ $groupKey }}] {{ $firstItem->nama_barang }}</span>
+                                        @endif
+                                    </div>
+                                    <div>
+                                        <small class="text-primary fw-semibold">{{ count($items) }} Catatan Pengerjaan</small>
+                                    </div>
                                 </div>
 
-                                {{-- Tabel Rincian Data untuk Barang Ini --}}
+                                {{-- Tabel Rincian Data --}}
                                 <div class="table-responsive">
                                     <table class="table table-bordered align-middle w-100 report-table mb-0"
                                         style="border-color: #94a3b8; font-size: 0.92rem; border-top: 0;">
@@ -212,8 +279,15 @@
                                                 <th style="width: 90px; border: 1px solid #94a3b8;">Tanggal</th>
                                                 <th style="width: 125px; border: 1px solid #94a3b8;">Jam Kerja</th>
                                                 <th style="width: 105px; border: 1px solid #94a3b8;">Durasi</th>
-                                                <th style="border: 1px solid #94a3b8;">Karyawan</th>
-                                                <th style="border: 1px solid #94a3b8;">Lokasi Subcon</th>
+                                                @if ($currentGroupBy !== 'karyawan')
+                                                    <th style="border: 1px solid #94a3b8;">Karyawan</th>
+                                                @endif
+                                                @if ($currentGroupBy === 'karyawan' || $currentGroupBy === 'subcon')
+                                                    <th style="border: 1px solid #94a3b8;">Barang yang Dikerjakan</th>
+                                                @endif
+                                                @if ($currentGroupBy !== 'subcon')
+                                                    <th style="border: 1px solid #94a3b8;">Lokasi Subcon</th>
+                                                @endif
                                                 <th style="width: 110px; border: 1px solid #94a3b8;">Jenis Pekerjaan</th>
                                                 <th style="width: 105px; border: 1px solid #94a3b8;">Jumlah Selesai</th>
                                                 <th style="width: 65px; border: 1px solid #94a3b8;">Satuan</th>
@@ -255,9 +329,17 @@
                                                             <span class="text-muted">-</span>
                                                         @endif
                                                     </td>
-                                                    <td class="text-start" style="border: 1px solid #cbd5e1;">
-                                                        {{ $item->nama_karyawan }} ({{ $item->no_karyawan }})</td>
-                                                    <td style="border: 1px solid #cbd5e1;">{{ $item->nama_lokasi }}</td>
+                                                    @if ($currentGroupBy !== 'karyawan')
+                                                        <td class="text-start" style="border: 1px solid #cbd5e1;">
+                                                            {{ $item->nama_karyawan }} ({{ $item->no_karyawan }})</td>
+                                                    @endif
+                                                    @if ($currentGroupBy === 'karyawan' || $currentGroupBy === 'subcon')
+                                                        <td class="text-start" style="border: 1px solid #cbd5e1;">
+                                                            <strong>[{{ $item->kode_barang }}]</strong> {{ $item->nama_barang }}</td>
+                                                    @endif
+                                                    @if ($currentGroupBy !== 'subcon')
+                                                        <td style="border: 1px solid #cbd5e1;">{{ $item->nama_lokasi }}</td>
+                                                    @endif
                                                     <td class="text-center" style="border: 1px solid #cbd5e1;">
                                                         {{ $item->jenis_pekerjaan ?: '-' }}
                                                     </td>
@@ -266,7 +348,7 @@
                                                         {{ number_format($item->jumlah, 0, ',', '.') }}
                                                     </td>
                                                     <td class="text-center" style="border: 1px solid #cbd5e1;">
-                                                        {{ $item->satuan ?? $satuan }}
+                                                        {{ $item->satuan ?? 'PCS' }}
                                                     </td>
                                                     <td class="text-start" style="border: 1px solid #cbd5e1;">
                                                         {{ $item->keterangan ?: '-' }}</td>
@@ -276,13 +358,17 @@
                                         <tfoot>
                                             <tr class="fw-bold"
                                                 style="background-color: #f1f5f9; border: 1px solid #94a3b8;">
-                                                <td colspan="7" class="text-end pe-3">
-                                                    Total :</td>
-                                                <td class="text-end fw-bold text-primary pe-3">
-                                                    {{ number_format($subtotal, 0, ',', '.') }}</td>
-                                                <td class="text-center fw-bold text-primary">
-                                                    {{ $satuan }}</td>
-                                                <td style="border: 1px solid #94a3b8;"></td>
+                                                <td colspan="3" class="text-start ps-3" style="border: 1px solid #94a3b8;">
+                                                    Total :
+                                                </td>
+                                                <td class="text-center fw-bold text-success" style="border: 1px solid #94a3b8; font-size: 0.88rem;">
+                                                    {{ $durasiTotalText }}
+                                                </td>
+                                                <td colspan="3" style="border: 1px solid #94a3b8;"></td>
+                                                <td class="text-end fw-bold text-primary pe-3" style="border: 1px solid #94a3b8;">
+                                                    {{ number_format($subtotal, 0, ',', '.') }}
+                                                </td>
+                                                <td colspan="2" style="border: 1px solid #94a3b8;"></td>
                                             </tr>
                                         </tfoot>
                                     </table>

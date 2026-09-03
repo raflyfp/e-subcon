@@ -286,6 +286,11 @@ class PengerjaanController extends Controller
             ? ($selectedLokasi ? $lokasiList->firstWhere('id', $selectedLokasi) : null)
             : $subcon;
 
+        $groupBy = $request->input('group_by', 'barang');
+        if (!in_array($groupBy, ['barang', 'karyawan', 'subcon'], true)) {
+            $groupBy = 'barang';
+        }
+
         return view('pages.laporan-subcon', compact(
             'pengerjaan',
             'isFiltered',
@@ -295,6 +300,7 @@ class PengerjaanController extends Controller
             'subcon',
             'tanggalMulai',
             'tanggalAkhir',
+            'groupBy',
             'selectedKaryawan',
             'selectedBarang',
             'selectedLokasi',
