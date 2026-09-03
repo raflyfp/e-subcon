@@ -46,11 +46,7 @@
                         </div>
                     </td>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="5" class="text-center">Data lokasi subcon kosong</td>
-                </tr>
-            @endforelse
+            @endforeach
         </tbody>
     </table>
 </div>
@@ -61,6 +57,10 @@
             pageLength: 15,
             info: false,
             dom: 'Bfrtip',
+            language: {
+                emptyTable: "Data lokasi subcon belum tersedia",
+                zeroRecords: "Tidak ditemukan data yang sesuai"
+            },
             buttons: [
                 {
                     extend: 'excelHtml5',

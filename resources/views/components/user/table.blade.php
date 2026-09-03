@@ -73,11 +73,7 @@
                         </div>
                     </td>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="7" class="text-center text-muted py-4">Data user belum tersedia</td>
-                </tr>
-            @endforelse
+            @endforeach
         </tbody>
     </table>
 </div>
@@ -89,6 +85,10 @@
                 pageLength: 15,
                 info: false,
                 dom: 'Bfrtip',
+                language: {
+                    emptyTable: "Data user belum tersedia",
+                    zeroRecords: "Tidak ditemukan data yang sesuai"
+                },
                 buttons: [
                     {
                         extend: 'excelHtml5',

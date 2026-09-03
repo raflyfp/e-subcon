@@ -12,7 +12,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($barang as $item)
+            @foreach ($barang as $item)
                 <tr class="text-center">
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $item->kode_barang }}</td>
@@ -52,11 +52,7 @@
                         </div>
                     </td>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="7" class="text-center">Data barang kosong</td>
-                </tr>
-            @endforelse
+            @endforeach
         </tbody>
     </table>
 </div>
@@ -67,6 +63,10 @@
             pageLength: 15,
             info: false,
             dom: 'Bfrtip',
+            language: {
+                emptyTable: "Data barang belum tersedia",
+                zeroRecords: "Tidak ditemukan data yang sesuai"
+            },
             buttons: [
                 {
                     extend: 'excelHtml5',

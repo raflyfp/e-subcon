@@ -10,7 +10,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($karyawan as $item)
+            @foreach ($karyawan as $item)
                 <tr class="text-center">
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $item->no_karyawan }}</td>
@@ -27,7 +27,6 @@
                                     data-no_karyawan="{{ $item->no_karyawan }}"
                                     data-nama="{{ $item->nama_karyawan }}"
                                     data-lokasi_subcon_id="{{ $item->lokasi_subcon_id }}"
-                                    data-is_active="{{ $item->is_active }}"
                                     title="Edit Karyawan">
                                     <i class="ti ti-edit fs-6"></i>
                                 </button>
@@ -35,23 +34,19 @@
 
                             @if (auth()->user()->canAccess('master_karyawan.toggle'))
                                 <button type="button"
-                                    class="btn btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-toggle-status {{ $item->is_active == 1 ? 'btn-danger' : 'btn-success' }}"
+                                    class="btn btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-toggle-status {{ $item->is_active ? 'btn-danger' : 'btn-success' }}"
                                     style="width: 32px; height: 32px; padding: 0;"
                                     data-id="{{ $item->id }}"
                                     data-nama="{{ $item->nama_karyawan }}"
                                     data-status="{{ $item->is_active }}"
-                                    title="{{ $item->is_active == 1 ? 'Nonaktifkan Karyawan' : 'Aktifkan Karyawan' }}">
-                                    <i class="ti {{ $item->is_active == 1 ? 'ti-ban' : 'ti-check' }} fs-6"></i>
+                                    title="{{ $item->is_active ? 'Nonaktifkan Karyawan' : 'Aktifkan Karyawan' }}">
+                                    <i class="ti {{ $item->is_active ? 'ti-ban' : 'ti-check' }} fs-6"></i>
                                 </button>
                             @endif
                         </div>
                     </td>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="5" class="text-center">Data karyawan kosong</td>
-                </tr>
-            @endforelse
+            @endforeach
         </tbody>
     </table>
 </div>
@@ -62,6 +57,10 @@
             pageLength: 15,
             info: false,
             dom: 'Bfrtip',
+            language: {
+                emptyTable: "Data karyawan belum tersedia",
+                zeroRecords: "Tidak ditemukan data yang sesuai"
+            },
             buttons: [
                 {
                     extend: 'excelHtml5',
