@@ -11,394 +11,419 @@
 
         <div class="row g-3 g-md-4">
 
-        {{-- ========================================================================= --}}
-        {{-- SEBELAH KIRI: PANEL FILTER LAPORAN                                        --}}
-        {{-- ========================================================================= --}}
-        <div class="col-lg-4 col-xl-3">
-            <div class="card border shadow-sm sticky-top" style="top: 90px; z-index: 10;">
-                <div class="card-header bg-white py-3 border-bottom">
-                    <h5 class="mb-0 text-dark fw-bold">
-                        <i class="ti ti-adjustments-horizontal text-primary me-2"></i>Filter Laporan
-                    </h5>
-                    <small class="text-muted">Pilih kriteria untuk menyaring data</small>
-                </div>
-                <div class="card-body p-3">
-                    <form method="GET" action="{{ route('laporan.index') }}" id="filterForm">
-                        <input type="hidden" name="filter" value="1">
+            {{-- ========================================================================= --}}
+            {{-- SEBELAH KIRI: PANEL FILTER LAPORAN                                        --}}
+            {{-- ========================================================================= --}}
+            <div class="col-lg-4 col-xl-3">
+                <div class="card border shadow-sm sticky-top" style="top: 90px; z-index: 10;">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h5 class="mb-0 text-dark fw-bold">
+                            <i class="ti ti-adjustments-horizontal text-primary me-2"></i>Filter Laporan
+                        </h5>
+                        <small class="text-muted">Pilih kriteria untuk menyaring data</small>
+                    </div>
+                    <div class="card-body p-3">
+                        <form method="GET" action="{{ route('laporan.index') }}" id="filterForm">
+                            <input type="hidden" name="filter" value="1">
 
-                        {{-- Tanggal Mulai --}}
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold" for="filter_tanggal_mulai">Tanggal Mulai</label>
-                            <input type="date" class="form-control" name="tanggal_mulai" id="filter_tanggal_mulai"
-                                value="{{ $tanggalMulai }}">
-                        </div>
-
-                        {{-- Tanggal Akhir --}}
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold" for="filter_tanggal_akhir">Tanggal Akhir</label>
-                            <input type="date" class="form-control" name="tanggal_akhir" id="filter_tanggal_akhir"
-                                value="{{ $tanggalAkhir }}">
-                        </div>
-
-                        <hr class="text-secondary opacity-25">
-
-                        @if (!auth()->user()->is_admin)
-                            <div class="mb-3 p-2 bg-light rounded border">
-                                <small class="text-muted d-block">Subcon Pelaksana:</small>
-                                <strong class="text-primary"><i class="ti ti-building me-1"></i>{{ $subcon->nama_lokasi ?? auth()->user()->name }}</strong>
-                            </div>
-                        @endif
-
-                        {{-- Filter Karyawan --}}
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold" for="filter_karyawan_id">Karyawan Pelaksana</label>
-                            <select class="form-select select2-filter" name="karyawan_id" id="filter_karyawan_id">
-                                <option value="">-- Semua Karyawan --</option>
-                                @foreach ($karyawanList as $k)
-                                    <option value="{{ $k->id }}"
-                                        {{ $selectedKaryawan == $k->id ? 'selected' : '' }}>
-                                        {{ $k->nama_karyawan }} ({{ $k->no_karyawan }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        {{-- Filter Barang --}}
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold" for="filter_barang_id">Barang</label>
-                            <select class="form-select select2-filter" name="barang_id" id="filter_barang_id">
-                                <option value="">-- Semua Barang --</option>
-                                @foreach ($barangList as $b)
-                                    <option value="{{ $b->id }}" {{ $selectedBarang == $b->id ? 'selected' : '' }}>
-                                        [{{ $b->kode_barang }}] {{ $b->nama_barang }} ({{ $b->satuan ?? 'PCS' }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        {{-- Filter Lokasi Subcon (Hanya Admin) --}}
-                        @if (auth()->user()->is_admin)
+                            {{-- Tanggal Mulai --}}
                             <div class="mb-3">
-                                <label class="form-label fw-semibold" for="filter_lokasi_subcon_id">Lokasi Subcon</label>
-                                <select class="form-select select2-filter" name="lokasi_subcon_id" id="filter_lokasi_subcon_id">
-                                    <option value="">-- Semua Lokasi --</option>
-                                    @foreach ($lokasiList as $l)
-                                        <option value="{{ $l->id }}" {{ $selectedLokasi == $l->id ? 'selected' : '' }}>
-                                            {{ $l->nama_lokasi }}
+                                <label class="form-label fw-semibold" for="filter_tanggal_mulai">Tanggal Mulai</label>
+                                <input type="date" class="form-control" name="tanggal_mulai" id="filter_tanggal_mulai"
+                                    value="{{ $tanggalMulai }}">
+                            </div>
+
+                            {{-- Tanggal Akhir --}}
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" for="filter_tanggal_akhir">Tanggal Akhir</label>
+                                <input type="date" class="form-control" name="tanggal_akhir" id="filter_tanggal_akhir"
+                                    value="{{ $tanggalAkhir }}">
+                            </div>
+
+                            <hr class="text-secondary opacity-25">
+
+                            @if (!auth()->user()->is_admin)
+                                <div class="mb-3 p-2 bg-light rounded border">
+                                    <small class="text-muted d-block">Subcon Pelaksana:</small>
+                                    <strong class="text-primary"><i
+                                            class="ti ti-building me-1"></i>{{ $subcon->nama_lokasi ?? auth()->user()->name }}</strong>
+                                </div>
+                            @endif
+
+                            {{-- Filter Karyawan --}}
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" for="filter_karyawan_id">Karyawan Pelaksana</label>
+                                <select class="form-select select2-filter" name="karyawan_id" id="filter_karyawan_id">
+                                    <option value="">-- Semua Karyawan --</option>
+                                    @foreach ($karyawanList as $k)
+                                        <option value="{{ $k->id }}"
+                                            {{ $selectedKaryawan == $k->id ? 'selected' : '' }}>
+                                            {{ $k->nama_karyawan }} ({{ $k->no_karyawan }})
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
-                        @endif
 
-                        {{-- Sort By Laporan --}}
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold" for="filter_group_by">
-                                <i class="ti ti-sort-ascending me-1 text-primary"></i>Sort By
-                            </label>
-                            <select class="form-select" name="group_by" id="filter_group_by">
-                                <option value="barang" {{ ($groupBy ?? 'barang') === 'barang' ? 'selected' : '' }}>
-                                    Per Kode / Nama Barang
-                                </option>
-                                <option value="karyawan" {{ ($groupBy ?? '') === 'karyawan' ? 'selected' : '' }}>
-                                    Per Karyawan Pelaksana
-                                </option>
-                                @if (auth()->user()->is_admin)
-                                    <option value="subcon" {{ ($groupBy ?? '') === 'subcon' ? 'selected' : '' }}>
-                                        Per Lokasi Subcon
+                            {{-- Filter Barang --}}
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" for="filter_barang_id">Barang</label>
+                                <select class="form-select select2-filter" name="barang_id" id="filter_barang_id">
+                                    <option value="">-- Semua Barang --</option>
+                                    @foreach ($barangList as $b)
+                                        <option value="{{ $b->id }}"
+                                            {{ $selectedBarang == $b->id ? 'selected' : '' }}>
+                                            [{{ $b->kode_barang }}] {{ $b->nama_barang }} ({{ $b->satuan ?? 'PCS' }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Filter Lokasi Subcon (Hanya Admin) --}}
+                            @if (auth()->user()->is_admin)
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" for="filter_lokasi_subcon_id">Lokasi
+                                        Subcon</label>
+                                    <select class="form-select select2-filter" name="lokasi_subcon_id"
+                                        id="filter_lokasi_subcon_id">
+                                        <option value="">-- Semua Lokasi --</option>
+                                        @foreach ($lokasiList as $l)
+                                            <option value="{{ $l->id }}"
+                                                {{ $selectedLokasi == $l->id ? 'selected' : '' }}>
+                                                {{ $l->nama_lokasi }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
+
+                            {{-- Sort By Laporan --}}
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" for="filter_group_by">
+                                    <i class="ti ti-sort-ascending me-1 text-primary"></i>Sort By
+                                </label>
+                                <select class="form-select" name="group_by" id="filter_group_by">
+                                    <option value="barang" {{ ($groupBy ?? 'barang') === 'barang' ? 'selected' : '' }}>
+                                        Per Kode / Nama Barang
                                     </option>
-                                @endif
-                            </select>
-                        </div>
+                                    <option value="karyawan" {{ ($groupBy ?? '') === 'karyawan' ? 'selected' : '' }}>
+                                        Per Karyawan Pelaksana
+                                    </option>
+                                    @if (auth()->user()->is_admin)
+                                        <option value="subcon" {{ ($groupBy ?? '') === 'subcon' ? 'selected' : '' }}>
+                                            Per Lokasi Subcon
+                                        </option>
+                                    @endif
+                                </select>
+                            </div>
 
-                        {{-- Submit Buttons --}}
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary fw-semibold py-2">
-                                <i class="ti ti-filter me-1"></i> Terapkan Filter
-                            </button>
-                            <a href="{{ route('laporan.index') }}" class="btn btn-outline-secondary btn-sm py-2">
-                                <i class="ti ti-rotate-2 me-1"></i> Reset Filter
-                            </a>
-                        </div>
+                            {{-- Submit Buttons --}}
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary fw-semibold py-2">
+                                    <i class="ti ti-filter me-1"></i> Terapkan Filter
+                                </button>
+                                <a href="{{ route('laporan.index') }}" class="btn btn-outline-secondary btn-sm py-2">
+                                    <i class="ti ti-rotate-2 me-1"></i> Reset Filter
+                                </a>
+                            </div>
 
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        {{-- ========================================================================= --}}
-        {{-- SEBELAH KANAN: HASIL LAPORAN (Report Sheet Document Style)                --}}
-        {{-- ========================================================================= --}}
-        <div class="col-lg-8 col-xl-9">
+            {{-- ========================================================================= --}}
+            {{-- SEBELAH KANAN: HASIL LAPORAN (Report Sheet Document Style)                --}}
+            {{-- ========================================================================= --}}
+            <div class="col-lg-8 col-xl-9">
 
-            @if (!$isFiltered)
-                {{-- State Awal: Belum Filter (Kosong) --}}
-                <div class="card border bg-white shadow-sm text-center py-5 px-4" style="min-height: 450px;">
-                    <div class="my-auto py-4">
-                        <div class="mb-3 text-primary opacity-50">
-                            <i class="ti ti-file-search" style="font-size: 64px;"></i>
-                        </div>
-                        <h4 class="fw-bold text-dark mb-2">Laporan Belum Ditampilkan</h4>
-                        <p class="text-muted fs-6 mb-4" style="max-width: 520px; margin: 0 auto;">
-                            Silakan tentukan kriteria tanggal, barang, atau karyawan pada panel filter di sebelah kiri,
-                            kemudian klik tombol <strong>"Terapkan Filter"</strong> untuk memuat data laporan.
-                        </p>
-                    </div>
-                </div>
-            @else
-                {{-- Action Toolbar: Print, Export PDF, Export Excel --}}
-                <div class="card mb-3 border-0 shadow-sm">
-                    <div class="card-body p-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-primary-subtle text-primary border px-3 py-2 fs-6">
-                                <i class="ti ti-sort-ascending me-1"></i> Sort By:
-                                <strong>
-                                    @if (($groupBy ?? 'barang') === 'karyawan')
-                                        Per Karyawan
-                                    @elseif (($groupBy ?? 'barang') === 'subcon')
-                                        Per Lokasi Subcon
-                                    @else
-                                        Per Kode Barang
-                                    @endif
-                                </strong>
-                            </span>
-                        </div>
-
-                        <div class="d-flex gap-2 align-items-center">
-                            @if (auth()->user()->canAccess('laporan_subcon'))
-                                {{-- Tombol Print --}}
-                                <button type="button" class="btn btn-outline-dark btn-sm fw-semibold"
-                                    onclick="printReportSheet()">
-                                    <i class="ti ti-printer me-1"></i> Print Laporan
-                                </button>
-                                {{-- Tombol PDF --}}
-                                <button type="button" class="btn btn-danger btn-sm fw-semibold" onclick="exportReportPDF()">
-                                    <i class="ti ti-file-type-pdf me-1"></i> Export PDF
-                                </button>
-                                {{-- Tombol Excel --}}
-                                <button type="button" class="btn btn-success btn-sm fw-semibold" onclick="exportReportExcel()">
-                                    <i class="ti ti-file-spreadsheet me-1"></i> Export Excel
-                                </button>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Frame Container Hasil Laporan dengan Scroll Internal --}}
-                <div class="report-scroll-frame border rounded bg-white shadow-sm" id="reportViewerFrame"
-                    style="max-height: 70vh; overflow-y: auto; overflow-x: auto; position: relative;">
-                    <div class="p-3 p-md-4" id="printable-report-sheet" style="color: #000; min-width: 680px;">
-
-                        {{-- Header Dokumen Laporan --}}
-                        <div class="report-header mb-4 pb-2 border-bottom">
-                            <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.02em;">PT. Sinaraya Nugraha</h4>
-                            <h5 class="fw-bold mb-1 text-dark">Laporan Pengerjaan Barang Subcon</h5>
-                            <div class="fw-bold text-dark fs-6 mb-2">
-                                Periode :
-                                {{ $tanggalMulai ? \Carbon\Carbon::parse($tanggalMulai)->format('Y-m-d') : 'Awal' }}
-                                s/d
-                                {{ $tanggalAkhir ? \Carbon\Carbon::parse($tanggalAkhir)->format('Y-m-d') : 'Sekarang' }}
+                @if (!$isFiltered)
+                    {{-- State Awal: Belum Filter (Kosong) --}}
+                    <div class="card border bg-white shadow-sm text-center py-5 px-4" style="min-height: 450px;">
+                        <div class="my-auto py-4">
+                            <div class="mb-3 text-primary opacity-50">
+                                <i class="ti ti-file-search" style="font-size: 64px;"></i>
                             </div>
-                            <div class="small fw-semibold text-secondary pt-1">
-                                <span><strong>Barang :</strong>
-                                    {{ $selectedBarangObj ? '[' . $selectedBarangObj->kode_barang . '] ' . $selectedBarangObj->nama_barang . ' (' . ($selectedBarangObj->satuan ?? 'PCS') . ')' : 'SEMUA BARANG' }}</span>
-                                <span class="mx-2">|</span>
-                                <span><strong>Lokasi :</strong>
-                                    {{ $selectedLokasiObj ? $selectedLokasiObj->nama_lokasi : 'SEMUA LOKASI' }}</span>
-                                @if (auth()->user()->is_admin)
-                                    <span class="mx-2">|</span>
-                                    <span><strong>Karyawan :</strong>
-                                        {{ $selectedKaryawanObj ? $selectedKaryawanObj->nama_karyawan . ' (' . $selectedKaryawanObj->no_karyawan . ')' : 'SEMUA KARYAWAN' }}</span>
+                            <h4 class="fw-bold text-dark mb-2">Laporan Belum Ditampilkan</h4>
+                            <p class="text-muted fs-6 mb-4" style="max-width: 520px; margin: 0 auto;">
+                                Silakan tentukan kriteria tanggal, barang, atau karyawan pada panel filter di sebelah kiri,
+                                kemudian klik tombol <strong>"Terapkan Filter"</strong> untuk memuat data laporan.
+                            </p>
+                        </div>
+                    </div>
+                @else
+                    {{-- Action Toolbar: Print, Export PDF, Export Excel --}}
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-body p-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary-subtle text-primary border px-3 py-2 fs-6">
+                                    <i class="ti ti-sort-ascending me-1"></i> Sort By:
+                                    <strong>
+                                        @if (($groupBy ?? 'barang') === 'karyawan')
+                                            Per Karyawan
+                                        @elseif (($groupBy ?? 'barang') === 'subcon')
+                                            Per Lokasi Subcon
+                                        @else
+                                            Per Kode Barang
+                                        @endif
+                                    </strong>
+                                </span>
+                            </div>
+
+                            <div class="d-flex gap-2 align-items-center">
+                                @if (auth()->user()->canAccess('laporan_subcon'))
+                                    {{-- Tombol Print --}}
+                                    <button type="button" class="btn btn-outline-dark btn-sm fw-semibold"
+                                        onclick="printReportSheet()">
+                                        <i class="ti ti-printer me-1"></i> Print Laporan
+                                    </button>
+                                    {{-- Tombol PDF --}}
+                                    <button type="button" class="btn btn-danger btn-sm fw-semibold"
+                                        onclick="exportReportPDF()">
+                                        <i class="ti ti-file-type-pdf me-1"></i> Export PDF
+                                    </button>
+                                    {{-- Tombol Excel --}}
+                                    <button type="button" class="btn btn-success btn-sm fw-semibold"
+                                        onclick="exportReportExcel()">
+                                        <i class="ti ti-file-spreadsheet me-1"></i> Export Excel
+                                    </button>
                                 @endif
                             </div>
                         </div>
+                    </div>
 
-                        {{-- Tabel-Tabel Pengelompokan Data --}}
-                        @php
-                            $currentGroupBy = $groupBy ?? 'barang';
-                            if ($currentGroupBy === 'karyawan') {
-                                $groupedPengerjaan = $pengerjaan->groupBy(function($item) {
-                                    return $item->nama_karyawan . ' (' . $item->no_karyawan . ')';
-                                });
-                            } elseif ($currentGroupBy === 'subcon') {
-                                $groupedPengerjaan = $pengerjaan->groupBy('nama_lokasi');
-                            } else {
-                                $groupedPengerjaan = $pengerjaan->groupBy('kode_barang');
-                            }
-                        @endphp
+                    {{-- Frame Container Hasil Laporan dengan Scroll Internal --}}
+                    <div class="report-scroll-frame border rounded bg-white shadow-sm" id="reportViewerFrame"
+                        style="max-height: 70vh; overflow-y: auto; overflow-x: auto; position: relative;">
+                        <div class="p-3 p-md-4" id="printable-report-sheet" style="color: #000; min-width: 680px;">
 
-                        @forelse ($groupedPengerjaan as $groupKey => $items)
+                            {{-- Header Dokumen Laporan --}}
+                            <div class="report-header mb-4 pb-2 border-bottom">
+                                <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.02em;">PT. Sinaraya Nugraha
+                                </h4>
+                                <h5 class="fw-bold mb-1 text-dark">Laporan Pengerjaan Barang Subcon</h5>
+                                <div class="fw-bold text-dark fs-6 mb-2">
+                                    Periode :
+                                    {{ $tanggalMulai ? \Carbon\Carbon::parse($tanggalMulai)->format('Y-m-d') : 'Awal' }}
+                                    s/d
+                                    {{ $tanggalAkhir ? \Carbon\Carbon::parse($tanggalAkhir)->format('Y-m-d') : 'Sekarang' }}
+                                </div>
+                                <div class="small fw-semibold text-secondary pt-1">
+                                    <span><strong>Barang :</strong>
+                                        {{ $selectedBarangObj ? '[' . $selectedBarangObj->kode_barang . '] ' . $selectedBarangObj->nama_barang . ' (' . ($selectedBarangObj->satuan ?? 'PCS') . ')' : 'SEMUA BARANG' }}</span>
+                                    <span class="mx-2">|</span>
+                                    <span><strong>Lokasi :</strong>
+                                        {{ $selectedLokasiObj ? $selectedLokasiObj->nama_lokasi : 'SEMUA LOKASI' }}</span>
+                                    @if (auth()->user()->is_admin)
+                                        <span class="mx-2">|</span>
+                                        <span><strong>Karyawan :</strong>
+                                            {{ $selectedKaryawanObj ? $selectedKaryawanObj->nama_karyawan . ' (' . $selectedKaryawanObj->no_karyawan . ')' : 'SEMUA KARYAWAN' }}</span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            {{-- Tabel-Tabel Pengelompokan Data --}}
                             @php
-                                $firstItem = $items->first();
-                                $subtotal = $items->sum('jumlah');
-                                $totalDurasiMenit = $items->sum('durasi_menit');
-
-                                $totJam = intdiv($totalDurasiMenit, 60);
-                                $totMnt = $totalDurasiMenit % 60;
-                                if ($totJam > 0 && $totMnt > 0) {
-                                    $durasiTotalText = "{$totJam} Jam {$totMnt} Mnt";
-                                } elseif ($totJam > 0) {
-                                    $durasiTotalText = "{$totJam} Jam";
-                                } elseif ($totMnt > 0) {
-                                    $durasiTotalText = "{$totMnt} Menit";
+                                $currentGroupBy = $groupBy ?? 'barang';
+                                if ($currentGroupBy === 'karyawan') {
+                                    $groupedPengerjaan = $pengerjaan->groupBy(function ($item) {
+                                        return $item->nama_karyawan . ' (' . $item->no_karyawan . ')';
+                                    });
+                                } elseif ($currentGroupBy === 'subcon') {
+                                    $groupedPengerjaan = $pengerjaan->groupBy('nama_lokasi');
                                 } else {
-                                    $durasiTotalText = "-";
+                                    $groupedPengerjaan = $pengerjaan->groupBy('kode_barang');
                                 }
                             @endphp
 
-                            <div class="barang-report-block mb-4" style="page-break-inside: avoid;">
-                                {{-- Header Tabel Per Kelompok --}}
-                                <div class="px-3 py-2 border rounded-top d-flex justify-content-between align-items-center"
-                                    style="background-color: #e0f2fe; color: #0369a1; font-weight: 700; border-color: #94a3b8 !important;">
-                                    <div>
-                                        @if ($currentGroupBy === 'karyawan')
-                                            <i class="ti ti-user me-1"></i>
-                                            <span class="fs-6">{{ $groupKey }}</span>
-                                            <span class="text-muted small fw-normal ms-2">(Lokasi: {{ $firstItem->nama_lokasi }})</span>
-                                        @elseif ($currentGroupBy === 'subcon')
-                                            <i class="ti ti-building me-1"></i>
-                                            <span class="fs-6">Lokasi Subcon: {{ $groupKey }}</span>
-                                        @else
-                                            <i class="ti ti-package me-1"></i>
-                                            <span class="fs-6">[{{ $groupKey }}] {{ $firstItem->nama_barang }}</span>
-                                        @endif
-                                    </div>
-                                    <div>
-                                        <small class="text-primary fw-semibold">{{ count($items) }} Catatan Pengerjaan</small>
-                                    </div>
-                                </div>
+                            @forelse ($groupedPengerjaan as $groupKey => $items)
+                                @php
+                                    $firstItem = $items->first();
+                                    $subtotal = $items->sum('jumlah');
+                                    $totalDurasiMenit = $items->sum('durasi_menit');
 
-                                {{-- Tabel Rincian Data --}}
-                                <div class="table-responsive">
-                                    <table class="table table-bordered align-middle w-100 report-table mb-0"
-                                        style="border-color: #94a3b8; font-size: 0.92rem; border-top: 0;">
-                                        <thead>
-                                            <tr class="text-center"
-                                                style="background-color: #f8fafc; color: #0f172a; font-weight: 600; border-color: #94a3b8;">
-                                                <th style="width: 35px; border: 1px solid #94a3b8;">No</th>
-                                                <th style="width: 90px; border: 1px solid #94a3b8;">Tanggal</th>
-                                                <th style="width: 125px; border: 1px solid #94a3b8;">Jam Kerja</th>
-                                                <th style="width: 105px; border: 1px solid #94a3b8;">Durasi</th>
-                                                @if ($currentGroupBy !== 'karyawan')
-                                                    <th style="border: 1px solid #94a3b8;">Karyawan</th>
-                                                @endif
-                                                @if ($currentGroupBy === 'karyawan' || $currentGroupBy === 'subcon')
-                                                    <th style="border: 1px solid #94a3b8;">Barang yang Dikerjakan</th>
-                                                @endif
-                                                @if ($currentGroupBy !== 'subcon')
-                                                    <th style="border: 1px solid #94a3b8;">Lokasi Subcon</th>
-                                                @endif
-                                                <th style="width: 110px; border: 1px solid #94a3b8;">Jenis Pekerjaan</th>
-                                                <th style="width: 105px; border: 1px solid #94a3b8;">Jumlah Selesai</th>
-                                                <th style="width: 65px; border: 1px solid #94a3b8;">Satuan</th>
-                                                <th style="border: 1px solid #94a3b8;">Keterangan</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($items as $item)
-                                                <tr class="text-center" style="border: 1px solid #cbd5e1;">
-                                                    <td style="border: 1px solid #cbd5e1;">{{ $loop->iteration }}</td>
-                                                    <td style="border: 1px solid #cbd5e1;">
-                                                        {{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y') }}</td>
-                                                    <td class="text-center" style="border: 1px solid #cbd5e1; font-size: 0.88rem;">
-                                                        @if ($item->jam_mulai && $item->jam_selesai)
-                                                            <span class="fw-semibold text-dark">{{ substr($item->jam_mulai, 0, 5) }} - {{ substr($item->jam_selesai, 0, 5) }}</span>
-                                                            <span class="text-muted small">WIB</span>
-                                                        @elseif ($item->jam_mulai)
-                                                            <span class="fw-semibold text-dark">{{ substr($item->jam_mulai, 0, 5) }}</span>
-                                                            <span class="text-muted small">WIB</span>
-                                                        @else
-                                                            <span class="text-muted">-</span>
-                                                        @endif
-                                                    </td>
-                                                    <td class="text-center" style="border: 1px solid #cbd5e1; font-size: 0.88rem;">
-                                                        @if (!empty($item->durasi_menit))
-                                                            @php
-                                                                $jam = intdiv($item->durasi_menit, 60);
-                                                                $mnt = $item->durasi_menit % 60;
-                                                                if ($jam > 0 && $mnt > 0) {
-                                                                    $durText = "{$jam} Jam {$mnt} Mnt";
-                                                                } elseif ($jam > 0) {
-                                                                    $durText = "{$jam} Jam";
-                                                                } else {
-                                                                    $durText = "{$mnt} Menit";
-                                                                }
-                                                            @endphp
-                                                            <span class="fw-semibold text-success">{{ $durText }}</span>
-                                                        @else
-                                                            <span class="text-muted">-</span>
-                                                        @endif
-                                                    </td>
+                                    $totJam = intdiv($totalDurasiMenit, 60);
+                                    $totMnt = $totalDurasiMenit % 60;
+                                    if ($totJam > 0 && $totMnt > 0) {
+                                        $durasiTotalText = "{$totJam} Jam {$totMnt} Mnt";
+                                    } elseif ($totJam > 0) {
+                                        $durasiTotalText = "{$totJam} Jam";
+                                    } elseif ($totMnt > 0) {
+                                        $durasiTotalText = "{$totMnt} Menit";
+                                    } else {
+                                        $durasiTotalText = '-';
+                                    }
+                                @endphp
+
+                                <div class="barang-report-block mb-4" style="page-break-inside: avoid;">
+                                    {{-- Header Tabel Per Kelompok --}}
+                                    <div class="px-3 py-2 border rounded-top d-flex justify-content-between align-items-center"
+                                        style="background-color: #e0f2fe; color: #0369a1; font-weight: 700; border-color: #94a3b8 !important;">
+                                        <div>
+                                            @if ($currentGroupBy === 'karyawan')
+                                                <i class="ti ti-user me-1"></i>
+                                                <span class="fs-6">{{ $groupKey }}</span>
+                                                <span class="text-muted small fw-normal ms-2">(Lokasi:
+                                                    {{ $firstItem->nama_lokasi }})</span>
+                                            @elseif ($currentGroupBy === 'subcon')
+                                                <i class="ti ti-building me-1"></i>
+                                                <span class="fs-6">Lokasi Subcon: {{ $groupKey }}</span>
+                                            @else
+                                                <i class="ti ti-package me-1"></i>
+                                                <span class="fs-6">[{{ $groupKey }}]
+                                                    {{ $firstItem->nama_barang }}</span>
+                                            @endif
+                                        </div>
+                                        {{-- <div>
+                                        <small class="text-primary fw-semibold">{{ count($items) }} Catatan Pengerjaan</small>
+                                    </div> --}}
+                                    </div>
+
+                                    {{-- Tabel Rincian Data --}}
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered align-middle w-100 report-table mb-0"
+                                            style="border-color: #94a3b8; font-size: 0.92rem; border-top: 0;">
+                                            <thead>
+                                                <tr class="text-center"
+                                                    style="background-color: #f8fafc; color: #0f172a; font-weight: 600; border-color: #94a3b8;">
+                                                    <th style="width: 35px; border: 1px solid #94a3b8;">No</th>
+                                                    <th style="width: 90px; border: 1px solid #94a3b8;">Tanggal</th>
+                                                    <th style="width: 125px; border: 1px solid #94a3b8;">Jam Kerja</th>
+                                                    <th style="width: 105px; border: 1px solid #94a3b8;">Durasi</th>
                                                     @if ($currentGroupBy !== 'karyawan')
-                                                        <td class="text-start" style="border: 1px solid #cbd5e1;">
-                                                            {{ $item->nama_karyawan }} ({{ $item->no_karyawan }})</td>
+                                                        <th style="border: 1px solid #94a3b8;">Karyawan</th>
                                                     @endif
                                                     @if ($currentGroupBy === 'karyawan' || $currentGroupBy === 'subcon')
-                                                        <td class="text-start" style="border: 1px solid #cbd5e1;">
-                                                            <strong>[{{ $item->kode_barang }}]</strong> {{ $item->nama_barang }}</td>
+                                                        <th style="border: 1px solid #94a3b8;">Barang yang Dikerjakan</th>
                                                     @endif
                                                     @if ($currentGroupBy !== 'subcon')
-                                                        <td style="border: 1px solid #cbd5e1;">{{ $item->nama_lokasi }}</td>
+                                                        <th style="border: 1px solid #94a3b8;">Lokasi Subcon</th>
                                                     @endif
-                                                    <td class="text-center" style="border: 1px solid #cbd5e1;">
-                                                        {{ $item->jenis_pekerjaan ?: '-' }}
-                                                    </td>
-                                                    <td class="text-end fw-bold text-dark pe-3"
-                                                        style="border: 1px solid #cbd5e1;">
-                                                        {{ number_format($item->jumlah, 0, ',', '.') }}
-                                                    </td>
-                                                    <td class="text-center" style="border: 1px solid #cbd5e1;">
-                                                        {{ $item->satuan ?? 'PCS' }}
-                                                    </td>
-                                                    <td class="text-start" style="border: 1px solid #cbd5e1;">
-                                                        {{ $item->keterangan ?: '-' }}</td>
+                                                    <th style="width: 110px; border: 1px solid #94a3b8;">Jenis Pekerjaan
+                                                    </th>
+                                                    <th style="width: 105px; border: 1px solid #94a3b8;">Jumlah Selesai
+                                                    </th>
+                                                    <th style="width: 65px; border: 1px solid #94a3b8;">Satuan</th>
+                                                    <th style="border: 1px solid #94a3b8;">Keterangan</th>
                                                 </tr>
-                                            @endforeach
-                                        </tbody>
-                                        <tfoot>
-                                            <tr class="fw-bold"
-                                                style="background-color: #f1f5f9; border: 1px solid #94a3b8;">
-                                                <td colspan="3" class="text-start ps-3" style="border: 1px solid #94a3b8;">
-                                                    Total :
-                                                </td>
-                                                <td class="text-center fw-bold text-success" style="border: 1px solid #94a3b8; font-size: 0.88rem;">
-                                                    {{ $durasiTotalText }}
-                                                </td>
-                                                <td colspan="3" style="border: 1px solid #94a3b8;"></td>
-                                                <td class="text-end fw-bold text-primary pe-3" style="border: 1px solid #94a3b8;">
-                                                    {{ number_format($subtotal, 0, ',', '.') }}
-                                                </td>
-                                                <td colspan="2" style="border: 1px solid #94a3b8;"></td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($items as $item)
+                                                    <tr class="text-center" style="border: 1px solid #cbd5e1;">
+                                                        <td style="border: 1px solid #cbd5e1;">{{ $loop->iteration }}</td>
+                                                        <td style="border: 1px solid #cbd5e1;">
+                                                            {{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y') }}
+                                                        </td>
+                                                        <td class="text-center"
+                                                            style="border: 1px solid #cbd5e1; font-size: 0.88rem;">
+                                                            @if ($item->jam_mulai && $item->jam_selesai)
+                                                                <span
+                                                                    class="fw-semibold text-dark">{{ substr($item->jam_mulai, 0, 5) }}
+                                                                    - {{ substr($item->jam_selesai, 0, 5) }}</span>
+                                                                <span class="text-muted small">WIB</span>
+                                                            @elseif ($item->jam_mulai)
+                                                                <span
+                                                                    class="fw-semibold text-dark">{{ substr($item->jam_mulai, 0, 5) }}</span>
+                                                                <span class="text-muted small">WIB</span>
+                                                            @else
+                                                                <span class="text-muted">-</span>
+                                                            @endif
+                                                        </td>
+                                                        <td class="text-center"
+                                                            style="border: 1px solid #cbd5e1; font-size: 0.88rem;">
+                                                            @if (!empty($item->durasi_menit))
+                                                                @php
+                                                                    $jam = intdiv($item->durasi_menit, 60);
+                                                                    $mnt = $item->durasi_menit % 60;
+                                                                    if ($jam > 0 && $mnt > 0) {
+                                                                        $durText = "{$jam} Jam {$mnt} Mnt";
+                                                                    } elseif ($jam > 0) {
+                                                                        $durText = "{$jam} Jam";
+                                                                    } else {
+                                                                        $durText = "{$mnt} Menit";
+                                                                    }
+                                                                @endphp
+                                                                <span
+                                                                    class="fw-semibold text-success">{{ $durText }}</span>
+                                                            @else
+                                                                <span class="text-muted">-</span>
+                                                            @endif
+                                                        </td>
+                                                        @if ($currentGroupBy !== 'karyawan')
+                                                            <td class="text-start" style="border: 1px solid #cbd5e1;">
+                                                                {{ $item->nama_karyawan }} ({{ $item->no_karyawan }})</td>
+                                                        @endif
+                                                        @if ($currentGroupBy === 'karyawan' || $currentGroupBy === 'subcon')
+                                                            <td class="text-start" style="border: 1px solid #cbd5e1;">
+                                                                <strong>[{{ $item->kode_barang }}]</strong>
+                                                                {{ $item->nama_barang }}
+                                                            </td>
+                                                        @endif
+                                                        @if ($currentGroupBy !== 'subcon')
+                                                            <td style="border: 1px solid #cbd5e1;">
+                                                                {{ $item->nama_lokasi }}</td>
+                                                        @endif
+                                                        <td class="text-center" style="border: 1px solid #cbd5e1;">
+                                                            {{ $item->jenis_pekerjaan ?: '-' }}
+                                                        </td>
+                                                        <td class="text-end fw-bold text-dark pe-3"
+                                                            style="border: 1px solid #cbd5e1;">
+                                                            {{ number_format($item->jumlah, 0, ',', '.') }}
+                                                        </td>
+                                                        <td class="text-center" style="border: 1px solid #cbd5e1;">
+                                                            {{ $item->satuan ?? 'PCS' }}
+                                                        </td>
+                                                        <td class="text-start" style="border: 1px solid #cbd5e1;">
+                                                            {{ $item->keterangan ?: '-' }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="fw-bold"
+                                                    style="background-color: #f1f5f9; border: 1px solid #94a3b8;">
+                                                    <td colspan="3" class="text-start ps-3"
+                                                        style="border: 1px solid #94a3b8;">
+                                                        Total :
+                                                    </td>
+                                                    <td class="text-center fw-bold text-success"
+                                                        style="border: 1px solid #94a3b8; font-size: 0.88rem;">
+                                                        {{ $durasiTotalText }}
+                                                    </td>
+                                                    <td colspan="3" style="border: 1px solid #94a3b8;"></td>
+                                                    <td class="text-end fw-bold text-primary pe-3"
+                                                        style="border: 1px solid #94a3b8;">
+                                                        {{ number_format($subtotal, 0, ',', '.') }}
+                                                    </td>
+                                                    <td colspan="2" style="border: 1px solid #94a3b8;"></td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center py-5 text-muted border rounded p-4 bg-light">
+                                    <i class="ti ti-alert-circle fs-2 d-block mb-2 text-secondary"></i>
+                                    Tidak ada data pengerjaan barang pada periode / filter ini.
+                                </div>
+                            @endforelse
+
+                            {{-- Footer Lembar Laporan --}}
+                            <div class="d-flex justify-content-between align-items-center mt-4 pt-3 text-muted small"
+                                style="border-top: 1px dashed #cbd5e1;">
+                                <div>
+                                    Dicetak oleh: <strong>{{ auth()->user()->name }}</strong>
+                                </div>
+                                <div>
+                                    Waktu cetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB
                                 </div>
                             </div>
-                        @empty
-                            <div class="text-center py-5 text-muted border rounded p-4 bg-light">
-                                <i class="ti ti-alert-circle fs-2 d-block mb-2 text-secondary"></i>
-                                Tidak ada data pengerjaan barang pada periode / filter ini.
-                            </div>
-                        @endforelse
 
-                        {{-- Footer Lembar Laporan --}}
-                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 text-muted small"
-                            style="border-top: 1px dashed #cbd5e1;">
-                            <div>
-                                Dicetak oleh: <strong>{{ auth()->user()->name }}</strong>
-                            </div>
-                            <div>
-                                Waktu cetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB
-                            </div>
                         </div>
-
                     </div>
-                </div>
-            @endif
+                @endif
+
+            </div>
 
         </div>
-
-    </div>
     </div>
 
     {{-- Styling Scroll Frame & Print Media --}}
@@ -562,7 +587,8 @@
             let reportHeaderHtml = '<table border="0">' +
                 '<tr><td colspan="10" style="font-size:16px; font-weight:bold;">e-System \u2014 PT. Sinaraya Nugraha<\/td><\/tr>' +
                 '<tr><td colspan="10" style="font-size:14px; font-weight:bold;">Laporan Pengerjaan Barang Subcon<\/td><\/tr>' +
-                '<tr><td colspan="10" style="font-size:12px; font-weight:bold;">Periode: ' + tglMulai + ' s/d ' + tglAkhir + '<\/td><\/tr>' +
+                '<tr><td colspan="10" style="font-size:12px; font-weight:bold;">Periode: ' + tglMulai + ' s/d ' + tglAkhir +
+                '<\/td><\/tr>' +
                 '<tr><td colspan="10"><\/td><\/tr>' +
                 '<\/table>';
 
@@ -580,7 +606,8 @@
                 }
             });
 
-            const fullExcelHtml = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">' +
+            const fullExcelHtml =
+                '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">' +
                 '<head>' +
                 '<meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8"/>' +
                 '<style>' +
