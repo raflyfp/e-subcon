@@ -31,11 +31,17 @@ class MasterPekerjaanController extends Controller
         ]);
 
         try {
-            Pekerjaan::create([
+            $pekerjaan = Pekerjaan::create([
                 'nama_pekerjaan' => trim($request->nama_pekerjaan),
                 'keterangan'     => $request->keterangan ? trim($request->keterangan) : null,
                 'is_active'      => true,
             ]);
+
+            \App\Models\ActivityLog::record(
+                'Master Pekerjaan',
+                'CREATE',
+                "Menambahkan jenis pekerjaan baru: {$pekerjaan->nama_pekerjaan}"
+            );
 
             return redirect()->back()->with('success', 'Master pekerjaan berhasil ditambahkan.');
         } catch (\Throwable $e) {
@@ -62,6 +68,12 @@ class MasterPekerjaanController extends Controller
                 'keterangan'     => $request->keterangan ? trim($request->keterangan) : null,
             ]);
 
+            \App\Models\ActivityLog::record(
+                'Master Pekerjaan',
+                'UPDATE',
+                "Memperbarui jenis pekerjaan: {$pekerjaan->nama_pekerjaan}"
+            );
+
             return redirect()->back()->with('success', 'Data pekerjaan berhasil diperbarui.');
         } catch (\Throwable $e) {
             Log::error('UpdatePekerjaan error', ['message' => $e->getMessage()]);
@@ -77,6 +89,12 @@ class MasterPekerjaanController extends Controller
         $pekerjaan = Pekerjaan::findOrFail($id);
         $pekerjaan->is_active = !$pekerjaan->is_active;
         $pekerjaan->save();
+
+        \App\Models\ActivityLog::record(
+            'Master Pekerjaan',
+            'TOGGLE_STATUS',
+            "Mengubah status jenis pekerjaan {$pekerjaan->nama_pekerjaan} menjadi " . ($pekerjaan->is_active ? 'Aktif' : 'Nonaktif')
+        );
 
         return response()->json([
             'success'   => true,

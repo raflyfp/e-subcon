@@ -36,12 +36,18 @@ class MasterKaryawanController extends Controller
         ]);
 
         try {
-            Karyawan::create([
+            $karyawan = Karyawan::create([
                 'nama_karyawan'    => $request->nama_karyawan,
                 'no_karyawan'      => $request->no_karyawan,
                 'lokasi_subcon_id' => $request->lokasi_subcon_id,
                 'is_active'        => true,
             ]);
+
+            \App\Models\ActivityLog::record(
+                'Master Karyawan',
+                'CREATE',
+                "Menambahkan karyawan baru: {$karyawan->nama_karyawan} ({$karyawan->no_karyawan})"
+            );
 
             return redirect()->back()->with('success', 'Data karyawan berhasil ditambahkan.');
         } catch (\Throwable $e) {
@@ -75,6 +81,12 @@ class MasterKaryawanController extends Controller
                 'lokasi_subcon_id' => $request->lokasi_subcon_id,
             ]);
 
+            \App\Models\ActivityLog::record(
+                'Master Karyawan',
+                'UPDATE',
+                "Memperbarui data karyawan: {$karyawan->nama_karyawan} ({$karyawan->no_karyawan})"
+            );
+
             return redirect()->back()->with('success', 'Data karyawan berhasil diperbarui');
         } catch (\Throwable $e) {
             Log::error('UpdateKaryawan error', [
@@ -95,6 +107,12 @@ class MasterKaryawanController extends Controller
         $karyawan = Karyawan::findOrFail($id);
         $karyawan->is_active = !$karyawan->is_active;
         $karyawan->save();
+
+        \App\Models\ActivityLog::record(
+            'Master Karyawan',
+            'TOGGLE_STATUS',
+            "Mengubah status karyawan {$karyawan->nama_karyawan} ({$karyawan->no_karyawan}) menjadi " . ($karyawan->is_active ? 'Aktif' : 'Nonaktif')
+        );
 
         return response()->json([
             'success'   => true,

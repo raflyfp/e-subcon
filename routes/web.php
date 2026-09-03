@@ -163,4 +163,9 @@ Route::middleware(['auth', 'throttle:web-traffic'])->group(function () {
             Route::put('/{id}/toggle-status', [MasterPekerjaanController::class, 'toggleStatus'])->name('pekerjaan.toggle')->middleware('permission:master_pekerjaan.toggle');
         });
     });
+
+    // Log Report (Audit Trail)
+    Route::middleware('permission:log_report')->group(function () {
+        Route::get('/log-report', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('log-report.index');
+    });
 });

@@ -35,21 +35,30 @@ class MasterBarangController extends Controller
             'kode_barang'      => 'required|unique:tb_barang,kode_barang',
             'nama_barang'      => 'required|string|max:255',
             'satuan'           => 'required|string|max:50',
-            'lokasi_subcon_id' => 'nullable|exists:tb_lokasi_subcon,id',
-            'pekerjaan_id'     => 'nullable|exists:tb_pekerjaan,id',
+            'lokasi_subcon_id' => 'required|exists:tb_lokasi_subcon,id',
+            'pekerjaan_id'     => 'required|exists:tb_pekerjaan,id',
+        ], [
+            'lokasi_subcon_id.required' => 'Penempatan Lokasi Subcon wajib dipilih.',
+            'pekerjaan_id.required'     => 'Jenis Pekerjaan wajib dipilih.',
         ]);
 
         try {
-            $pekerjaan = $request->pekerjaan_id ? Pekerjaan::find($request->pekerjaan_id) : null;
+            $pekerjaan = Pekerjaan::findOrFail($request->pekerjaan_id);
 
-            Barang::create([
+            $barang = Barang::create([
                 'kode_barang'      => $request->kode_barang,
                 'nama_barang'      => $request->nama_barang,
                 'satuan'           => strtoupper(trim($request->satuan)),
-                'lokasi_subcon_id' => $request->lokasi_subcon_id ?: null,
-                'pekerjaan_id'     => $pekerjaan?->id ?: null,
-                'jenis_pekerjaan'  => $pekerjaan?->nama_pekerjaan ?: null,
+                'lokasi_subcon_id' => $request->lokasi_subcon_id,
+                'pekerjaan_id'     => $pekerjaan->id,
+                'jenis_pekerjaan'  => $pekerjaan->nama_pekerjaan,
             ]);
+
+            \App\Models\ActivityLog::record(
+                'Master Barang',
+                'CREATE',
+                "Menambahkan barang baru: {$barang->kode_barang} - {$barang->nama_barang} ({$barang->jenis_pekerjaan})"
+            );
 
             return redirect()->back()->with('success', 'Barang berhasil ditambahkan');
         } catch (\Throwable $e) {
@@ -67,21 +76,30 @@ class MasterBarangController extends Controller
             'kode_barang'      => 'required|unique:tb_barang,kode_barang,' . $id,
             'nama_barang'      => 'required|string|max:255',
             'satuan'           => 'required|string|max:50',
-            'lokasi_subcon_id' => 'nullable|exists:tb_lokasi_subcon,id',
-            'pekerjaan_id'     => 'nullable|exists:tb_pekerjaan,id',
+            'lokasi_subcon_id' => 'required|exists:tb_lokasi_subcon,id',
+            'pekerjaan_id'     => 'required|exists:tb_pekerjaan,id',
+        ], [
+            'lokasi_subcon_id.required' => 'Penempatan Lokasi Subcon wajib dipilih.',
+            'pekerjaan_id.required'     => 'Jenis Pekerjaan wajib dipilih.',
         ]);
 
         $barang = Barang::findOrFail($id);
-        $pekerjaan = $request->pekerjaan_id ? Pekerjaan::find($request->pekerjaan_id) : null;
+        $pekerjaan = Pekerjaan::findOrFail($request->pekerjaan_id);
 
         $barang->update([
             'kode_barang'      => $request->kode_barang,
             'nama_barang'      => $request->nama_barang,
             'satuan'           => strtoupper(trim($request->satuan)),
-            'lokasi_subcon_id' => $request->lokasi_subcon_id ?: null,
-            'pekerjaan_id'     => $pekerjaan?->id ?: null,
-            'jenis_pekerjaan'  => $pekerjaan?->nama_pekerjaan ?: null,
+            'lokasi_subcon_id' => $request->lokasi_subcon_id,
+            'pekerjaan_id'     => $pekerjaan->id,
+            'jenis_pekerjaan'  => $pekerjaan->nama_pekerjaan,
         ]);
+
+        \App\Models\ActivityLog::record(
+            'Master Barang',
+            'UPDATE',
+            "Memperbarui data barang: {$barang->kode_barang} - {$barang->nama_barang}"
+        );
 
         return redirect()->back()->with('success', 'Data barang berhasil diupdate');
     }
@@ -94,6 +112,12 @@ class MasterBarangController extends Controller
         $barang = Barang::findOrFail($id);
         $barang->is_active = !$barang->is_active;
         $barang->save();
+
+        \App\Models\ActivityLog::record(
+            'Master Barang',
+            'TOGGLE_STATUS',
+            "Mengubah status barang {$barang->kode_barang} ({$barang->nama_barang}) menjadi " . ($barang->is_active ? 'Aktif' : 'Nonaktif')
+        );
 
         return response()->json([
             'success'   => true,

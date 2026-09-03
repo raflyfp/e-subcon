@@ -58,6 +58,9 @@ class User extends Authenticatable
         'Laporan Subcon' => [
             'laporan_subcon.view' => 'Lihat & Export Laporan',
         ],
+        'Log Report' => [
+            'log_report.view' => 'Lihat Log Report',
+        ],
     ];
 
     public const PERMISSION_MATRIX = [
@@ -107,7 +110,7 @@ class User extends Authenticatable
                 'delete' => 'master_lokasi_subcon.toggle',
             ],
         ],
-        'Transaksi & Laporan' => [
+        'Transaksi' => [
             [
                 'name'   => 'Formulir Pengerjaan',
                 'view'   => 'formulir_pengerjaan.view',
@@ -115,9 +118,18 @@ class User extends Authenticatable
                 'edit'   => null,
                 'delete' => null,
             ],
+        ],
+        'Report' => [
             [
                 'name'   => 'Laporan Pengerjaan Subcon',
                 'view'   => 'laporan_subcon.view',
+                'create' => null,
+                'edit'   => null,
+                'delete' => null,
+            ],
+            [
+                'name'   => 'Log Report',
+                'view'   => 'log_report.view',
                 'create' => null,
                 'edit'   => null,
                 'delete' => null,
@@ -154,12 +166,11 @@ class User extends Authenticatable
         'master_lokasi_subcon.edit'  => 'Edit Lokasi Subcon',
         'master_lokasi_subcon.toggle'=> 'Nonaktifkan / Aktifkan Lokasi Subcon',
         'formulir_pengerjaan'        => 'Formulir Pengerjaan',
-        'formulir_pengerjaan.view'   => 'Buka Form Pengerjaan',
-        'formulir_pengerjaan.create' => 'Simpan Pengerjaan',
-        'formulir_pengerjaan.delete' => 'Hapus Pengerjaan',
+        'formulir_pengerjaan.view'   => 'Buka Form & Input Pengerjaan',
         'laporan_subcon'             => 'Laporan Subcon',
-        'laporan_subcon.view'        => 'Lihat Laporan',
-        'laporan_subcon.export'      => 'Cetak & Export Excel/PDF',
+        'laporan_subcon.view'        => 'Lihat & Export Laporan',
+        'log_report'                 => 'Log Report',
+        'log_report.view'            => 'Lihat Log Report',
     ];
 
     public static function getAllPermissions(): array

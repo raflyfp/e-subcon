@@ -131,7 +131,7 @@ class PengerjaanController extends Controller
         }
 
         try {
-            Pengerjaan::create([
+            $pengerjaan = Pengerjaan::create([
                 'karyawan_id'      => $request->karyawan_id,
                 'barang_id'        => $request->barang_id,
                 'lokasi_subcon_id' => $lokasiSubconId,
@@ -143,6 +143,16 @@ class PengerjaanController extends Controller
                 'jumlah'           => $request->jumlah,
                 'keterangan'       => $request->keterangan,
             ]);
+
+            $karyawanName = Karyawan::find($request->karyawan_id)?->nama_karyawan ?: 'Karyawan';
+            $barangName   = Barang::find($request->barang_id)?->nama_barang ?: 'Barang';
+            $lokasiName   = LokasiSubcon::find($lokasiSubconId)?->nama_lokasi ?: 'Subcon';
+
+            \App\Models\ActivityLog::record(
+                'Formulir Pengerjaan',
+                'CREATE',
+                "Input pengerjaan: {$request->jumlah} pcs {$barangName} oleh {$karyawanName} di {$lokasiName} (Tanggal: {$request->tanggal})"
+            );
 
             return redirect()->back()->with('success', 'Data pengerjaan barang berhasil disimpan.');
         } catch (\Throwable $e) {
@@ -305,7 +315,15 @@ class PengerjaanController extends Controller
             }
         }
 
+        $info = "Hapus transaksi pengerjaan ID #{$pengerjaan->id}: {$pengerjaan->jumlah} pcs tanggal {$pengerjaan->tanggal}";
+
         $pengerjaan->delete();
+
+        \App\Models\ActivityLog::record(
+            'Formulir Pengerjaan',
+            'DELETE',
+            $info
+        );
 
         return response()->json([
             'success' => true,

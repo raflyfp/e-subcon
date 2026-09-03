@@ -22,6 +22,12 @@ class UserController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
+            \App\Models\ActivityLog::record(
+                'Autentikasi',
+                'LOGIN',
+                'User berhasil login ke sistem (' . auth()->user()->role . ')'
+            );
+
             if (auth()->user()->is_admin) {
                 return redirect()->route('dashboard');
             }
@@ -34,6 +40,14 @@ class UserController extends Controller
 
     public function logout(Request $request)
     {
+        if (Auth::check()) {
+            \App\Models\ActivityLog::record(
+                'Autentikasi',
+                'LOGOUT',
+                'User logout dari sistem'
+            );
+        }
+
         // logout user hanya untuk device ini saja sehingga tidak menghapus token remember me di device lain
         Auth::logoutCurrentDevice();
         $request->session()->invalidate();

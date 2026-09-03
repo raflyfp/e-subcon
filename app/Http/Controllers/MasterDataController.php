@@ -94,6 +94,12 @@ class MasterDataController extends Controller
 
             DB::commit();
 
+            \App\Models\ActivityLog::record(
+                'Master User',
+                'CREATE',
+                "Menambahkan user baru: {$user->name} ({$user->username}) dengan role {$user->role}"
+            );
+
             return redirect()->back()->with('success', 'User dan Hak Akses berhasil ditambahkan.');
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -174,6 +180,12 @@ class MasterDataController extends Controller
 
             DB::commit();
 
+            \App\Models\ActivityLog::record(
+                'Master User',
+                'UPDATE',
+                "Memperbarui user: {$user->name} ({$user->username}), role: {$user->role}"
+            );
+
             return redirect()->back()->with('success', 'Data user dan hak akses berhasil diperbarui.');
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -217,6 +229,12 @@ class MasterDataController extends Controller
         $user->save();
 
         $statusText = $user->is_active ? 'diaktifkan' : 'dinonaktifkan';
+
+        \App\Models\ActivityLog::record(
+            'Master User',
+            'TOGGLE_STATUS',
+            "Mengubah status akun user {$user->name} ({$user->username}) menjadi " . ($user->is_active ? 'Aktif' : 'Nonaktif')
+        );
 
         return response()->json([
             'success'   => true,

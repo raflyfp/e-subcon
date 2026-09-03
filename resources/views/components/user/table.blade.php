@@ -112,14 +112,16 @@
                     'master_pekerjaan.view', 'master_pekerjaan.create', 'master_pekerjaan.edit', 'master_pekerjaan.toggle',
                     'master_lokasi_subcon.view', 'master_lokasi_subcon.create', 'master_lokasi_subcon.edit', 'master_lokasi_subcon.toggle',
                     'formulir_pengerjaan.view',
-                    'laporan_subcon.view'
+                    'laporan_subcon.view',
+                    'log_report.view'
                 ],
                 'admin_ppic': [
                     'dashboard.view',
                     'master_barang.view', 'master_barang.create', 'master_barang.edit', 'master_barang.toggle',
                     'master_pekerjaan.view', 'master_pekerjaan.create', 'master_pekerjaan.edit', 'master_pekerjaan.toggle',
                     'formulir_pengerjaan.view',
-                    'laporan_subcon.view'
+                    'laporan_subcon.view',
+                    'log_report.view'
                 ],
                 'admin_biasa': [
                     'dashboard.view',
@@ -127,7 +129,8 @@
                     'master_barang.view', 'master_barang.create', 'master_barang.edit', 'master_barang.toggle',
                     'master_pekerjaan.view', 'master_pekerjaan.create', 'master_pekerjaan.edit', 'master_pekerjaan.toggle',
                     'formulir_pengerjaan.view',
-                    'laporan_subcon.view'
+                    'laporan_subcon.view',
+                    'log_report.view'
                 ],
                 'user': [
                     'dashboard.view',

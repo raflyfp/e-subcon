@@ -51,7 +51,7 @@ class MasterLokasiSubconController extends Controller
             ]);
 
             // 2. Buat Lokasi Subcon
-            LokasiSubcon::create([
+            $lokasi = LokasiSubcon::create([
                 'user_id'     => $user->id,
                 'nama_lokasi' => $request->nama_lokasi,
                 'alamat'      => $request->alamat,
@@ -59,6 +59,12 @@ class MasterLokasiSubconController extends Controller
             ]);
 
             DB::commit();
+
+            \App\Models\ActivityLog::record(
+                'Master Lokasi Subcon',
+                'CREATE',
+                "Menambahkan lokasi subcon baru: {$lokasi->nama_lokasi} (Akun: {$user->username})"
+            );
 
             return redirect()->back()->with('success', 'Lokasi subcon dan akun login berhasil ditambahkan (Username: ' . $request->username . ')');
         } catch (\Throwable $e) {
@@ -120,6 +126,12 @@ class MasterLokasiSubconController extends Controller
 
             DB::commit();
 
+            \App\Models\ActivityLog::record(
+                'Master Lokasi Subcon',
+                'UPDATE',
+                "Memperbarui data lokasi subcon: {$lokasi->nama_lokasi}"
+            );
+
             return redirect()->back()->with('success', 'Data lokasi subcon berhasil diperbarui');
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -136,6 +148,12 @@ class MasterLokasiSubconController extends Controller
         $lokasi = LokasiSubcon::findOrFail($id);
         $lokasi->is_active = !$lokasi->is_active;
         $lokasi->save();
+
+        \App\Models\ActivityLog::record(
+            'Master Lokasi Subcon',
+            'TOGGLE_STATUS',
+            "Mengubah status lokasi subcon {$lokasi->nama_lokasi} menjadi " . ($lokasi->is_active ? 'Aktif' : 'Nonaktif')
+        );
 
         return response()->json([
             'success'   => true,

@@ -30,9 +30,9 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Jenis Pekerjaan</label>
-                        <select class="form-select" name="pekerjaan_id" id="pekerjaan_id_update">
-                            <option value="">-- Tanpa Jenis Pekerjaan (Umum) --</option>
+                        <label class="form-label fw-semibold">Jenis Pekerjaan <span class="text-danger">*</span></label>
+                        <select class="form-select" name="pekerjaan_id" id="pekerjaan_id_update" required>
+                            <option value="">-- Pilih Jenis Pekerjaan --</option>
                             @foreach ($pekerjaanList as $p)
                                 <option value="{{ $p->id }}">{{ $p->nama_pekerjaan }}</option>
                             @endforeach
@@ -41,9 +41,9 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Penempatan Lokasi Subcon</label>
-                        <select class="form-select" name="lokasi_subcon_id" id="lokasi_subcon_id_update">
-                            <option value="">-- Tanpa Lokasi Subcon (Umum) --</option>
+                        <label class="form-label fw-semibold">Penempatan Lokasi Subcon <span class="text-danger">*</span></label>
+                        <select class="form-select" name="lokasi_subcon_id" id="lokasi_subcon_id_update" required>
+                            <option value="">-- Pilih Lokasi Subcon --</option>
                             @foreach ($subconList as $s)
                                 <option value="{{ $s->id }}">{{ $s->nama_lokasi }}</option>
                             @endforeach

@@ -76,30 +76,44 @@
                     </li>
                 @endif
 
-                @php
-                    $canAccessPengerjaan = auth()->user()->canAccess('formulir_pengerjaan') || auth()->user()->canAccess('laporan_subcon');
-                @endphp
-
-                @if ($canAccessPengerjaan)
+                @if (auth()->user()->canAccess('formulir_pengerjaan'))
                     <!-- Pengerjaan -->
                     <li class="pc-item pc-caption">
                         <label class="text-secondary">Pengerjaan</label>
                     </li>
 
-                    @if (auth()->user()->canAccess('formulir_pengerjaan'))
-                        <li class="pc-item">
-                            <a href="{{ url('pengerjaan') }}" class="pc-link">
-                                <span class="pc-micon"><i class="ti ti-edit"></i></span>
-                                <span class="pc-mtext">Formulir Pengerjaan</span>
-                            </a>
-                        </li>
-                    @endif
+                    <li class="pc-item">
+                        <a href="{{ url('pengerjaan') }}" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-edit"></i></span>
+                            <span class="pc-mtext">Formulir Pengerjaan</span>
+                        </a>
+                    </li>
+                @endif
+
+                @php
+                    $canAccessReport = auth()->user()->canAccess('laporan_subcon') || auth()->user()->canAccess('log_report');
+                @endphp
+
+                @if ($canAccessReport)
+                    <!-- Report -->
+                    <li class="pc-item pc-caption">
+                        <label class="text-secondary">Report</label>
+                    </li>
 
                     @if (auth()->user()->canAccess('laporan_subcon'))
                         <li class="pc-item">
                             <a href="{{ url('laporan-subcon') }}" class="pc-link">
                                 <span class="pc-micon"><i class="ti ti-file-analytics"></i></span>
                                 <span class="pc-mtext">Laporan Subcon</span>
+                            </a>
+                        </li>
+                    @endif
+
+                    @if (auth()->user()->canAccess('log_report'))
+                        <li class="pc-item">
+                            <a href="{{ route('log-report.index') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-history"></i></span>
+                                <span class="pc-mtext">Log Report</span>
                             </a>
                         </li>
                     @endif
