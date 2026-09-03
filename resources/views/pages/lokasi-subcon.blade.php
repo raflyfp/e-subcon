@@ -10,10 +10,12 @@
             <div class="col-md-12">
                 <div class="row">
                     <div class="col px-4 py-4">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#tambah_lokasi">
-                            <i class="ti ti-plus me-1"></i> Tambah Lokasi
-                        </button>
+                        @if (auth()->user()->canAccess('master_lokasi_subcon.create'))
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#tambah_lokasi">
+                                <i class="ti ti-plus me-1"></i> Tambah Lokasi
+                            </button>
+                        @endif
                     </div>
                 </div>
 

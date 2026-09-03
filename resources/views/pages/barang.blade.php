@@ -10,10 +10,12 @@
             <div class="col-md-12">
                 <div class="row">
                     <div class="col px-4 py-4">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#tambah_barang">
-                            <i class="ti ti-plus me-1"></i> Tambah Barang
-                        </button>
+                        @if (auth()->user()->canAccess('master_barang.create'))
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#tambah_barang">
+                                <i class="ti ti-plus me-1"></i> Tambah Barang
+                            </button>
+                        @endif
                     </div>
                 </div>
 

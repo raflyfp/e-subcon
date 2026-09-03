@@ -20,9 +20,11 @@ class MasterDataController extends Controller
             ->orderBy('id', 'asc')
             ->get();
 
-        $availablePermissions = User::AVAILABLE_PERMISSIONS;
+        $permissionGroups = User::PERMISSION_GROUPS;
+        $permissionMatrix = User::PERMISSION_MATRIX;
+        $hasSuperAdmin = User::where('role', User::ROLE_SUPER_ADMIN)->exists();
 
-        return view('pages.user', compact('user', 'availablePermissions'));
+        return view('pages.user', compact('user', 'permissionGroups', 'permissionMatrix', 'hasSuperAdmin'));
     }
 
     /**
@@ -54,9 +56,12 @@ class MasterDataController extends Controller
         $role = $request->input('role', User::ROLE_ADMIN_BIASA);
         $permissions = $request->input('permissions', []);
 
-        // Jika Super Admin, berikan semua permission secara default
+        // Batasi akun Super Admin hanya 1
         if ($role === User::ROLE_SUPER_ADMIN) {
-            $permissions = array_keys(User::AVAILABLE_PERMISSIONS);
+            if (User::where('role', User::ROLE_SUPER_ADMIN)->exists()) {
+                return redirect()->back()->withInput()->with('error', 'Akun Super Admin dibatasi hanya 1 akun. Silakan pilih role lain (Admin PPIC, Admin Biasa, atau User).');
+            }
+            $permissions = array_keys(User::getAllPermissions());
         }
 
         // Tentukan is_admin (role admin = 1, role user/subcon = 0)
@@ -121,8 +126,16 @@ class MasterDataController extends Controller
         $role = $request->input('role', $user->role);
         $permissions = $request->input('permissions', []);
 
+        // Batasi akun Super Admin hanya 1
         if ($role === User::ROLE_SUPER_ADMIN) {
-            $permissions = array_keys(User::AVAILABLE_PERMISSIONS);
+            $otherSuperAdminExists = User::where('role', User::ROLE_SUPER_ADMIN)
+                ->where('id', '!=', $id)
+                ->exists();
+
+            if ($otherSuperAdminExists) {
+                return redirect()->back()->withInput()->with('error', 'Akun Super Admin dibatasi hanya 1 akun. Silakan pilih role lain.');
+            }
+            $permissions = array_keys(User::getAllPermissions());
         }
 
         $isAdmin = in_array($role, [User::ROLE_SUPER_ADMIN, User::ROLE_ADMIN_PPIC, User::ROLE_ADMIN_BIASA], true) ? 1 : 0;
@@ -191,6 +204,15 @@ class MasterDataController extends Controller
         }
 
         $user = User::findOrFail($id);
+
+        // Cegah penonaktifan Super Admin
+        if ($user->role === User::ROLE_SUPER_ADMIN) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun Super Admin tidak dapat dinonaktifkan.',
+            ], 422);
+        }
+
         $user->is_active = !$user->is_active;
         $user->save();
 

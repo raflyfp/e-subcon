@@ -18,16 +18,160 @@ class User extends Authenticatable
     public const ROLE_USER        = 'user';
     public const ROLE_SUBCON      = 'subcon';
 
-    public const AVAILABLE_PERMISSIONS = [
-        'dashboard'            => 'Dashboard',
-        'master_user'          => 'Master User',
-        'master_karyawan'      => 'Master Karyawan',
-        'master_barang'        => 'Master Barang',
-        'master_pekerjaan'     => 'Master Pekerjaan',
-        'master_lokasi_subcon' => 'Master Lokasi Subcon',
-        'formulir_pengerjaan'  => 'Formulir Pengerjaan',
-        'laporan_subcon'       => 'Laporan Subcon',
+    public const PERMISSION_GROUPS = [
+        'Dashboard' => [
+            'dashboard.view' => 'Lihat Dashboard',
+        ],
+        'Master User' => [
+            'master_user.view'   => 'Lihat Menu & Data',
+            'master_user.create' => 'Tambah User',
+            'master_user.edit'   => 'Edit User & Hak Akses',
+            'master_user.toggle' => 'Nonaktifkan / Aktifkan User',
+        ],
+        'Master Karyawan' => [
+            'master_karyawan.view'   => 'Lihat Menu & Data',
+            'master_karyawan.create' => 'Tambah Karyawan',
+            'master_karyawan.edit'   => 'Edit Karyawan',
+            'master_karyawan.toggle' => 'Nonaktifkan / Aktifkan Karyawan',
+        ],
+        'Master Barang' => [
+            'master_barang.view'   => 'Lihat Menu & Data',
+            'master_barang.create' => 'Tambah Barang',
+            'master_barang.edit'   => 'Edit Barang',
+            'master_barang.toggle' => 'Nonaktifkan / Aktifkan Barang',
+        ],
+        'Master Pekerjaan' => [
+            'master_pekerjaan.view'   => 'Lihat Menu & Data',
+            'master_pekerjaan.create' => 'Tambah Pekerjaan',
+            'master_pekerjaan.edit'   => 'Edit Pekerjaan',
+            'master_pekerjaan.toggle' => 'Nonaktifkan / Aktifkan Pekerjaan',
+        ],
+        'Master Lokasi Subcon' => [
+            'master_lokasi_subcon.view'   => 'Lihat Menu & Data',
+            'master_lokasi_subcon.create' => 'Tambah Lokasi Subcon',
+            'master_lokasi_subcon.edit'   => 'Edit Lokasi Subcon',
+            'master_lokasi_subcon.toggle' => 'Nonaktifkan / Aktifkan Lokasi Subcon',
+        ],
+        'Formulir Pengerjaan' => [
+            'formulir_pengerjaan.view' => 'Buka Form & Input Pengerjaan',
+        ],
+        'Laporan Subcon' => [
+            'laporan_subcon.view' => 'Lihat & Export Laporan',
+        ],
     ];
+
+    public const PERMISSION_MATRIX = [
+        'Dashboard' => [
+            [
+                'name'   => 'Dashboard Monitoring',
+                'view'   => 'dashboard.view',
+                'create' => null,
+                'edit'   => null,
+                'delete' => null,
+            ],
+        ],
+        'Master Data' => [
+            [
+                'name'   => 'User & Hak Akses',
+                'view'   => 'master_user.view',
+                'create' => 'master_user.create',
+                'edit'   => 'master_user.edit',
+                'delete' => 'master_user.toggle',
+            ],
+            [
+                'name'   => 'Karyawan',
+                'view'   => 'master_karyawan.view',
+                'create' => 'master_karyawan.create',
+                'edit'   => 'master_karyawan.edit',
+                'delete' => 'master_karyawan.toggle',
+            ],
+            [
+                'name'   => 'Barang',
+                'view'   => 'master_barang.view',
+                'create' => 'master_barang.create',
+                'edit'   => 'master_barang.edit',
+                'delete' => 'master_barang.toggle',
+            ],
+            [
+                'name'   => 'Pekerjaan',
+                'view'   => 'master_pekerjaan.view',
+                'create' => 'master_pekerjaan.create',
+                'edit'   => 'master_pekerjaan.edit',
+                'delete' => 'master_pekerjaan.toggle',
+            ],
+            [
+                'name'   => 'Lokasi Subcon',
+                'view'   => 'master_lokasi_subcon.view',
+                'create' => 'master_lokasi_subcon.create',
+                'edit'   => 'master_lokasi_subcon.edit',
+                'delete' => 'master_lokasi_subcon.toggle',
+            ],
+        ],
+        'Transaksi & Laporan' => [
+            [
+                'name'   => 'Formulir Pengerjaan',
+                'view'   => 'formulir_pengerjaan.view',
+                'create' => null,
+                'edit'   => null,
+                'delete' => null,
+            ],
+            [
+                'name'   => 'Laporan Pengerjaan Subcon',
+                'view'   => 'laporan_subcon.view',
+                'create' => null,
+                'edit'   => null,
+                'delete' => null,
+            ],
+        ],
+    ];
+
+    public const AVAILABLE_PERMISSIONS = [
+        'dashboard'                  => 'Dashboard',
+        'dashboard.view'             => 'Lihat Dashboard',
+        'master_user'                => 'Master User',
+        'master_user.view'           => 'Lihat Menu & Data',
+        'master_user.create'         => 'Tambah User',
+        'master_user.edit'           => 'Edit User & Hak Akses',
+        'master_user.toggle'         => 'Nonaktifkan / Aktifkan User',
+        'master_karyawan'            => 'Master Karyawan',
+        'master_karyawan.view'       => 'Lihat Menu & Data',
+        'master_karyawan.create'     => 'Tambah Karyawan',
+        'master_karyawan.edit'       => 'Edit Karyawan',
+        'master_karyawan.toggle'     => 'Nonaktifkan / Aktifkan Karyawan',
+        'master_barang'              => 'Master Barang',
+        'master_barang.view'         => 'Lihat Menu & Data',
+        'master_barang.create'       => 'Tambah Barang',
+        'master_barang.edit'         => 'Edit Barang',
+        'master_barang.toggle'       => 'Nonaktifkan / Aktifkan Barang',
+        'master_pekerjaan'           => 'Master Pekerjaan',
+        'master_pekerjaan.view'      => 'Lihat Menu & Data',
+        'master_pekerjaan.create'    => 'Tambah Pekerjaan',
+        'master_pekerjaan.edit'      => 'Edit Pekerjaan',
+        'master_pekerjaan.toggle'    => 'Nonaktifkan / Aktifkan Pekerjaan',
+        'master_lokasi_subcon'       => 'Master Lokasi Subcon',
+        'master_lokasi_subcon.view'  => 'Lihat Menu & Data',
+        'master_lokasi_subcon.create'=> 'Tambah Lokasi Subcon',
+        'master_lokasi_subcon.edit'  => 'Edit Lokasi Subcon',
+        'master_lokasi_subcon.toggle'=> 'Nonaktifkan / Aktifkan Lokasi Subcon',
+        'formulir_pengerjaan'        => 'Formulir Pengerjaan',
+        'formulir_pengerjaan.view'   => 'Buka Form Pengerjaan',
+        'formulir_pengerjaan.create' => 'Simpan Pengerjaan',
+        'formulir_pengerjaan.delete' => 'Hapus Pengerjaan',
+        'laporan_subcon'             => 'Laporan Subcon',
+        'laporan_subcon.view'        => 'Lihat Laporan',
+        'laporan_subcon.export'      => 'Cetak & Export Excel/PDF',
+    ];
+
+    public static function getAllPermissions(): array
+    {
+        $flattened = [];
+        foreach (self::PERMISSION_GROUPS as $group => $items) {
+            foreach ($items as $key => $label) {
+                $flattened[$key] = $label;
+            }
+        }
+        return $flattened;
+    }
 
     protected $fillable = [
         'name',
@@ -54,7 +198,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Memeriksa apakah user memiliki hak akses ke suatu menu/halaman
+     * Memeriksa apakah user memiliki hak akses ke suatu menu/aksi
      */
     public function canAccess(string $permission): bool
     {
@@ -63,14 +207,38 @@ class User extends Authenticatable
             return false;
         }
 
-        // Super Admin memiliki akses penuh ke seluruh menu
+        // Super Admin memiliki akses penuh ke seluruh menu dan aksi
         if ($this->role === self::ROLE_SUPER_ADMIN || ($this->is_admin && empty($this->permissions))) {
             return true;
         }
 
-        // Cek array permissions yang tersimpan
-        if (is_array($this->permissions)) {
-            return in_array($permission, $this->permissions, true);
+        if (!is_array($this->permissions)) {
+            return false;
+        }
+
+        // 1. Direct match (misal: 'master_barang.create')
+        if (in_array($permission, $this->permissions, true)) {
+            return true;
+        }
+
+        // 2. Base module match untuk sidebar / menu access
+        // Jika cek 'master_barang' (atau 'master_barang.view'), izinkan jika user memiliki aksi apapun di modul tersebut
+        if (!str_contains($permission, '.')) {
+            // Cek apakah punya permission base itu sendiri atau sub-permission apapun di modul tersebut
+            if (in_array($permission, $this->permissions, true)) {
+                return true;
+            }
+            foreach ($this->permissions as $p) {
+                if (str_starts_with($p, $permission . '.')) {
+                    return true;
+                }
+            }
+        } else {
+            // Jika cek 'master_barang.view', izinkan jika punya permission legacy 'master_barang'
+            $base = explode('.', $permission)[0];
+            if (in_array($base, $this->permissions, true)) {
+                return true;
+            }
         }
 
         return false;

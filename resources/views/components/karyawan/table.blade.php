@@ -18,27 +18,32 @@
                     <td>{{ $item->lokasiSubcon->nama_lokasi ?? '-' }}</td>
                     <td class="no-export text-center">
                         <div class="d-inline-flex gap-2 justify-content-center align-items-center">
-                            <button type="button" class="btn btn-warning btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-edit"
-                                style="width: 32px; height: 32px; padding: 0;"
-                                data-bs-toggle="modal"
-                                data-bs-target="#update_karyawan"
-                                data-id="{{ $item->id }}"
-                                data-no_karyawan="{{ $item->no_karyawan }}"
-                                data-nama="{{ $item->nama_karyawan }}"
-                                data-lokasi_subcon_id="{{ $item->lokasi_subcon_id }}"
-                                data-is_active="{{ $item->is_active }}"
-                                title="Edit Karyawan">
-                                <i class="ti ti-edit fs-6"></i>
-                            </button>
-                            <button type="button"
-                                class="btn btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-toggle-status {{ $item->is_active == 1 ? 'btn-danger' : 'btn-success' }}"
-                                style="width: 32px; height: 32px; padding: 0;"
-                                data-id="{{ $item->id }}"
-                                data-nama="{{ $item->nama_karyawan }}"
-                                data-status="{{ $item->is_active }}"
-                                title="{{ $item->is_active == 1 ? 'Nonaktifkan Karyawan' : 'Aktifkan Karyawan' }}">
-                                <i class="ti {{ $item->is_active == 1 ? 'ti-ban' : 'ti-check' }} fs-6"></i>
-                            </button>
+                            @if (auth()->user()->canAccess('master_karyawan.edit'))
+                                <button type="button" class="btn btn-warning btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-edit"
+                                    style="width: 32px; height: 32px; padding: 0;"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#update_karyawan"
+                                    data-id="{{ $item->id }}"
+                                    data-no_karyawan="{{ $item->no_karyawan }}"
+                                    data-nama="{{ $item->nama_karyawan }}"
+                                    data-lokasi_subcon_id="{{ $item->lokasi_subcon_id }}"
+                                    data-is_active="{{ $item->is_active }}"
+                                    title="Edit Karyawan">
+                                    <i class="ti ti-edit fs-6"></i>
+                                </button>
+                            @endif
+
+                            @if (auth()->user()->canAccess('master_karyawan.toggle'))
+                                <button type="button"
+                                    class="btn btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-toggle-status {{ $item->is_active == 1 ? 'btn-danger' : 'btn-success' }}"
+                                    style="width: 32px; height: 32px; padding: 0;"
+                                    data-id="{{ $item->id }}"
+                                    data-nama="{{ $item->nama_karyawan }}"
+                                    data-status="{{ $item->is_active }}"
+                                    title="{{ $item->is_active == 1 ? 'Nonaktifkan Karyawan' : 'Aktifkan Karyawan' }}">
+                                    <i class="ti {{ $item->is_active == 1 ? 'ti-ban' : 'ti-check' }} fs-6"></i>
+                                </button>
+                            @endif
                         </div>
                     </td>
                 </tr>

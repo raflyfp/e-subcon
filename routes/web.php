@@ -20,20 +20,27 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// Rate limit login: 5 percobaan per menit per akun+IP
+// Rate limit login: 20 percobaan per menit per akun/IP
 RateLimiter::for("login", function (Request $request) {
-    return Limit::perMinute(5)->by(
+    return Limit::perMinute(20)->by(
         str($request->input("username"))->lower() . '|' . $request->ip()
+    );
+});
+
+// Rate limit umum untuk operasi web & AJAX berkecepatan tinggi: 1000 request per menit per user/IP
+RateLimiter::for("web-traffic", function (Request $request) {
+    return Limit::perMinute(1000)->by(
+        $request->user()?->id ?: $request->ip()
     );
 });
 
 Route::get('/check-session', function () {
     return response()->json(['authenticated' => Auth::check()]);
-})->name('check-session')->middleware('web');
+})->name('check-session')->middleware(['web', 'throttle:web-traffic']);
 
 Route::get('/refresh-csrf', function () {
     return response()->json(['csrf_token' => csrf_token()]);
-})->name('refresh-csrf')->middleware('web');
+})->name('refresh-csrf')->middleware(['web', 'throttle:web-traffic']);
 
 // Halaman utama: jika belum login langsung ke login, jika sudah login ke dashboard (admin) atau form pengerjaan (subcon)
 Route::get('/', function () {
@@ -58,10 +65,10 @@ Route::get('/login', function () {
         return redirect()->route('pengerjaan.index');
     }
     return view('pages.login');
-})->name('login')->middleware('throttle:10,1');
+})->name('login')->middleware('throttle:120,1');
 
 Route::post('/login', [UserController::class, 'login'])->name('login.post')->middleware('throttle:login');
-Route::post('/logout', [UserController::class, 'logout'])->name('logout')->middleware('throttle:50,1');
+Route::post('/logout', [UserController::class, 'logout'])->name('logout')->middleware('throttle:web-traffic');
 
 
 /*
@@ -70,7 +77,7 @@ Route::post('/logout', [UserController::class, 'logout'])->name('logout')->middl
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'throttle:web-traffic'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
@@ -79,8 +86,8 @@ Route::middleware('auth')->group(function () {
     */
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('permission:dashboard');
-    Route::get('/password', [UserController::class, 'password'])->name('password')->middleware('throttle:10,1');
-    Route::get('/reset_password', [UserController::class, 'ChangePassword'])->name('password.change')->middleware('throttle:10,1');
+    Route::get('/password', [UserController::class, 'password'])->name('password');
+    Route::get('/reset_password', [UserController::class, 'ChangePassword'])->name('password.change');
 
 
     /*
@@ -89,14 +96,14 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::prefix('pengerjaan')->middleware(['throttle:100,1', 'permission:formulir_pengerjaan'])->group(function () {
+    Route::prefix('pengerjaan')->middleware('permission:formulir_pengerjaan')->group(function () {
         Route::get('/', [PengerjaanController::class, 'index'])->name('pengerjaan.index');
         Route::get('/riwayat', [PengerjaanController::class, 'laporan'])->name('pengerjaan.riwayat');
-        Route::post('/tambah', [PengerjaanController::class, 'store'])->name('pengerjaan.store');
-        Route::delete('/{id}', [PengerjaanController::class, 'destroy'])->name('pengerjaan.destroy');
+        Route::post('/tambah', [PengerjaanController::class, 'store'])->name('pengerjaan.store')->middleware('permission:formulir_pengerjaan.create');
+        Route::delete('/{id}', [PengerjaanController::class, 'destroy'])->name('pengerjaan.destroy')->middleware('permission:formulir_pengerjaan.delete');
     });
 
-    Route::get('/laporan-subcon', [PengerjaanController::class, 'laporan'])->name('laporan.index')->middleware(['throttle:100,1', 'permission:laporan_subcon']);
+    Route::get('/laporan-subcon', [PengerjaanController::class, 'laporan'])->name('laporan.index')->middleware('permission:laporan_subcon');
 
 
     /*
@@ -107,53 +114,53 @@ Route::middleware('auth')->group(function () {
 
     // Master User & Hak Akses
     Route::middleware('permission:master_user')->group(function () {
-        Route::get('/user', [MasterDataController::class, 'index'])->name('user.index')->middleware('throttle:20,1');
-        Route::prefix('master-user')->middleware('throttle:20,1')->group(function () {
+        Route::get('/user', [MasterDataController::class, 'index'])->name('user.index');
+        Route::prefix('master-user')->group(function () {
             Route::get('/', [MasterDataController::class, 'getData']);
-            Route::post('/tambah', [MasterDataController::class, 'CreateUser'])->name('user.simpan');
-            Route::put('/{id}', [MasterDataController::class, 'updateUser'])->name('user.update');
-            Route::put('/{id}/toggle-status', [MasterDataController::class, 'toggleStatus'])->name('user.toggle');
+            Route::post('/tambah', [MasterDataController::class, 'CreateUser'])->name('user.simpan')->middleware('permission:master_user.create');
+            Route::put('/{id}', [MasterDataController::class, 'updateUser'])->name('user.update')->middleware('permission:master_user.edit');
+            Route::put('/{id}/toggle-status', [MasterDataController::class, 'toggleStatus'])->name('user.toggle')->middleware('permission:master_user.toggle');
         });
     });
 
     // Master Karyawan
     Route::middleware('permission:master_karyawan')->group(function () {
-        Route::get('/karyawan', [MasterKaryawanController::class, 'index'])->name('karyawan.index')->middleware('throttle:20,1');
-        Route::prefix('master-karyawan')->middleware('throttle:100,1')->group(function () {
+        Route::get('/karyawan', [MasterKaryawanController::class, 'index'])->name('karyawan.index');
+        Route::prefix('master-karyawan')->group(function () {
             Route::get('/data', [MasterKaryawanController::class, 'getData'])->name('karyawan.data');
-            Route::post('/tambah', [MasterKaryawanController::class, 'store'])->name('karyawan.store');
-            Route::put('/{id}', [MasterKaryawanController::class, 'update'])->name('karyawan.update');
-            Route::put('/{id}/toggle-status', [MasterKaryawanController::class, 'toggleStatus'])->name('karyawan.toggle');
+            Route::post('/tambah', [MasterKaryawanController::class, 'store'])->name('karyawan.store')->middleware('permission:master_karyawan.create');
+            Route::put('/{id}', [MasterKaryawanController::class, 'update'])->name('karyawan.update')->middleware('permission:master_karyawan.edit');
+            Route::put('/{id}/toggle-status', [MasterKaryawanController::class, 'toggleStatus'])->name('karyawan.toggle')->middleware('permission:master_karyawan.toggle');
         });
     });
 
     // Master Barang
     Route::middleware('permission:master_barang')->group(function () {
-        Route::get('/barang', [MasterBarangController::class, 'index'])->name('barang.index')->middleware('throttle:20,1');
-        Route::prefix('master-barang')->middleware('throttle:100,1')->group(function () {
-            Route::post('/tambah', [MasterBarangController::class, 'store'])->name('barang.store');
-            Route::put('/{id}', [MasterBarangController::class, 'update'])->name('barang.update');
-            Route::put('/{id}/toggle-status', [MasterBarangController::class, 'toggleStatus'])->name('barang.toggle');
+        Route::get('/barang', [MasterBarangController::class, 'index'])->name('barang.index');
+        Route::prefix('master-barang')->group(function () {
+            Route::post('/tambah', [MasterBarangController::class, 'store'])->name('barang.store')->middleware('permission:master_barang.create');
+            Route::put('/{id}', [MasterBarangController::class, 'update'])->name('barang.update')->middleware('permission:master_barang.edit');
+            Route::put('/{id}/toggle-status', [MasterBarangController::class, 'toggleStatus'])->name('barang.toggle')->middleware('permission:master_barang.toggle');
         });
     });
 
     // Master Lokasi Subcon
     Route::middleware('permission:master_lokasi_subcon')->group(function () {
-        Route::get('/lokasi-subcon', [MasterLokasiSubconController::class, 'index'])->name('lokasi.index')->middleware('throttle:20,1');
-        Route::prefix('master-lokasi-subcon')->middleware('throttle:100,1')->group(function () {
-            Route::post('/tambah', [MasterLokasiSubconController::class, 'store'])->name('lokasi.store');
-            Route::put('/{id}', [MasterLokasiSubconController::class, 'update'])->name('lokasi.update');
-            Route::put('/{id}/toggle-status', [MasterLokasiSubconController::class, 'toggleStatus'])->name('lokasi.toggle');
+        Route::get('/lokasi-subcon', [MasterLokasiSubconController::class, 'index'])->name('lokasi.index');
+        Route::prefix('master-lokasi-subcon')->group(function () {
+            Route::post('/tambah', [MasterLokasiSubconController::class, 'store'])->name('lokasi.store')->middleware('permission:master_lokasi_subcon.create');
+            Route::put('/{id}', [MasterLokasiSubconController::class, 'update'])->name('lokasi.update')->middleware('permission:master_lokasi_subcon.edit');
+            Route::put('/{id}/toggle-status', [MasterLokasiSubconController::class, 'toggleStatus'])->name('lokasi.toggle')->middleware('permission:master_lokasi_subcon.toggle');
         });
     });
 
     // Master Pekerjaan
     Route::middleware('permission:master_pekerjaan')->group(function () {
-        Route::get('/pekerjaan', [MasterPekerjaanController::class, 'index'])->name('pekerjaan.index')->middleware('throttle:20,1');
-        Route::prefix('master-pekerjaan')->middleware('throttle:100,1')->group(function () {
-            Route::post('/tambah', [MasterPekerjaanController::class, 'store'])->name('pekerjaan.store');
-            Route::put('/{id}', [MasterPekerjaanController::class, 'update'])->name('pekerjaan.update');
-            Route::put('/{id}/toggle-status', [MasterPekerjaanController::class, 'toggleStatus'])->name('pekerjaan.toggle');
+        Route::get('/pekerjaan', [MasterPekerjaanController::class, 'index'])->name('pekerjaan.index');
+        Route::prefix('master-pekerjaan')->group(function () {
+            Route::post('/tambah', [MasterPekerjaanController::class, 'store'])->name('pekerjaan.store')->middleware('permission:master_pekerjaan.create');
+            Route::put('/{id}', [MasterPekerjaanController::class, 'update'])->name('pekerjaan.update')->middleware('permission:master_pekerjaan.edit');
+            Route::put('/{id}/toggle-status', [MasterPekerjaanController::class, 'toggleStatus'])->name('pekerjaan.toggle')->middleware('permission:master_pekerjaan.toggle');
         });
     });
 });

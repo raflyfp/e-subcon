@@ -22,28 +22,33 @@
                     <td>{{ $item->lokasiSubcon->nama_lokasi ?? 'Semua / Umum' }}</td>
                     <td class="no-export text-center">
                         <div class="d-inline-flex gap-2 justify-content-center align-items-center">
-                            <button type="button" class="btn btn-warning btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-edit-barang"
-                                style="width: 32px; height: 32px; padding: 0;"
-                                data-bs-toggle="modal"
-                                data-bs-target="#update_barang"
-                                data-id="{{ $item->id }}"
-                                data-kode="{{ $item->kode_barang }}"
-                                data-nama="{{ $item->nama_barang }}"
-                                data-pekerjaan_id="{{ $item->pekerjaan_id }}"
-                                data-satuan="{{ $item->satuan ?? 'PCS' }}"
-                                data-lokasi_subcon_id="{{ $item->lokasi_subcon_id }}"
-                                title="Edit Barang">
-                                <i class="ti ti-edit fs-6"></i>
-                            </button>
-                            <button type="button"
-                                class="btn btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-toggle-barang {{ $item->is_active ? 'btn-danger' : 'btn-success' }}"
-                                style="width: 32px; height: 32px; padding: 0;"
-                                data-id="{{ $item->id }}"
-                                data-nama="{{ $item->nama_barang }}"
-                                data-status="{{ $item->is_active }}"
-                                title="{{ $item->is_active ? 'Nonaktifkan Barang' : 'Aktifkan Barang' }}">
-                                <i class="ti {{ $item->is_active ? 'ti-ban' : 'ti-check' }} fs-6"></i>
-                            </button>
+                            @if (auth()->user()->canAccess('master_barang.edit'))
+                                <button type="button" class="btn btn-warning btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-edit-barang"
+                                    style="width: 32px; height: 32px; padding: 0;"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#update_barang"
+                                    data-id="{{ $item->id }}"
+                                    data-kode="{{ $item->kode_barang }}"
+                                    data-nama="{{ $item->nama_barang }}"
+                                    data-pekerjaan_id="{{ $item->pekerjaan_id }}"
+                                    data-satuan="{{ $item->satuan ?? 'PCS' }}"
+                                    data-lokasi_subcon_id="{{ $item->lokasi_subcon_id }}"
+                                    title="Edit Barang">
+                                    <i class="ti ti-edit fs-6"></i>
+                                </button>
+                            @endif
+
+                            @if (auth()->user()->canAccess('master_barang.toggle'))
+                                <button type="button"
+                                    class="btn btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-toggle-barang {{ $item->is_active ? 'btn-danger' : 'btn-success' }}"
+                                    style="width: 32px; height: 32px; padding: 0;"
+                                    data-id="{{ $item->id }}"
+                                    data-nama="{{ $item->nama_barang }}"
+                                    data-status="{{ $item->is_active }}"
+                                    title="{{ $item->is_active ? 'Nonaktifkan Barang' : 'Aktifkan Barang' }}">
+                                    <i class="ti {{ $item->is_active ? 'ti-ban' : 'ti-check' }} fs-6"></i>
+                                </button>
+                            @endif
                         </div>
                     </td>
                 </tr>

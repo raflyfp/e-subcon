@@ -133,19 +133,21 @@
                         </div>
 
                         <div class="d-flex gap-2 align-items-center">
-                            {{-- Tombol Print --}}
-                            <button type="button" class="btn btn-outline-dark btn-sm fw-semibold"
-                                onclick="printReportSheet()">
-                                <i class="ti ti-printer me-1"></i> Print Laporan
-                            </button>
-                            {{-- Tombol PDF --}}
-                            <button type="button" class="btn btn-danger btn-sm fw-semibold" onclick="exportReportPDF()">
-                                <i class="ti ti-file-type-pdf me-1"></i> Export PDF
-                            </button>
-                            {{-- Tombol Excel --}}
-                            <button type="button" class="btn btn-success btn-sm fw-semibold" onclick="exportReportExcel()">
-                                <i class="ti ti-file-spreadsheet me-1"></i> Export Excel
-                            </button>
+                            @if (auth()->user()->canAccess('laporan_subcon'))
+                                {{-- Tombol Print --}}
+                                <button type="button" class="btn btn-outline-dark btn-sm fw-semibold"
+                                    onclick="printReportSheet()">
+                                    <i class="ti ti-printer me-1"></i> Print Laporan
+                                </button>
+                                {{-- Tombol PDF --}}
+                                <button type="button" class="btn btn-danger btn-sm fw-semibold" onclick="exportReportPDF()">
+                                    <i class="ti ti-file-type-pdf me-1"></i> Export PDF
+                                </button>
+                                {{-- Tombol Excel --}}
+                                <button type="button" class="btn btn-success btn-sm fw-semibold" onclick="exportReportExcel()">
+                                    <i class="ti ti-file-spreadsheet me-1"></i> Export Excel
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </div>

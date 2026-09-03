@@ -208,9 +208,11 @@
                         <button type="reset" class="btn btn-secondary">
                             <i class="ti ti-rotate-2 me-1"></i> Reset
                         </button>
-                        <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold">
-                            <i class="ti ti-send me-1"></i> Kirim Data Pengerjaan
-                        </button>
+                        @if (auth()->user()->canAccess('formulir_pengerjaan'))
+                            <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold">
+                                <i class="ti ti-send me-1"></i> Kirim Data Pengerjaan
+                            </button>
+                        @endif
                     </div>
                 </div>
 

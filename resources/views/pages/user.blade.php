@@ -9,10 +9,12 @@
             <div class="card p-2">
                 <div class="row">
                     <div class="col px-4 py-4">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#tambah_user">Tambah
-                            User
-                        </button>
+                        @if (auth()->user()->canAccess('master_user.create'))
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#tambah_user">
+                                <i class="ti ti-plus me-1"></i> Tambah User
+                            </button>
+                        @endif
                     </div>
                 </div>
 

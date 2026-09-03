@@ -44,20 +44,22 @@
                     </td>
                     <td class="no-export text-center">
                         <div class="d-inline-flex gap-2 justify-content-center align-items-center">
-                            <button type="button" class="btn btn-warning btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-edit-user"
-                                style="width: 32px; height: 32px; padding: 0;"
-                                data-bs-toggle="modal"
-                                data-bs-target="#update_user"
-                                data-id="{{ $item->id }}"
-                                data-name="{{ $item->name }}"
-                                data-username="{{ $item->username }}"
-                                data-role="{{ $item->role }}"
-                                data-permissions="{{ json_encode($item->permissions ?? []) }}"
-                                title="Edit User & Hak Akses">
-                                <i class="ti ti-edit fs-6"></i>
-                            </button>
+                            @if (auth()->user()->canAccess('master_user.edit'))
+                                <button type="button" class="btn btn-warning btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-edit-user"
+                                    style="width: 32px; height: 32px; padding: 0;"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#update_user"
+                                    data-id="{{ $item->id }}"
+                                    data-name="{{ $item->name }}"
+                                    data-username="{{ $item->username }}"
+                                    data-role="{{ $item->role }}"
+                                    data-permissions="{{ json_encode($item->permissions ?? []) }}"
+                                    title="Edit User & Hak Akses">
+                                    <i class="ti ti-edit fs-6"></i>
+                                </button>
+                            @endif
 
-                            @if (auth()->id() != $item->id)
+                            @if (auth()->user()->canAccess('master_user.toggle') && auth()->id() != $item->id && $item->role !== 'super_admin')
                                 <button type="button"
                                     class="btn btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-toggle-user {{ $item->is_active ? 'btn-danger' : 'btn-success' }}"
                                     style="width: 32px; height: 32px; padding: 0;"
@@ -100,13 +102,43 @@
                 ]
             });
 
-            // Preset default permissions per role
+            // Preset default permissions per role (Granular: View, Create, Edit, Toggle/Delete)
             const rolePresets = {
-                'super_admin': ['dashboard', 'master_user', 'master_karyawan', 'master_barang', 'master_pekerjaan', 'master_lokasi_subcon', 'formulir_pengerjaan', 'laporan_subcon'],
-                'admin_ppic': ['dashboard', 'master_barang', 'master_pekerjaan', 'formulir_pengerjaan', 'laporan_subcon'],
-                'admin_biasa': ['dashboard', 'master_karyawan', 'master_barang', 'master_pekerjaan', 'formulir_pengerjaan', 'laporan_subcon'],
-                'user': ['dashboard', 'formulir_pengerjaan', 'laporan_subcon'],
-                'subcon': ['dashboard', 'formulir_pengerjaan', 'laporan_subcon']
+                'super_admin': [
+                    'dashboard.view',
+                    'master_user.view', 'master_user.create', 'master_user.edit', 'master_user.toggle',
+                    'master_karyawan.view', 'master_karyawan.create', 'master_karyawan.edit', 'master_karyawan.toggle',
+                    'master_barang.view', 'master_barang.create', 'master_barang.edit', 'master_barang.toggle',
+                    'master_pekerjaan.view', 'master_pekerjaan.create', 'master_pekerjaan.edit', 'master_pekerjaan.toggle',
+                    'master_lokasi_subcon.view', 'master_lokasi_subcon.create', 'master_lokasi_subcon.edit', 'master_lokasi_subcon.toggle',
+                    'formulir_pengerjaan.view',
+                    'laporan_subcon.view'
+                ],
+                'admin_ppic': [
+                    'dashboard.view',
+                    'master_barang.view', 'master_barang.create', 'master_barang.edit', 'master_barang.toggle',
+                    'master_pekerjaan.view', 'master_pekerjaan.create', 'master_pekerjaan.edit', 'master_pekerjaan.toggle',
+                    'formulir_pengerjaan.view',
+                    'laporan_subcon.view'
+                ],
+                'admin_biasa': [
+                    'dashboard.view',
+                    'master_karyawan.view', 'master_karyawan.create', 'master_karyawan.edit', 'master_karyawan.toggle',
+                    'master_barang.view', 'master_barang.create', 'master_barang.edit', 'master_barang.toggle',
+                    'master_pekerjaan.view', 'master_pekerjaan.create', 'master_pekerjaan.edit', 'master_pekerjaan.toggle',
+                    'formulir_pengerjaan.view',
+                    'laporan_subcon.view'
+                ],
+                'user': [
+                    'dashboard.view',
+                    'formulir_pengerjaan.view',
+                    'laporan_subcon.view'
+                ],
+                'subcon': [
+                    'dashboard.view',
+                    'formulir_pengerjaan.view',
+                    'laporan_subcon.view'
+                ]
             };
 
             // Saat memilih role pada modal Tambah
@@ -116,14 +148,71 @@
                 $('.check-permission-tambah').each(function() {
                     $(this).prop('checked', presets.includes($(this).val()));
                 });
+                updateColCheckboxes('tambah');
+            });
+
+            // Helper untuk update status checkbox di header kolom
+            function updateColCheckboxes(type) {
+                ['view', 'create', 'edit', 'delete'].forEach(function(col) {
+                    const total = $(`.permission-row-${type} .perm-${col}`).length;
+                    const checked = $(`.permission-row-${type} .perm-${col}:checked`).length;
+                    $(`.col-check-${type}[data-col="${col}"]`).prop('checked', total > 0 && total === checked);
+                });
+            }
+
+            // Handler centang seluruh kolom di modal Tambah
+            $(document).on('change', '.col-check-tambah', function() {
+                const col = $(this).data('col');
+                const isChecked = $(this).is(':checked');
+                $(`.permission-row-tambah .perm-${col}`).prop('checked', isChecked).trigger('change');
+            });
+
+            // Handler centang seluruh kolom di modal Edit
+            $(document).on('change', '.col-check-edit', function() {
+                const col = $(this).data('col');
+                const isChecked = $(this).is(':checked');
+                $(`.permission-row-edit .perm-${col}`).prop('checked', isChecked).trigger('change');
+            });
+
+            // Relasi baris: Jika Tambah/Ubah/Hapus dicentang, otomatis centang Hak Akses (Lihat)
+            $(document).on('change', '.permission-row-tambah .perm-create, .permission-row-tambah .perm-edit, .permission-row-tambah .perm-delete', function() {
+                if ($(this).is(':checked')) {
+                    $(this).closest('tr').find('.perm-view').prop('checked', true);
+                }
+                updateColCheckboxes('tambah');
+            });
+
+            // Relasi baris: Jika Hak Akses (Lihat) dimatikan, otomatis matikan Tambah/Ubah/Hapus
+            $(document).on('change', '.permission-row-tambah .perm-view', function() {
+                if (!$(this).is(':checked')) {
+                    $(this).closest('tr').find('.perm-create, .perm-edit, .perm-delete').prop('checked', false);
+                }
+                updateColCheckboxes('tambah');
+            });
+
+            // Relasi baris untuk modal Edit
+            $(document).on('change', '.permission-row-edit .perm-create, .permission-row-edit .perm-edit, .permission-row-edit .perm-delete', function() {
+                if ($(this).is(':checked')) {
+                    $(this).closest('tr').find('.perm-view').prop('checked', true);
+                }
+                updateColCheckboxes('edit');
+            });
+
+            $(document).on('change', '.permission-row-edit .perm-view', function() {
+                if (!$(this).is(':checked')) {
+                    $(this).closest('tr').find('.perm-create, .perm-edit, .perm-delete').prop('checked', false);
+                }
+                updateColCheckboxes('edit');
             });
 
             // Tombol Pilih Semua / Reset Tambah
             $('#btn_select_all_tambah').on('click', function() {
                 $('.check-permission-tambah').prop('checked', true);
+                $('.col-check-tambah').prop('checked', true);
             });
             $('#btn_unselect_all_tambah').on('click', function() {
                 $('.check-permission-tambah').prop('checked', false);
+                $('.col-check-tambah').prop('checked', false);
             });
 
             // Tombol Edit User
@@ -148,17 +237,29 @@
                 $('#edit_user_password').val('');
                 $('#edit_user_role').val(role);
 
+                // Jika bukan Super Admin dan Super Admin sudah ada, disable opsi Super Admin di modal edit
+                const isThisSuperAdmin = (role === 'super_admin');
+                const superAdminExists = {{ !empty($hasSuperAdmin) ? 'true' : 'false' }};
+                if (!isThisSuperAdmin && superAdminExists) {
+                    $('#opt_super_admin_edit').prop('disabled', true).text('Super Admin (Sudah ada - Maks. 1 Akun)');
+                } else {
+                    $('#opt_super_admin_edit').prop('disabled', false).text('Super Admin (Akses Penuh Semua Menu & Aksi)');
+                }
+
                 // Set checkbox permissions
                 $('.check-permission-edit').each(function() {
                     const val = $(this).val();
                     if (role === 'super_admin') {
                         $(this).prop('checked', true);
                     } else if (Array.isArray(permissions)) {
-                        $(this).prop('checked', permissions.includes(val));
+                        const baseModule = val.split('.')[0];
+                        const isChecked = permissions.includes(val) || permissions.includes(baseModule);
+                        $(this).prop('checked', isChecked);
                     } else {
                         $(this).prop('checked', false);
                     }
                 });
+                updateColCheckboxes('edit');
             });
 
             // Saat role diubah pada modal Edit
@@ -168,14 +269,17 @@
                 $('.check-permission-edit').each(function() {
                     $(this).prop('checked', presets.includes($(this).val()));
                 });
+                updateColCheckboxes('edit');
             });
 
             // Tombol Pilih Semua / Reset Edit
             $('#btn_select_all_edit').on('click', function() {
                 $('.check-permission-edit').prop('checked', true);
+                $('.col-check-edit').prop('checked', true);
             });
             $('#btn_unselect_all_edit').on('click', function() {
                 $('.check-permission-edit').prop('checked', false);
+                $('.col-check-edit').prop('checked', false);
             });
 
             // Toggle Status Aktif/Nonaktif User
