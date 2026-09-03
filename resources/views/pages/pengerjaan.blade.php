@@ -34,7 +34,7 @@
         </div>
 
         <div class="card-body p-4">
-            <form method="POST" action="{{ route('pengerjaan.store') }}" id="formPengerjaanAuth">
+            <form method="POST" action="{{ route('pengerjaan.store') }}" id="formPengerjaanAuth" novalidate>
                 @csrf
 
                 {{-- 1. Lokasi Subcon (HANYA DITAMPILKAN JIKA ADMIN) --}}
@@ -171,9 +171,7 @@
                     </div>
 
                     <div class="mt-2" id="durasi_badge_container">
-                        {{-- <div id="durasi_badge_info" class="text-muted small">
-                            <i class="ti ti-info-circle me-1"></i>Pilih jam mulai & jam selesai untuk menghitung durasi waktu secara otomatis.
-                        </div> --}}
+                        <div id="durasi_badge_info" class="small"></div>
                     </div>
                 </div>
 
@@ -352,17 +350,18 @@
 
                 if (!mulai || !selesai) {
                     currentDurasiText = '';
-                    $('#durasi_badge_info')
-                        .removeClass('text-success fw-bold')
-                        .addClass('text-muted')
-                        .html(
-                            '<i class="ti ti-info-circle me-1"></i>Pilih jam mulai & jam selesai untuk menghitung durasi waktu secara otomatis.'
-                        );
+                    $('#durasi_badge_info').empty();
                     return;
                 }
 
                 let [hMulai, mMulai] = mulai.split(':').map(Number);
                 let [hSelesai, mSelesai] = selesai.split(':').map(Number);
+
+                if (isNaN(hMulai) || isNaN(mMulai) || isNaN(hSelesai) || isNaN(mSelesai)) {
+                    currentDurasiText = '';
+                    $('#durasi_badge_info').empty();
+                    return;
+                }
 
                 let menitMulai = hMulai * 60 + mMulai;
                 let menitSelesai = hSelesai * 60 + mSelesai;
@@ -386,12 +385,11 @@
                 }
 
                 currentDurasiText = durasiText;
-                $('#durasi_badge_info')
-                    .removeClass('text-muted')
-                    .addClass('text-success fw-bold')
-                    .html(
-                        `<i class="ti ti-circle-check fs-6 me-1"></i> Durasi terhitung: <u>${durasiText}</u> (${diffMenit} Menit)`
-                    );
+                $('#durasi_badge_info').html(
+                    `<span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6">` +
+                    `<i class="ti ti-circle-check fs-6 me-1"></i> Durasi terhitung: <strong>${durasiText}</strong> (${diffMenit} Menit)` +
+                    `</span>`
+                );
             }
 
             // Buka timepicker popup secara langsung saat input jam mulai / selesai diklik
@@ -405,7 +403,7 @@
                 }
             });
 
-            $('#auth_jam_mulai, #auth_jam_selesai').on('input change', hitungDurasi);
+            $('#auth_jam_mulai, #auth_jam_selesai').on('input change blur keyup', hitungDurasi);
             if ($('#auth_jam_mulai').val() && $('#auth_jam_selesai').val()) {
                 hitungDurasi();
             }

@@ -99,8 +99,8 @@ Route::middleware(['auth', 'throttle:web-traffic'])->group(function () {
     Route::prefix('pengerjaan')->middleware('permission:formulir_pengerjaan')->group(function () {
         Route::get('/', [PengerjaanController::class, 'index'])->name('pengerjaan.index');
         Route::get('/riwayat', [PengerjaanController::class, 'laporan'])->name('pengerjaan.riwayat');
-        Route::post('/tambah', [PengerjaanController::class, 'store'])->name('pengerjaan.store')->middleware('permission:formulir_pengerjaan.create');
-        Route::delete('/{id}', [PengerjaanController::class, 'destroy'])->name('pengerjaan.destroy')->middleware('permission:formulir_pengerjaan.delete');
+        Route::post('/tambah', [PengerjaanController::class, 'store'])->name('pengerjaan.store');
+        Route::delete('/{id}', [PengerjaanController::class, 'destroy'])->name('pengerjaan.destroy');
     });
 
     Route::get('/laporan-subcon', [PengerjaanController::class, 'laporan'])->name('laporan.index')->middleware('permission:laporan_subcon');
