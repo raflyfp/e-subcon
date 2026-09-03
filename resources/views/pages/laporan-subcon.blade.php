@@ -206,14 +206,15 @@
                                         <thead>
                                             <tr class="text-center"
                                                 style="background-color: #f8fafc; color: #0f172a; font-weight: 600; border-color: #94a3b8;">
-                                                <th style="width: 40px; border: 1px solid #94a3b8;">No</th>
-                                                <th style="width: 95px; border: 1px solid #94a3b8;">Tanggal</th>
-                                                <th style="width: 125px; border: 1px solid #94a3b8;">Jam & Durasi</th>
+                                                <th style="width: 35px; border: 1px solid #94a3b8;">No</th>
+                                                <th style="width: 90px; border: 1px solid #94a3b8;">Tanggal</th>
+                                                <th style="width: 125px; border: 1px solid #94a3b8;">Jam Kerja</th>
+                                                <th style="width: 105px; border: 1px solid #94a3b8;">Durasi</th>
                                                 <th style="border: 1px solid #94a3b8;">Karyawan</th>
                                                 <th style="border: 1px solid #94a3b8;">Lokasi Subcon</th>
-                                                <th style="width: 120px; border: 1px solid #94a3b8;">Jenis Pekerjaan</th>
-                                                <th style="width: 120px; border: 1px solid #94a3b8;">Jumlah Selesai</th>
-                                                <th style="width: 75px; border: 1px solid #94a3b8;">Satuan</th>
+                                                <th style="width: 110px; border: 1px solid #94a3b8;">Jenis Pekerjaan</th>
+                                                <th style="width: 105px; border: 1px solid #94a3b8;">Jumlah Selesai</th>
+                                                <th style="width: 65px; border: 1px solid #94a3b8;">Satuan</th>
                                                 <th style="border: 1px solid #94a3b8;">Keterangan</th>
                                             </tr>
                                         </thead>
@@ -225,17 +226,29 @@
                                                         {{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y') }}</td>
                                                     <td class="text-center" style="border: 1px solid #cbd5e1; font-size: 0.88rem;">
                                                         @if ($item->jam_mulai && $item->jam_selesai)
-                                                            <div>{{ substr($item->jam_mulai, 0, 5) }} - {{ substr($item->jam_selesai, 0, 5) }}</div>
-                                                            @if (!empty($item->durasi_menit))
-                                                                @php
-                                                                    $jam = intdiv($item->durasi_menit, 60);
-                                                                    $mnt = $item->durasi_menit % 60;
-                                                                    $durText = ($jam > 0 ? $jam . 'j ' : '') . ($mnt > 0 ? $mnt . 'm' : ($jam > 0 ? '' : '0m'));
-                                                                @endphp
-                                                                <span class="badge bg-light text-primary border" style="font-size: 0.75rem;">
-                                                                    <i class="ti ti-clock me-1"></i>{{ $durText }}
-                                                                </span>
-                                                            @endif
+                                                            <span class="fw-semibold text-dark">{{ substr($item->jam_mulai, 0, 5) }} - {{ substr($item->jam_selesai, 0, 5) }}</span>
+                                                            <span class="text-muted small">WIB</span>
+                                                        @elseif ($item->jam_mulai)
+                                                            <span class="fw-semibold text-dark">{{ substr($item->jam_mulai, 0, 5) }}</span>
+                                                            <span class="text-muted small">WIB</span>
+                                                        @else
+                                                            <span class="text-muted">-</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="text-center" style="border: 1px solid #cbd5e1; font-size: 0.88rem;">
+                                                        @if (!empty($item->durasi_menit))
+                                                            @php
+                                                                $jam = intdiv($item->durasi_menit, 60);
+                                                                $mnt = $item->durasi_menit % 60;
+                                                                if ($jam > 0 && $mnt > 0) {
+                                                                    $durText = "{$jam} Jam {$mnt} Mnt";
+                                                                } elseif ($jam > 0) {
+                                                                    $durText = "{$jam} Jam";
+                                                                } else {
+                                                                    $durText = "{$mnt} Menit";
+                                                                }
+                                                            @endphp
+                                                            <span class="fw-semibold text-success">{{ $durText }}</span>
                                                         @else
                                                             <span class="text-muted">-</span>
                                                         @endif
@@ -261,7 +274,7 @@
                                         <tfoot>
                                             <tr class="fw-bold"
                                                 style="background-color: #f1f5f9; border: 1px solid #94a3b8;">
-                                                <td colspan="6" class="text-end pe-3">
+                                                <td colspan="7" class="text-end pe-3">
                                                     Total :</td>
                                                 <td class="text-end fw-bold text-primary pe-3">
                                                     {{ number_format($subtotal, 0, ',', '.') }}</td>
@@ -459,10 +472,10 @@
             const filename = 'Laporan_Subcon_' + tglMulai + '_sd_' + tglAkhir + '.xls';
 
             let reportHeaderHtml = '<table border="0">' +
-                '<tr><td colspan="9" style="font-size:16px; font-weight:bold;">e-System \u2014 PT. Sinaraya Nugraha<\/td><\/tr>' +
-                '<tr><td colspan="9" style="font-size:14px; font-weight:bold;">Laporan Pengerjaan Barang Subcon<\/td><\/tr>' +
-                '<tr><td colspan="9" style="font-size:12px; font-weight:bold;">Periode: ' + tglMulai + ' s/d ' + tglAkhir + '<\/td><\/tr>' +
-                '<tr><td colspan="9"><\/td><\/tr>' +
+                '<tr><td colspan="10" style="font-size:16px; font-weight:bold;">e-System \u2014 PT. Sinaraya Nugraha<\/td><\/tr>' +
+                '<tr><td colspan="10" style="font-size:14px; font-weight:bold;">Laporan Pengerjaan Barang Subcon<\/td><\/tr>' +
+                '<tr><td colspan="10" style="font-size:12px; font-weight:bold;">Periode: ' + tglMulai + ' s/d ' + tglAkhir + '<\/td><\/tr>' +
+                '<tr><td colspan="10"><\/td><\/tr>' +
                 '<\/table>';
 
             let tablesHtml = '';
@@ -472,7 +485,7 @@
                 const table = block.querySelector('table');
                 if (table) {
                     tablesHtml += '<table border="0">' +
-                        '<tr><td colspan="9" style="background-color:#e0f2fe; font-size:13px; font-weight:bold; color:#0369a1; border:0.5pt solid #94a3b8;">' +
+                        '<tr><td colspan="10" style="background-color:#e0f2fe; font-size:13px; font-weight:bold; color:#0369a1; border:0.5pt solid #94a3b8;">' +
                         headerText + '<\/td><\/tr>' +
                         '<\/table>' +
                         table.outerHTML + '<br/>';

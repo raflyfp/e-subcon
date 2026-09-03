@@ -151,7 +151,7 @@
                     <div class="row g-3 align-items-center">
                         <div class="col-sm-6">
                             <label class="form-label small fw-semibold text-muted mb-1" for="auth_jam_mulai">
-                                <i class="ti ti-clock-play text-primary me-1"></i> Jam Mulai
+                                <i class="ti ti-clock-play text-primary me-1"></i> Jam Mulai (WIB)
                             </label>
                             <input type="time" class="form-control form-control-lg bg-white" name="jam_mulai" id="auth_jam_mulai"
                                 value="{{ old('jam_mulai') }}" style="cursor: pointer;">
@@ -159,7 +159,7 @@
 
                         <div class="col-sm-6">
                             <label class="form-label small fw-semibold text-muted mb-1" for="auth_jam_selesai">
-                                <i class="ti ti-clock-stop text-danger me-1"></i> Jam Selesai
+                                <i class="ti ti-clock-stop text-danger me-1"></i> Jam Selesai (WIB)
                             </label>
                             <input type="time" class="form-control form-control-lg bg-white" name="jam_selesai" id="auth_jam_selesai"
                                 value="{{ old('jam_selesai') }}" style="cursor: pointer;">
@@ -464,7 +464,7 @@
                 let waktuInfoHtml = '';
                 if (jamMulai && jamSelesai) {
                     let durasiLabel = currentDurasiText ? ` (${currentDurasiText})` : '';
-                    waktuInfoHtml = `<strong>Jam Kerja:</strong> ${jamMulai} - ${jamSelesai}${durasiLabel}<br>`;
+                    waktuInfoHtml = `<strong>Jam Kerja:</strong> ${jamMulai} - ${jamSelesai} WIB${durasiLabel}<br>`;
                 }
 
                 Swal.fire({
