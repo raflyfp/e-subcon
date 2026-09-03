@@ -6,7 +6,7 @@
                 <th>Nama Subcon</th>
                 <th>Akun Login (Username)</th>
                 <th>Alamat</th>
-                <th class="no-export">Action</th>
+                <th class="no-export text-center" style="width: 90px; min-width: 90px;">Action</th>
             </tr>
         </thead>
         <tbody>
@@ -16,24 +16,27 @@
                     <td class="text-start">{{ $item->nama_lokasi }}</td>
                     <td>{{ $item->user?->username ?? '-' }}</td>
                     <td class="text-start">{{ $item->alamat ?? '-' }}</td>
-                    <td class="no-export">
-                        <div class="d-flex gap-2 justify-content-center">
-                            <button type="button" class="btn btn-warning btn-sm btn-edit-lokasi" data-bs-toggle="modal"
+                    <td class="no-export text-center">
+                        <div class="d-inline-flex gap-2 justify-content-center align-items-center">
+                            <button type="button" class="btn btn-warning btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-edit-lokasi"
+                                style="width: 32px; height: 32px; padding: 0;"
+                                data-bs-toggle="modal"
                                 data-bs-target="#update_lokasi"
                                 data-id="{{ $item->id }}"
                                 data-nama="{{ $item->nama_lokasi }}"
                                 data-alamat="{{ $item->alamat }}"
                                 data-username="{{ $item->user?->username ?? '' }}"
                                 title="Edit Lokasi">
-                                <i class="ti ti-pencil"></i>
+                                <i class="ti ti-edit fs-6"></i>
                             </button>
                             <button type="button"
-                                class="btn btn-sm btn-toggle-lokasi {{ $item->is_active ? 'btn-danger' : 'btn-success' }}"
+                                class="btn btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-toggle-lokasi {{ $item->is_active ? 'btn-danger' : 'btn-success' }}"
+                                style="width: 32px; height: 32px; padding: 0;"
                                 data-id="{{ $item->id }}"
                                 data-nama="{{ $item->nama_lokasi }}"
                                 data-status="{{ $item->is_active }}"
                                 title="{{ $item->is_active ? 'Nonaktifkan Lokasi' : 'Aktifkan Lokasi' }}">
-                                <i class="ti {{ $item->is_active ? 'ti-map-pin-off' : 'ti-map-pin' }}"></i>
+                                <i class="ti {{ $item->is_active ? 'ti-ban' : 'ti-check' }} fs-6"></i>
                             </button>
                         </div>
                     </td>

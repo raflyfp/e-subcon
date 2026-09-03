@@ -34,19 +34,19 @@
 
                         <ul class="pc-submenu">
                             <li class="pc-item">
-                                <a class="pc-link" href="{{ url('user') }}">Daftar User</a>
+                                <a class="pc-link" href="{{ url('user') }}">Master User</a>
                             </li>
                             <li class="pc-item">
-                                <a class="pc-link" href="{{ url('karyawan') }}">Daftar Karyawan</a>
+                                <a class="pc-link" href="{{ url('karyawan') }}">Master Karyawan</a>
                             </li>
                             <li class="pc-item">
-                                <a class="pc-link" href="{{ url('barang') }}">Daftar Barang</a>
+                                <a class="pc-link" href="{{ url('barang') }}">Master Barang</a>
                             </li>
                             <li class="pc-item">
-                                <a class="pc-link" href="{{ url('pekerjaan') }}">Daftar Pekerjaan</a>
+                                <a class="pc-link" href="{{ url('pekerjaan') }}">Master Pekerjaan</a>
                             </li>
                             <li class="pc-item">
-                                <a class="pc-link" href="{{ url('lokasi-subcon') }}">Lokasi Subcon</a>
+                                <a class="pc-link" href="{{ url('lokasi-subcon') }}">Master Lokasi Subcon</a>
                             </li>
                         </ul>
                     </li>

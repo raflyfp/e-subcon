@@ -5,7 +5,7 @@
                 <th>No</th>
                 <th>Nama Pekerjaan</th>
                 <th>Status</th>
-                <th class="no-export">Action</th>
+                <th class="no-export text-center" style="width: 90px; min-width: 90px;">Action</th>
             </tr>
         </thead>
         <tbody>
@@ -18,22 +18,25 @@
                             {{ $item->is_active ? 'Aktif' : 'Non-aktif' }}
                         </span>
                     </td>
-                    <td class="no-export">
-                        <div class="d-flex gap-2 justify-content-center">
-                            <button type="button" class="btn btn-warning btn-sm btn-edit-pekerjaan" data-bs-toggle="modal"
+                    <td class="no-export text-center">
+                        <div class="d-inline-flex gap-2 justify-content-center align-items-center">
+                            <button type="button" class="btn btn-warning btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-edit-pekerjaan"
+                                style="width: 32px; height: 32px; padding: 0;"
+                                data-bs-toggle="modal"
                                 data-bs-target="#update_pekerjaan"
                                 data-id="{{ $item->id }}"
                                 data-nama="{{ $item->nama_pekerjaan }}"
                                 title="Edit Pekerjaan">
-                                <i class="ti ti-pencil"></i>
+                                <i class="ti ti-edit fs-6"></i>
                             </button>
                             <button type="button"
-                                class="btn btn-sm btn-toggle-pekerjaan {{ $item->is_active ? 'btn-danger' : 'btn-success' }}"
+                                class="btn btn-sm d-inline-flex align-items-center justify-content-center shadow-sm btn-toggle-pekerjaan {{ $item->is_active ? 'btn-danger' : 'btn-success' }}"
+                                style="width: 32px; height: 32px; padding: 0;"
                                 data-id="{{ $item->id }}"
                                 data-nama="{{ $item->nama_pekerjaan }}"
                                 data-status="{{ $item->is_active }}"
                                 title="{{ $item->is_active ? 'Nonaktifkan Pekerjaan' : 'Aktifkan Pekerjaan' }}">
-                                <i class="ti {{ $item->is_active ? 'ti-briefcase-off' : 'ti-briefcase' }}"></i>
+                                <i class="ti {{ $item->is_active ? 'ti-ban' : 'ti-check' }} fs-6"></i>
                             </button>
                         </div>
                     </td>
