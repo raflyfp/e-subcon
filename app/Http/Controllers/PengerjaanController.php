@@ -251,8 +251,9 @@ class PengerjaanController extends Controller
                 }
             }
 
-            $pengerjaan = $query->orderBy('p.tanggal', 'desc')
-                ->orderBy('p.id', 'desc')
+            $pengerjaan = $query->orderBy('p.tanggal', 'asc')
+                ->orderBy('p.jam_mulai', 'asc')
+                ->orderBy('p.id', 'asc')
                 ->get();
         }
 
