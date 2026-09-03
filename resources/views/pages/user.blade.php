@@ -19,6 +19,7 @@
                 <div class="row">
                     <div class="col px-4">
                         @include('components.user.modal')
+                        @include('components.user.modal_update')
                         <x-user.table :user="$user" />
                     </div>
                 </div>

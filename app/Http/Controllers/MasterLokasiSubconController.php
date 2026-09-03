@@ -41,10 +41,13 @@ class MasterLokasiSubconController extends Controller
         try {
             // 1. Buat User Akun Subcon
             $user = User::create([
-                'name'      => $request->nama_lokasi,
-                'username'  => $request->username,
-                'password'  => Hash::make($request->password),
-                'is_admin'  => 0,
+                'name'        => $request->nama_lokasi,
+                'username'    => $request->username,
+                'password'    => Hash::make($request->password),
+                'role'        => User::ROLE_SUBCON,
+                'permissions' => ['dashboard', 'formulir_pengerjaan', 'laporan_subcon'],
+                'is_admin'    => 0,
+                'is_active'   => true,
             ]);
 
             // 2. Buat Lokasi Subcon
@@ -98,10 +101,13 @@ class MasterLokasiSubconController extends Controller
             } else if ($request->filled('username')) {
                 $password = $request->filled('password') ? $request->password : '12345';
                 $user = User::create([
-                    'name'     => $request->nama_lokasi,
-                    'username' => $request->username,
-                    'password' => Hash::make($password),
-                    'is_admin' => 0,
+                    'name'        => $request->nama_lokasi,
+                    'username'    => $request->username,
+                    'password'    => Hash::make($password),
+                    'role'        => User::ROLE_SUBCON,
+                    'permissions' => ['dashboard', 'formulir_pengerjaan', 'laporan_subcon'],
+                    'is_admin'    => 0,
+                    'is_active'   => true,
                 ]);
                 $lokasi->user_id = $user->id;
             }

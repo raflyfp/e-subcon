@@ -11,16 +11,26 @@
         <div class="navbar-content">
             <ul class="pc-navbar">
 
-                <!-- Dashboard (semua role) -->
-                <li class="pc-item">
-                    <a href="{{ route('dashboard') }}" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
-                        <span class="pc-mtext">Dashboard</span>
-                    </a>
-                </li>
+                @if (auth()->user()->canAccess('dashboard'))
+                    <!-- Dashboard -->
+                    <li class="pc-item">
+                        <a href="{{ route('dashboard') }}" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
+                            <span class="pc-mtext">Dashboard</span>
+                        </a>
+                    </li>
+                @endif
 
-                @if (auth()->user()->is_admin)
-                    <!-- Master Data (admin only) -->
+                @php
+                    $canAccessMaster = auth()->user()->canAccess('master_user') ||
+                                       auth()->user()->canAccess('master_karyawan') ||
+                                       auth()->user()->canAccess('master_barang') ||
+                                       auth()->user()->canAccess('master_pekerjaan') ||
+                                       auth()->user()->canAccess('master_lokasi_subcon');
+                @endphp
+
+                @if ($canAccessMaster)
+                    <!-- Master Data -->
                     <li class="pc-item pc-caption">
                         <label>Master Data</label>
                     </li>
@@ -33,43 +43,67 @@
                         </a>
 
                         <ul class="pc-submenu">
-                            <li class="pc-item">
-                                <a class="pc-link" href="{{ url('user') }}">Master User</a>
-                            </li>
-                            <li class="pc-item">
-                                <a class="pc-link" href="{{ url('karyawan') }}">Master Karyawan</a>
-                            </li>
-                            <li class="pc-item">
-                                <a class="pc-link" href="{{ url('barang') }}">Master Barang</a>
-                            </li>
-                            <li class="pc-item">
-                                <a class="pc-link" href="{{ url('pekerjaan') }}">Master Pekerjaan</a>
-                            </li>
-                            <li class="pc-item">
-                                <a class="pc-link" href="{{ url('lokasi-subcon') }}">Master Lokasi Subcon</a>
-                            </li>
+                            @if (auth()->user()->canAccess('master_user'))
+                                <li class="pc-item">
+                                    <a class="pc-link" href="{{ url('user') }}">Master User</a>
+                                </li>
+                            @endif
+
+                            @if (auth()->user()->canAccess('master_karyawan'))
+                                <li class="pc-item">
+                                    <a class="pc-link" href="{{ url('karyawan') }}">Master Karyawan</a>
+                                </li>
+                            @endif
+
+                            @if (auth()->user()->canAccess('master_barang'))
+                                <li class="pc-item">
+                                    <a class="pc-link" href="{{ url('barang') }}">Master Barang</a>
+                                </li>
+                            @endif
+
+                            @if (auth()->user()->canAccess('master_pekerjaan'))
+                                <li class="pc-item">
+                                    <a class="pc-link" href="{{ url('pekerjaan') }}">Master Pekerjaan</a>
+                                </li>
+                            @endif
+
+                            @if (auth()->user()->canAccess('master_lokasi_subcon'))
+                                <li class="pc-item">
+                                    <a class="pc-link" href="{{ url('lokasi-subcon') }}">Master Lokasi Subcon</a>
+                                </li>
+                            @endif
                         </ul>
                     </li>
                 @endif
 
-                <!-- Pengerjaan (semua role) -->
-                <li class="pc-item pc-caption">
-                    <label class="text-secondary">Pengerjaan</label>
-                </li>
+                @php
+                    $canAccessPengerjaan = auth()->user()->canAccess('formulir_pengerjaan') || auth()->user()->canAccess('laporan_subcon');
+                @endphp
 
-                <li class="pc-item">
-                    <a href="{{ url('pengerjaan') }}" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-edit"></i></span>
-                        <span class="pc-mtext">Formulir Pengerjaan</span>
-                    </a>
-                </li>
+                @if ($canAccessPengerjaan)
+                    <!-- Pengerjaan -->
+                    <li class="pc-item pc-caption">
+                        <label class="text-secondary">Pengerjaan</label>
+                    </li>
 
-                <li class="pc-item">
-                    <a href="{{ url('laporan-subcon') }}" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-file-analytics"></i></span>
-                        <span class="pc-mtext">Laporan Subcon</span>
-                    </a>
-                </li>
+                    @if (auth()->user()->canAccess('formulir_pengerjaan'))
+                        <li class="pc-item">
+                            <a href="{{ url('pengerjaan') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-edit"></i></span>
+                                <span class="pc-mtext">Formulir Pengerjaan</span>
+                            </a>
+                        </li>
+                    @endif
+
+                    @if (auth()->user()->canAccess('laporan_subcon'))
+                        <li class="pc-item">
+                            <a href="{{ url('laporan-subcon') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-file-analytics"></i></span>
+                                <span class="pc-mtext">Laporan Subcon</span>
+                            </a>
+                        </li>
+                    @endif
+                @endif
 
             </ul>
         </div>
