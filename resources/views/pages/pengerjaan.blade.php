@@ -45,7 +45,7 @@
                         </label>
                         <p class="text-muted small mb-2">Pilih lokasi tempat pengerjaan barang dilakukan:</p>
 
-                        <select class="form-select form-select-lg" name="lokasi_subcon_id" id="auth_lokasi_subcon_id"
+                        <select class="form-select" name="lokasi_subcon_id" id="auth_lokasi_subcon_id"
                             required>
                             <option value="">-- Pilih Lokasi Subcon --</option>
                             @foreach ($lokasiList as $l)
@@ -73,7 +73,7 @@
                         @endif
                     </p>
 
-                    <select class="form-select form-select-lg" name="karyawan_id" id="auth_karyawan_id" required>
+                    <select class="form-select" name="karyawan_id" id="auth_karyawan_id" required>
                         <option value="">-- Pilih Karyawan --</option>
                         @foreach ($karyawanList as $k)
                             <option value="{{ $k->id }}" data-lokasi="{{ $k->lokasi_subcon_id }}"
@@ -116,7 +116,7 @@
                     <p class="text-muted small mb-2">Pilih kode / nama barang yang dikerjakan (terfilter sesuai jenis
                         pekerjaan):</p>
 
-                    <select class="form-select form-select-lg" name="barang_id" id="auth_barang_id" required>
+                    <select class="form-select" name="barang_id" id="auth_barang_id" required>
                         <option value="">-- Pilih Barang --</option>
                         @foreach ($barangList as $b)
                             <option value="{{ $b->id }}" data-satuan="{{ $b->satuan ?? 'PCS' }}"
@@ -231,6 +231,30 @@
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <style>
+        /* Styling Select2 agar nama barang / teks panjang tidak terpotong dengan wrap text */
+        .select2-container--bootstrap-5 .select2-selection--single {
+            height: auto !important;
+            min-height: 42px !important;
+            padding: 7px 12px !important;
+            font-size: 0.95rem !important;
+        }
+        .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+            white-space: normal !important;
+            word-break: break-word !important;
+            line-height: 1.45 !important;
+            color: #1e293b !important;
+            padding-right: 25px !important;
+        }
+        .select2-container--bootstrap-5 .select2-dropdown .select2-results__option {
+            white-space: normal !important;
+            word-break: break-word !important;
+            line-height: 1.45 !important;
+            font-size: 0.92rem !important;
+            padding: 8px 12px !important;
+        }
+    </style>
 
     <script>
         $(document).ready(function() {
