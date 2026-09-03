@@ -1,52 +1,46 @@
 <div class="dt-responsive table-responsive">
-    <table id="barang-table" class="table table-striped table-bordered nowrap">
+    <table id="pekerjaan-table" class="table table-striped table-bordered nowrap">
         <thead>
             <tr class="text-center">
                 <th>No</th>
-                <th>Kode Barang</th>
-                <th>Nama Barang</th>
-                <th>Jenis Pekerjaan</th>
-                <th>Satuan</th>
-                <th>Lokasi Subcon</th>
+                <th>Nama Pekerjaan</th>
+                <th>Status</th>
                 <th class="no-export">Action</th>
             </tr>
         </thead>
         <tbody>
-            @forelse ($barang as $item)
+            @forelse ($pekerjaan as $item)
                 <tr class="text-center">
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $item->kode_barang }}</td>
-                    <td class="text-start">{{ $item->nama_barang }}</td>
-                    <td>{{ $item->pekerjaan->nama_pekerjaan ?? $item->jenis_pekerjaan ?? '-' }}</td>
-                    <td>{{ $item->satuan ?? 'PCS' }}</td>
-                    <td>{{ $item->lokasiSubcon->nama_lokasi ?? 'Semua / Umum' }}</td>
+                    <td class="text-start fw-bold">{{ $item->nama_pekerjaan }}</td>
+                    <td>
+                        <span class="badge {{ $item->is_active ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} border px-2 py-1">
+                            {{ $item->is_active ? 'Aktif' : 'Non-aktif' }}
+                        </span>
+                    </td>
                     <td class="no-export">
                         <div class="d-flex gap-2 justify-content-center">
-                            <button type="button" class="btn btn-warning btn-sm btn-edit-barang" data-bs-toggle="modal"
-                                data-bs-target="#update_barang"
+                            <button type="button" class="btn btn-warning btn-sm btn-edit-pekerjaan" data-bs-toggle="modal"
+                                data-bs-target="#update_pekerjaan"
                                 data-id="{{ $item->id }}"
-                                data-kode="{{ $item->kode_barang }}"
-                                data-nama="{{ $item->nama_barang }}"
-                                data-pekerjaan_id="{{ $item->pekerjaan_id }}"
-                                data-satuan="{{ $item->satuan ?? 'PCS' }}"
-                                data-lokasi_subcon_id="{{ $item->lokasi_subcon_id }}"
-                                title="Edit Barang">
+                                data-nama="{{ $item->nama_pekerjaan }}"
+                                title="Edit Pekerjaan">
                                 <i class="ti ti-pencil"></i>
                             </button>
                             <button type="button"
-                                class="btn btn-sm btn-toggle-barang {{ $item->is_active ? 'btn-danger' : 'btn-success' }}"
+                                class="btn btn-sm btn-toggle-pekerjaan {{ $item->is_active ? 'btn-danger' : 'btn-success' }}"
                                 data-id="{{ $item->id }}"
-                                data-nama="{{ $item->nama_barang }}"
+                                data-nama="{{ $item->nama_pekerjaan }}"
                                 data-status="{{ $item->is_active }}"
-                                title="{{ $item->is_active ? 'Nonaktifkan Barang' : 'Aktifkan Barang' }}">
-                                <i class="ti {{ $item->is_active ? 'ti-box-off' : 'ti-box' }}"></i>
+                                title="{{ $item->is_active ? 'Nonaktifkan Pekerjaan' : 'Aktifkan Pekerjaan' }}">
+                                <i class="ti {{ $item->is_active ? 'ti-briefcase-off' : 'ti-briefcase' }}"></i>
                             </button>
                         </div>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="text-center">Data barang kosong</td>
+                    <td colspan="4" class="text-center">Data pekerjaan kosong</td>
                 </tr>
             @endforelse
         </tbody>
@@ -55,7 +49,7 @@
 
 @push('scripts')
     <script>
-        $('#barang-table').DataTable({
+        $('#pekerjaan-table').DataTable({
             pageLength: 15,
             info: false,
             dom: 'Bfrtip',
@@ -73,18 +67,14 @@
         });
 
         // Edit
-        $(document).on('click', '.btn-edit-barang', function() {
+        $(document).on('click', '.btn-edit-pekerjaan', function() {
             let id = $(this).data('id');
-            $('#formUpdateBarang').attr('action', "{{ url('master-barang') }}/" + id);
-            $('#kode_barang_update').val($(this).data('kode'));
-            $('#nama_barang_update').val($(this).data('nama'));
-            $('#pekerjaan_id_update').val($(this).data('pekerjaan_id') || '');
-            $('#satuan_update').val($(this).data('satuan'));
-            $('#lokasi_subcon_id_update').val($(this).data('lokasi_subcon_id') || '');
+            $('#formUpdatePekerjaan').attr('action', "{{ url('master-pekerjaan') }}/" + id);
+            $('#nama_pekerjaan_update').val($(this).data('nama'));
         });
 
         // Toggle status
-        $(document).on('click', '.btn-toggle-barang', function() {
+        $(document).on('click', '.btn-toggle-pekerjaan', function() {
             let id = $(this).data('id');
             let nama = $(this).data('nama');
             let currentStatus = $(this).data('status');
@@ -92,7 +82,7 @@
 
             Swal.fire({
                 title: 'Apakah Anda yakin?',
-                text: `Anda akan ${actionText} barang ${nama}`,
+                text: `Anda akan ${actionText} pekerjaan ${nama}`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: currentStatus == 1 ? '#d33' : '#28a745',
@@ -102,7 +92,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "{{ url('master-barang') }}/" + id + "/toggle-status",
+                        url: "{{ url('master-pekerjaan') }}/" + id + "/toggle-status",
                         method: 'POST',
                         data: { _token: '{{ csrf_token() }}', _method: 'PUT' },
                         success: function(res) {

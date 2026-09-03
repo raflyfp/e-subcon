@@ -5,6 +5,7 @@ use App\Http\Controllers\MasterBarangController;
 use App\Http\Controllers\MasterDataController;
 use App\Http\Controllers\MasterKaryawanController;
 use App\Http\Controllers\MasterLokasiSubconController;
+use App\Http\Controllers\MasterPekerjaanController;
 use App\Http\Controllers\PengerjaanController;
 use App\Http\Controllers\UserController;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -136,6 +137,14 @@ Route::middleware('auth')->group(function () {
             Route::post('/tambah', [MasterLokasiSubconController::class, 'store'])->name('lokasi.store');
             Route::put('/{id}', [MasterLokasiSubconController::class, 'update'])->name('lokasi.update');
             Route::put('/{id}/toggle-status', [MasterLokasiSubconController::class, 'toggleStatus'])->name('lokasi.toggle');
+        });
+
+        // Master Pekerjaan
+        Route::get('/pekerjaan', [MasterPekerjaanController::class, 'index'])->middleware('throttle:20,1');
+        Route::prefix('master-pekerjaan')->middleware('throttle:100,1')->group(function () {
+            Route::post('/tambah', [MasterPekerjaanController::class, 'store'])->name('pekerjaan.store');
+            Route::put('/{id}', [MasterPekerjaanController::class, 'update'])->name('pekerjaan.update');
+            Route::put('/{id}/toggle-status', [MasterPekerjaanController::class, 'toggleStatus'])->name('pekerjaan.toggle');
         });
     });
 });

@@ -10,6 +10,8 @@ class Barang extends Model
 
     protected $fillable = [
         'lokasi_subcon_id',
+        'pekerjaan_id',
+        'jenis_pekerjaan',
         'kode_barang',
         'nama_barang',
         'satuan',
@@ -23,6 +25,11 @@ class Barang extends Model
     public function lokasiSubcon()
     {
         return $this->belongsTo(LokasiSubcon::class, 'lokasi_subcon_id', 'id');
+    }
+
+    public function pekerjaan()
+    {
+        return $this->belongsTo(Pekerjaan::class, 'pekerjaan_id', 'id');
     }
 
     public function pengerjaan()

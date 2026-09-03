@@ -29,6 +29,17 @@
                     </div>
 
                     <div class="mb-3">
+                        <label class="form-label fw-semibold">Jenis Pekerjaan</label>
+                        <select class="form-select" name="pekerjaan_id">
+                            <option value="">-- Pilih Jenis Pekerjaan (Opsional) --</option>
+                            @foreach ($pekerjaanList as $p)
+                                <option value="{{ $p->id }}">{{ $p->nama_pekerjaan }}</option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Kategori pengerjaan barang ini (misal: Folding, Packing, Sewing, Cutting).</small>
+                    </div>
+
+                    <div class="mb-3">
                         <label class="form-label fw-semibold">Penempatan Lokasi Subcon</label>
                         <select class="form-select" name="lokasi_subcon_id">
                             <option value="">-- Tanpa Lokasi Subcon (Umum) --</option>

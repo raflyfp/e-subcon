@@ -43,6 +43,9 @@
                                 <a class="pc-link" href="{{ url('barang') }}">Daftar Barang</a>
                             </li>
                             <li class="pc-item">
+                                <a class="pc-link" href="{{ url('pekerjaan') }}">Daftar Pekerjaan</a>
+                            </li>
+                            <li class="pc-item">
                                 <a class="pc-link" href="{{ url('lokasi-subcon') }}">Lokasi Subcon</a>
                             </li>
                         </ul>

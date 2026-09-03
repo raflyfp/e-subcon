@@ -84,13 +84,34 @@
                     </select>
                 </div>
 
-                {{-- 3. Barang yang Dikerjakan --}}
+                {{-- 3. (Admin) / 2. (Subcon) Jenis Pekerjaan (SEBELUM KODE BARANG - CENTANG / CHECKBOX) --}}
+                <div class="mb-4 p-3 bg-light rounded border">
+                    <label class="form-label fw-bold">
+                        {{ auth()->user()->is_admin ? '3.' : '2.' }} Jenis Pekerjaan <span class="text-danger">*</span>
+                    </label>
+                    <p class="text-muted small mb-2">Pilih jenis pekerjaan untuk memfilter daftar barang yang dikerjakan:</p>
+
+                    <div class="d-flex gap-4 p-3 bg-white rounded border flex-wrap" id="container_jenis_pekerjaan">
+                        @foreach ($pekerjaanList as $p)
+                            <div class="form-check">
+                                <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan"
+                                    id="check_{{ strtolower($p->nama_pekerjaan) }}" value="{{ $p->nama_pekerjaan }}"
+                                    {{ old('jenis_pekerjaan') == $p->nama_pekerjaan ? 'checked' : '' }}>
+                                <label class="form-check-label fw-bold" for="check_{{ strtolower($p->nama_pekerjaan) }}" style="cursor: pointer;">
+                                    {{ $p->nama_pekerjaan }}
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- 4. (Admin) / 3. (Subcon) Barang yang Dikerjakan --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_barang_id">
-                        {{ auth()->user()->is_admin ? '3.' : '2.' }} Barang yang Dikerjakan <span
+                        {{ auth()->user()->is_admin ? '4.' : '3.' }} Barang yang Dikerjakan <span
                             class="text-danger">*</span>
                     </label>
-                    <p class="text-muted small mb-2">Pilih kode / nama barang yang dikerjakan:</p>
+                    <p class="text-muted small mb-2">Pilih kode / nama barang yang dikerjakan (terfilter sesuai jenis pekerjaan):</p>
 
                     <select class="form-select form-select-lg" name="barang_id" id="auth_barang_id" required>
                         <option value="">-- Pilih Barang --</option>
@@ -98,6 +119,8 @@
                             <option value="{{ $b->id }}" data-satuan="{{ $b->satuan ?? 'PCS' }}"
                                 data-kode="{{ $b->kode_barang }}" data-nama="{{ $b->nama_barang }}"
                                 data-lokasi="{{ $b->lokasi_subcon_id ?? '' }}"
+                                data-pekerjaan-id="{{ $b->pekerjaan_id ?? '' }}"
+                                data-jenis-pekerjaan="{{ $b->pekerjaan->nama_pekerjaan ?? $b->jenis_pekerjaan ?? '' }}"
                                 {{ old('barang_id') == $b->id ? 'selected' : '' }}>
                                 [{{ $b->kode_barang }}] {{ $b->nama_barang }} (Satuan: {{ $b->satuan ?? 'PCS' }})
                             </option>
@@ -105,10 +128,10 @@
                     </select>
                 </div>
 
-                {{-- 4. Tanggal Pengerjaan --}}
+                {{-- 5. (Admin) / 4. (Subcon) Tanggal Pengerjaan --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_tanggal">
-                        {{ auth()->user()->is_admin ? '4.' : '3.' }} Tanggal Pengerjaan <span class="text-danger">*</span>
+                        {{ auth()->user()->is_admin ? '5.' : '4.' }} Tanggal Pengerjaan <span class="text-danger">*</span>
                     </label>
                     <p class="text-muted small mb-2">Tanggal pengerjaan otomatis terisi hari ini:</p>
 
@@ -118,64 +141,27 @@
                         ({{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}).</small>
                 </div>
 
-                {{-- 5. Jumlah Pengerjaan Selesai (dengan Pilihan Jenis Pekerjaan di Bawahnya) --}}
+                {{-- 6. (Admin) / 5. (Subcon) Jumlah Pengerjaan Selesai --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_jumlah">
-                        {{ auth()->user()->is_admin ? '5.' : '4.' }} Jumlah Barang Selesai <span id="label_satuan_text"
+                        {{ auth()->user()->is_admin ? '6.' : '5.' }} Jumlah Barang Selesai <span id="label_satuan_text"
                             class="text-primary">(PCS)</span> <span class="text-danger">*</span>
                     </label>
-                    <p class="text-muted small mb-2">Masukkan kuantitas barang yang diselesaikan dan pilih jenis
-                        pekerjaannya:</p>
+                    <p class="text-muted small mb-2">Masukkan kuantitas barang yang telah diselesaikan:</p>
 
-                    {{-- 1 Input Jumlah Barang Selesai --}}
-                    <div class="input-group input-group-lg mb-3">
+                    {{-- Input Jumlah Barang Selesai --}}
+                    <div class="input-group input-group-lg">
                         <input type="number" class="form-control form-control-lg" name="jumlah" id="auth_jumlah"
                             min="1" placeholder="Masukkan jumlah (contoh: 50)" value="{{ old('jumlah') }}" required>
                         <span class="input-group-text bg-white fw-bold text-primary span_satuan_addon"
                             id="span_satuan_addon">PCS</span>
                     </div>
-
-                    {{-- Pilihan Jenis Pekerjaan (Checkbox Tunggal - Awalnya Kosong) --}}
-                    <div class="d-flex gap-4 p-3 bg-white rounded border flex-wrap">
-                        <div class="form-check">
-                            <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan"
-                                id="check_folding" value="Folding"
-                                {{ old('jenis_pekerjaan') == 'Folding' ? 'checked' : '' }}>
-                            <label class="form-check-label fw-bold" for="check_folding" style="cursor: pointer;">
-                                Folding
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan"
-                                id="check_packing" value="Packing"
-                                {{ old('jenis_pekerjaan') == 'Packing' ? 'checked' : '' }}>
-                            <label class="form-check-label fw-bold" for="check_packing" style="cursor: pointer;">
-                                Packing
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan"
-                                id="check_sewing" value="Sewing"
-                                {{ old('jenis_pekerjaan') == 'Sewing' ? 'checked' : '' }}>
-                            <label class="form-check-label fw-bold" for="check_sewing" style="cursor: pointer;">
-                                Sewing
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input check-single-jenis" type="checkbox" name="jenis_pekerjaan"
-                                id="check_cutting" value="Cutting"
-                                {{ old('jenis_pekerjaan') == 'Cutting' ? 'checked' : '' }}>
-                            <label class="form-check-label fw-bold" for="check_cutting" style="cursor: pointer;">
-                                Cutting
-                            </label>
-                        </div>
-                    </div>
                 </div>
 
-                {{-- 6. Keterangan --}}
+                {{-- 7. (Admin) / 6. (Subcon) Keterangan --}}
                 <div class="mb-4 p-3 bg-light rounded border">
                     <label class="form-label fw-bold" for="auth_keterangan">
-                        {{ auth()->user()->is_admin ? '6.' : '5.' }} Catatan / Keterangan (Opsional)
+                        {{ auth()->user()->is_admin ? '7.' : '6.' }} Catatan / Keterangan (Opsional)
                     </label>
                     <p class="text-muted small mb-2">Tuliskan keterangan tambahan bila ada kendala atau catatan khusus:</p>
 
@@ -234,41 +220,39 @@
             let allKaryawanOptions = $('#auth_karyawan_id option').clone();
             let allBarangOptions = $('#auth_barang_id option').clone();
 
-            // Filter karyawan dan barang berdasarkan lokasi subcon yang dipilih (khusus admin)
-            $('#auth_lokasi_subcon_id').on('change', function() {
-                let selectedLokasi = $(this).val();
-
-                // 1. Filter Karyawan
-                let currentKaryawan = $('#auth_karyawan_id').val();
-                $('#auth_karyawan_id').empty();
-                allKaryawanOptions.each(function() {
-                    let optVal = $(this).val();
-                    let optLokasi = $(this).data('lokasi');
-                    if (!optVal || !selectedLokasi || String(optLokasi) === String(
-                        selectedLokasi)) {
-                        $('#auth_karyawan_id').append($(this).clone());
-                    }
-                });
-                if (currentKaryawan && $('#auth_karyawan_id').find(`option[value="${currentKaryawan}"]`)
-                    .length) {
-                    $('#auth_karyawan_id').val(currentKaryawan);
-                } else {
-                    $('#auth_karyawan_id').val('');
-                }
-                $('#auth_karyawan_id').trigger('change.select2');
-
-                // 2. Filter Barang
+            // Fungsi filter barang berdasarkan lokasi subcon (jika ada) dan jenis pekerjaan
+            function filterBarangOptions() {
+                let selectedLokasi = $('#auth_lokasi_subcon_id').length ? $('#auth_lokasi_subcon_id').val() : '';
+                let selectedJenis = $('.check-single-jenis:checked').val() || '';
                 let currentBarang = $('#auth_barang_id').val();
+
                 $('#auth_barang_id').empty();
+
                 allBarangOptions.each(function() {
                     let optVal = $(this).val();
+                    if (!optVal) {
+                        $('#auth_barang_id').append($(this).clone());
+                        return;
+                    }
+
                     let optLokasi = $(this).data('lokasi');
-                    // Tampilkan jika opsi kosong, lokasi belum dipilih, lokasi cocok, atau barang bersifat umum (optLokasi kosong)
-                    if (!optVal || !selectedLokasi || String(optLokasi) === String(
-                        selectedLokasi) || !optLokasi) {
+                    let optJenis = $(this).data('jenis-pekerjaan');
+
+                    // Filter Lokasi: jika tidak ada lokasi dipilih, atau lokasi cocok, atau barang bersifat umum (optLokasi kosong)
+                    let matchLokasi = !selectedLokasi || String(optLokasi) === String(selectedLokasi) || !optLokasi;
+
+                    // Filter Jenis Pekerjaan: jika jenis pekerjaan dipilih, hanya tampilkan yang sesuai jenis pekerjaan tersebut
+                    let matchJenis = true;
+                    if (selectedJenis) {
+                        matchJenis = optJenis && String(optJenis).trim().toLowerCase() === String(selectedJenis).trim().toLowerCase();
+                    }
+
+                    if (matchLokasi && matchJenis) {
                         $('#auth_barang_id').append($(this).clone());
                     }
                 });
+
+                // Cek apakah barang yang terpilih sebelumnya masih ada dalam opsi yang difilter
                 if (currentBarang && $('#auth_barang_id').find(`option[value="${currentBarang}"]`).length) {
                     $('#auth_barang_id').val(currentBarang);
                 } else {
@@ -276,18 +260,51 @@
                 }
                 $('#auth_barang_id').trigger('change.select2');
                 updateSatuanDisplay();
+            }
+
+            // Filter karyawan berdasarkan lokasi subcon (khusus admin)
+            function filterKaryawanOptions() {
+                if (!$('#auth_lokasi_subcon_id').length) return;
+
+                let selectedLokasi = $('#auth_lokasi_subcon_id').val();
+                let currentKaryawan = $('#auth_karyawan_id').val();
+
+                $('#auth_karyawan_id').empty();
+                allKaryawanOptions.each(function() {
+                    let optVal = $(this).val();
+                    let optLokasi = $(this).data('lokasi');
+                    if (!optVal || !selectedLokasi || String(optLokasi) === String(selectedLokasi)) {
+                        $('#auth_karyawan_id').append($(this).clone());
+                    }
+                });
+                if (currentKaryawan && $('#auth_karyawan_id').find(`option[value="${currentKaryawan}"]`).length) {
+                    $('#auth_karyawan_id').val(currentKaryawan);
+                } else {
+                    $('#auth_karyawan_id').val('');
+                }
+                $('#auth_karyawan_id').trigger('change.select2');
+            }
+
+            $('#auth_lokasi_subcon_id').on('change', function() {
+                filterKaryawanOptions();
+                filterBarangOptions();
+            });
+
+            // Checkbox single-selection (jika salah satu dicentang, yang lain uncheck) & trigger filter barang
+            $('.check-single-jenis').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('.check-single-jenis').not(this).prop('checked', false);
+                }
+                filterBarangOptions();
             });
 
             if ($('#auth_lokasi_subcon_id').length && $('#auth_lokasi_subcon_id').val()) {
                 $('#auth_lokasi_subcon_id').trigger('change');
             }
 
-            // Checkbox single-selection (jika salah satu dicentang, yang lain uncheck)
-            $('.check-single-jenis').on('change', function() {
-                if ($(this).is(':checked')) {
-                    $('.check-single-jenis').not(this).prop('checked', false);
-                }
-            });
+            if ($('.check-single-jenis:checked').length) {
+                filterBarangOptions();
+            }
 
             // Validasi & Konfirmasi submit form
             let isConfirmed = false;
@@ -300,10 +317,10 @@
                 e.preventDefault();
 
                 let form = this;
+                let karyawanId = $('#auth_karyawan_id').val();
+                let selectedJenis = $('.check-single-jenis:checked').val() || '';
                 let barangId = $('#auth_barang_id').val();
                 let qty = parseInt($('#auth_jumlah').val()) || 0;
-                let anyChecked = $('.check-single-jenis:checked').length > 0;
-                let selectedJenis = $('.check-single-jenis:checked').val() || '';
                 let satuan = $('.span_satuan_addon').first().text() || 'PCS';
 
                 let selectedBarangOption = $('#auth_barang_id').find(':selected');
@@ -311,6 +328,25 @@
                 let namaBarang = selectedBarangOption.data('nama') || '';
                 let displayBarang = (kodeBarang && namaBarang) ? `[${kodeBarang}] ${namaBarang}` : (
                     selectedBarangOption.text().trim() || '-');
+
+                if (!karyawanId) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Karyawan Belum Dipilih',
+                        text: 'Silakan pilih karyawan pelaksana terlebih dahulu.'
+                    });
+                    $('#auth_karyawan_id').select2('open');
+                    return false;
+                }
+
+                if (!selectedJenis) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Pilihan Kosong',
+                        text: 'Silakan centang salah satu jenis pekerjaan terlebih dahulu.'
+                    });
+                    return false;
+                }
 
                 if (!barangId) {
                     Swal.fire({
@@ -332,20 +368,11 @@
                     return false;
                 }
 
-                if (!anyChecked) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Pilihan Kosong',
-                        text: 'Silakan centang salah satu jenis pekerjaan (Folding, Packing, Sewing, atau Cutting).'
-                    });
-                    return false;
-                }
-
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
                     html: `<div class="text-start p-3 bg-light rounded border mb-2" style="font-size: 0.95rem; line-height: 1.6;">` +
-                        `<strong>Nama Barang:</strong> ${displayBarang}<br>` +
                         `<strong>Jenis Pekerjaan:</strong> ${selectedJenis}<br>` +
+                        `<strong>Nama Barang:</strong> ${displayBarang}<br>` +
                         `<strong>Jumlah Selesai:</strong> ${qty} ${satuan}` +
                         `</div>` +
                         `<small class="text-muted">Pastikan data di atas sudah benar sebelum disimpan.</small>`,

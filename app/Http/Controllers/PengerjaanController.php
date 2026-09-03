@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Barang;
 use App\Models\Karyawan;
 use App\Models\LokasiSubcon;
+use App\Models\Pekerjaan;
 use App\Models\Pengerjaan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,11 +19,12 @@ class PengerjaanController extends Controller
     public function index()
     {
         $user = auth()->user();
+        $pekerjaanList = Pekerjaan::where('is_active', true)->orderBy('nama_pekerjaan')->get();
 
         if ($user->is_admin) {
             // Admin dapat memilih seluruh karyawan, barang, dan lokasi subcon
             $karyawanList = Karyawan::where('is_active', true)->orderBy('nama_karyawan')->get();
-            $barangList   = Barang::with('lokasiSubcon')->where('is_active', true)->orderBy('nama_barang')->get();
+            $barangList   = Barang::with(['lokasiSubcon', 'pekerjaan'])->where('is_active', true)->orderBy('nama_barang')->get();
             $lokasiList   = LokasiSubcon::where('is_active', true)->orderBy('nama_lokasi')->get();
             $subcon       = null;
 
@@ -30,7 +32,8 @@ class PengerjaanController extends Controller
                 'karyawanList',
                 'barangList',
                 'lokasiList',
-                'subcon'
+                'subcon',
+                'pekerjaanList'
             ));
         }
 
@@ -47,10 +50,10 @@ class PengerjaanController extends Controller
         // Ambil barang yang ditugaskan ke subcon ini (fallback ke semua barang aktif jika belum diatur)
         $barangList = collect([]);
         if ($subcon) {
-            $barangList = $subcon->barang()->where('is_active', true)->orderBy('nama_barang')->get();
+            $barangList = $subcon->barang()->with('pekerjaan')->where('is_active', true)->orderBy('nama_barang')->get();
         }
         if ($barangList->isEmpty()) {
-            $barangList = Barang::where('is_active', true)->orderBy('nama_barang')->get();
+            $barangList = Barang::with('pekerjaan')->where('is_active', true)->orderBy('nama_barang')->get();
         }
 
         $lokasiList = collect([]);
@@ -59,7 +62,8 @@ class PengerjaanController extends Controller
             'karyawanList',
             'barangList',
             'lokasiList',
-            'subcon'
+            'subcon',
+            'pekerjaanList'
         ));
     }
 
