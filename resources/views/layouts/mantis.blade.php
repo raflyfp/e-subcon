@@ -3,13 +3,13 @@
 <!-- [Head] start -->
 
 <head>
-    <title>e-Subcon</title>
+    <title>e-System</title>
     <!-- [Meta] -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="e-Subcon — Pencatatan Pengerjaan Barang Subcon">
-    <meta name="keywords" content="e-Subcon, subcon, pengerjaan">
+    <meta name="description" content="e-System — Pencatatan Pengerjaan Barang Subcon">
+    <meta name="keywords" content="e-System, e-system, subcon, pengerjaan">
 
     <!-- [Favicon] icon -->
     <link rel="icon" href="{{ asset('template/dist') }}/assets/images/favicon.png" type="image/x-icon">
@@ -221,7 +221,7 @@
         <div class="footer-wrapper container-fluid">
             <div class="row">
                 <div class="col-sm my-1">
-                    <p>e-Subcon</p>
+                    <p>e-System</p>
                 </div>
 
             </div>

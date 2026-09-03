@@ -14,7 +14,7 @@
                     </h3>
                     <p class="text-muted mb-0 small">
                         @if (auth()->user()->is_admin)
-                            Panel Administrasi & Monitoring Rekapitulasi e-Subcon
+                            Panel Administrasi & Monitoring Rekapitulasi e-System
                         @else
                             Subcon: <strong><i class="ti ti-building me-1"></i>{{ $subcon->nama_lokasi ?? auth()->user()->name }}</strong>
                         @endif

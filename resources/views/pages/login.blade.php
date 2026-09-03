@@ -3,14 +3,14 @@
 <!-- [Head] start -->
 
 <head>
-    <title>Login — e-Subcon</title>
+    <title>Login — e-System</title>
     <!-- [Meta] -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="e-Subcon — Pencatatan Pengerjaan Barang Subcon">
-    <meta name="keywords" content="e-Subcon, subcon, pengerjaan">
-    <meta name="author" content="e-Subcon">
+    <meta name="description" content="e-System — Pencatatan Pengerjaan Barang Subcon">
+    <meta name="keywords" content="e-System, e-system, subcon, pengerjaan">
+    <meta name="author" content="e-System">
 
     <!-- [Favicon] icon -->
     {{-- <link rel="icon" href="{{ asset('template/dist') }}/assets/images/favicon.svg" type="image/x-icon"> --}}
@@ -56,7 +56,7 @@
 
                         <div class="card-body">
                             <div class="d-flex justify-content-center align-items-end mb-4">
-                                <h3 class="fw-bold text-primary">e-Subcon</h3>
+                                <h3 class="fw-bold text-primary">e-System</h3>
                             </div>
                             <div class="form-group mb-3">
                                 <label class="form-label">Username</label>
@@ -87,7 +87,7 @@
                     </form>
 
                     <div class="text-center pb-3">
-                        <small class="text-muted">Sistem Pencatatan Pengerjaan Barang e-Subcon</small>
+                        <small class="text-muted">Sistem Pencatatan Pengerjaan Barang e-System</small>
                     </div>
 
                 </div>

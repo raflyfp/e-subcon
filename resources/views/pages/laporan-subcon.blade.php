@@ -441,7 +441,7 @@
             const filename = 'Laporan_Subcon_' + tglMulai + '_sd_' + tglAkhir + '.xls';
 
             let reportHeaderHtml = '<table border="0">' +
-                '<tr><td colspan="8" style="font-size:16px; font-weight:bold;">e-Subcon \u2014 PT. Sinaraya Nugraha<\/td><\/tr>' +
+                '<tr><td colspan="8" style="font-size:16px; font-weight:bold;">e-System \u2014 PT. Sinaraya Nugraha<\/td><\/tr>' +
                 '<tr><td colspan="8" style="font-size:14px; font-weight:bold;">Laporan Pengerjaan Barang Subcon<\/td><\/tr>' +
                 '<tr><td colspan="8" style="font-size:12px; font-weight:bold;">Periode: ' + tglMulai + ' s/d ' + tglAkhir + '<\/td><\/tr>' +
                 '<tr><td colspan="8"><\/td><\/tr>' +

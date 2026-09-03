@@ -4,7 +4,7 @@
         <!-- Brand -->
         <div class="m-header enterprise-header">
             <a href="{{ url('/') }}" class="text-center fs-3 fw-bold">
-                e-Subcon
+                e-System
             </a>
         </div>
 
