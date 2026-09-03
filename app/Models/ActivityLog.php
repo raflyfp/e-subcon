@@ -42,10 +42,11 @@ class ActivityLog extends Model
     {
         try {
             $user = $actor ?: Auth::user();
+            $guestUsername = Request::input('username') ?: Request::input('name');
 
             return self::create([
                 'user_id'     => $user?->id,
-                'user_name'   => $user?->name ?: ($user?->username ?: 'Guest / System'),
+                'user_name'   => $user?->name ?: ($user?->username ?: ($guestUsername ? "Guest ({$guestUsername})" : 'Guest / System')),
                 'role'        => $user?->role ?: 'guest',
                 'action'      => strtoupper($action),
                 'module'      => $module,

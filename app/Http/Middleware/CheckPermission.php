@@ -31,6 +31,12 @@ class CheckPermission
 
         // Cek hak akses ke permission yang diminta
         if (!$user->canAccess($permission)) {
+            \App\Models\ActivityLog::record(
+                'Hak Akses',
+                'ACCESS_DENIED',
+                "Upaya akses ditolak: Pengguna {$user->name} ({$user->role}) mencoba mengakses fitur '{$permission}' tanpa izin."
+            );
+
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,

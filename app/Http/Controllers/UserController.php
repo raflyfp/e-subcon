@@ -20,20 +20,38 @@ class UserController extends Controller
         $remember = $request->boolean('remember');
 
         if (Auth::attempt($credentials, $remember)) {
+            $user = auth()->user();
+
+            if (!$user->is_active) {
+                Auth::logout();
+                \App\Models\ActivityLog::record(
+                    'Autentikasi',
+                    'LOGIN_FAILED',
+                    "Login ditolak untuk username '{$request->username}' karena status akun nonaktif."
+                );
+                return back()->with('error', 'Akun Anda sedang dinonaktifkan. Hubungi administrator.');
+            }
+
             $request->session()->regenerate();
 
             \App\Models\ActivityLog::record(
                 'Autentikasi',
                 'LOGIN',
-                'User berhasil login ke sistem (' . auth()->user()->role . ')'
+                'User berhasil login ke sistem (' . $user->role . ')'
             );
 
-            if (auth()->user()->is_admin) {
+            if ($user->is_admin) {
                 return redirect()->route('dashboard');
             }
 
             return redirect()->route('pengerjaan.index');
         }
+
+        \App\Models\ActivityLog::record(
+            'Autentikasi',
+            'LOGIN_FAILED',
+            "Percobaan login gagal dengan username: '{$request->username}' (Password salah atau username tidak ditemukan)"
+        );
 
         return back()->with('error', 'Username atau password salah');
     }

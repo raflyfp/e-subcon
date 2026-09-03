@@ -60,6 +60,9 @@ class ActivityLogController extends Controller
         $actionList = [
             'LOGIN',
             'LOGOUT',
+            'LOGIN_FAILED',
+            'VALIDATION_FAILED',
+            'ACCESS_DENIED',
             'CREATE',
             'UPDATE',
             'DELETE',

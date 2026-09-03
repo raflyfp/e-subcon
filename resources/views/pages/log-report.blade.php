@@ -161,6 +161,12 @@
                                                         <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">LOGIN</span>
                                                     @elseif ($log->action === 'LOGOUT')
                                                         <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">LOGOUT</span>
+                                                    @elseif ($log->action === 'LOGIN_FAILED')
+                                                        <span class="badge bg-danger text-white px-2 py-1"><i class="ti ti-alert-triangle me-1"></i>GAGAL LOGIN</span>
+                                                    @elseif ($log->action === 'VALIDATION_FAILED')
+                                                        <span class="badge bg-warning text-dark px-2 py-1"><i class="ti ti-alert-circle me-1"></i>VALIDASI GAGAL</span>
+                                                    @elseif ($log->action === 'ACCESS_DENIED')
+                                                        <span class="badge bg-danger text-white px-2 py-1"><i class="ti ti-shield-x me-1"></i>AKSES DITOLAK</span>
                                                     @else
                                                         <span class="badge bg-light text-dark border px-2 py-1">{{ $log->action }}</span>
                                                     @endif
