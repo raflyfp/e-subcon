@@ -45,8 +45,7 @@
                         </label>
                         <p class="text-muted small mb-2">Pilih lokasi tempat pengerjaan barang dilakukan:</p>
 
-                        <select class="form-select" name="lokasi_subcon_id" id="auth_lokasi_subcon_id"
-                            required>
+                        <select class="form-select" name="lokasi_subcon_id" id="auth_lokasi_subcon_id" required>
                             <option value="">-- Pilih Lokasi Subcon --</option>
                             @foreach ($lokasiList as $l)
                                 <option value="{{ $l->id }}"
@@ -154,19 +153,100 @@
 
                     <div class="row g-3 align-items-center">
                         <div class="col-sm-6">
-                            <label class="form-label small fw-semibold text-muted mb-1" for="auth_jam_mulai">
+                            <label class="form-label small fw-semibold text-muted mb-1">
                                 <i class="ti ti-clock-play text-primary me-1"></i> Jam Mulai (WIB)
                             </label>
-                            <input type="time" class="form-control form-control-lg bg-white" name="jam_mulai"
-                                id="auth_jam_mulai" value="{{ old('jam_mulai') }}" style="cursor: pointer;">
+                            <input type="hidden" name="jam_mulai" id="auth_jam_mulai" value="{{ old('jam_mulai') }}">
+                            <div class="custom-time-picker" id="picker_jam_mulai" data-target="auth_jam_mulai">
+                                <div class="ctp-display" id="display_jam_mulai">
+                                    <span class="ctp-display-time" id="display_text_jam_mulai">--:--</span>
+                                    <i class="ti ti-clock fs-5 text-muted"></i>
+                                </div>
+                                <div class="ctp-dropdown" id="dropdown_jam_mulai">
+                                    <div class="ctp-header">
+                                        <div class="ctp-handle"></div>
+                                        <div class="ctp-title text-primary">
+                                            <i class="ti ti-clock-play me-1"></i> Jam Mulai (WIB)
+                                        </div>
+                                    </div>
+                                    <div class="ctp-columns">
+                                        <div class="ctp-col">
+                                            <button type="button" class="ctp-arrow ctp-arrow-up" data-dir="up"
+                                                data-col="hour" data-picker="jam_mulai"><i
+                                                    class="ti ti-chevron-up"></i></button>
+                                            <div class="ctp-scroll" id="scroll_hour_jam_mulai" data-col="hour"
+                                                data-picker="jam_mulai"></div>
+                                            <button type="button" class="ctp-arrow ctp-arrow-down" data-dir="down"
+                                                data-col="hour" data-picker="jam_mulai"><i
+                                                    class="ti ti-chevron-down"></i></button>
+                                        </div>
+                                        <div class="ctp-separator">:</div>
+                                        <div class="ctp-col">
+                                            <button type="button" class="ctp-arrow ctp-arrow-up" data-dir="up"
+                                                data-col="minute" data-picker="jam_mulai"><i
+                                                    class="ti ti-chevron-up"></i></button>
+                                            <div class="ctp-scroll" id="scroll_minute_jam_mulai" data-col="minute"
+                                                data-picker="jam_mulai"></div>
+                                            <button type="button" class="ctp-arrow ctp-arrow-down" data-dir="down"
+                                                data-col="minute" data-picker="jam_mulai"><i
+                                                    class="ti ti-chevron-down"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="ctp-ok-wrapper">
+                                        <button type="button" class="ctp-ok-btn"><i
+                                                class="ti ti-check me-1"></i>OK</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="col-sm-6">
-                            <label class="form-label small fw-semibold text-muted mb-1" for="auth_jam_selesai">
+                            <label class="form-label small fw-semibold text-muted mb-1">
                                 <i class="ti ti-clock-stop text-danger me-1"></i> Jam Selesai (WIB)
                             </label>
-                            <input type="time" class="form-control form-control-lg bg-white" name="jam_selesai"
-                                id="auth_jam_selesai" value="{{ old('jam_selesai') }}" style="cursor: pointer;">
+                            <input type="hidden" name="jam_selesai" id="auth_jam_selesai"
+                                value="{{ old('jam_selesai') }}">
+                            <div class="custom-time-picker" id="picker_jam_selesai" data-target="auth_jam_selesai">
+                                <div class="ctp-display" id="display_jam_selesai">
+                                    <span class="ctp-display-time" id="display_text_jam_selesai">--:--</span>
+                                    <i class="ti ti-clock fs-5 text-muted"></i>
+                                </div>
+                                <div class="ctp-dropdown" id="dropdown_jam_selesai">
+                                    <div class="ctp-header">
+                                        <div class="ctp-handle"></div>
+                                        <div class="ctp-title text-danger">
+                                            <i class="ti ti-clock-stop me-1"></i> Jam Selesai (WIB)
+                                        </div>
+                                    </div>
+                                    <div class="ctp-columns">
+                                        <div class="ctp-col">
+                                            <button type="button" class="ctp-arrow ctp-arrow-up" data-dir="up"
+                                                data-col="hour" data-picker="jam_selesai"><i
+                                                    class="ti ti-chevron-up"></i></button>
+                                            <div class="ctp-scroll" id="scroll_hour_jam_selesai" data-col="hour"
+                                                data-picker="jam_selesai"></div>
+                                            <button type="button" class="ctp-arrow ctp-arrow-down" data-dir="down"
+                                                data-col="hour" data-picker="jam_selesai"><i
+                                                    class="ti ti-chevron-down"></i></button>
+                                        </div>
+                                        <div class="ctp-separator">:</div>
+                                        <div class="ctp-col">
+                                            <button type="button" class="ctp-arrow ctp-arrow-up" data-dir="up"
+                                                data-col="minute" data-picker="jam_selesai"><i
+                                                    class="ti ti-chevron-up"></i></button>
+                                            <div class="ctp-scroll" id="scroll_minute_jam_selesai" data-col="minute"
+                                                data-picker="jam_selesai"></div>
+                                            <button type="button" class="ctp-arrow ctp-arrow-down" data-dir="down"
+                                                data-col="minute" data-picker="jam_selesai"><i
+                                                    class="ti ti-chevron-down"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="ctp-ok-wrapper">
+                                        <button type="button" class="ctp-ok-btn"><i
+                                                class="ti ti-check me-1"></i>OK</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -240,6 +320,7 @@
             padding: 7px 12px !important;
             font-size: 0.95rem !important;
         }
+
         .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
             white-space: normal !important;
             word-break: break-word !important;
@@ -247,12 +328,301 @@
             color: #1e293b !important;
             padding-right: 25px !important;
         }
+
         .select2-container--bootstrap-5 .select2-dropdown .select2-results__option {
             white-space: normal !important;
             word-break: break-word !important;
             line-height: 1.45 !important;
             font-size: 0.92rem !important;
             padding: 8px 12px !important;
+        }
+
+        /* ====== Custom 24h Time Picker ====== */
+        .custom-time-picker {
+            position: relative;
+            width: 100%;
+        }
+
+        .ctp-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            min-height: 48px;
+            transition: border-color .2s, box-shadow .2s;
+            user-select: none;
+        }
+
+        .ctp-display:hover {
+            border-color: #2563eb;
+        }
+
+        .ctp-display:focus-within,
+        .custom-time-picker.open .ctp-display {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+        }
+
+        .ctp-display-time {
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 2px;
+            color: #1e293b;
+        }
+
+        .ctp-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            z-index: 1055;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .12);
+            padding: 12px 8px;
+            animation: ctpFadeIn .15s ease;
+        }
+
+        .custom-time-picker.open .ctp-dropdown {
+            display: block;
+        }
+
+        @keyframes ctpFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ctp-header {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f1f5f9;
+            text-align: center;
+        }
+
+        .ctp-handle {
+            display: none;
+        }
+
+        .ctp-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: .3px;
+        }
+
+        .ctp-columns {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .ctp-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80px;
+        }
+
+        .ctp-separator {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #64748b;
+            padding: 0 2px;
+            line-height: 1;
+        }
+
+        .ctp-arrow {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 0;
+            color: #94a3b8;
+            font-size: 1.3rem;
+            line-height: 1;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            transition: color .15s;
+        }
+
+        .ctp-arrow:hover {
+            color: #2563eb;
+        }
+
+        .ctp-arrow:active {
+            color: #1d4ed8;
+            transform: scale(0.92);
+        }
+
+        .ctp-scroll {
+            height: 180px;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+        }
+
+        .ctp-scroll-inner {
+            transition: transform .2s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        .ctp-item {
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: #94a3b8;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all .15s;
+            user-select: none;
+        }
+
+        .ctp-item:hover {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .ctp-item.active {
+            background: #2563eb;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.25rem;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, .25);
+        }
+
+        @media (max-width: 576px) {
+            .ctp-dropdown {
+                position: fixed;
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                border-radius: 16px 16px 0 0;
+                padding: 16px 12px 24px;
+                animation: ctpSlideUp .25s ease;
+            }
+
+            .ctp-header {
+                margin-bottom: 12px;
+                padding-bottom: 12px;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            .ctp-handle {
+                display: block;
+                width: 40px;
+                height: 5px;
+                background: #cbd5e1;
+                border-radius: 10px;
+                margin: 0 auto 12px;
+            }
+
+            .ctp-title {
+                font-size: 1.15rem;
+                font-weight: 700;
+            }
+
+            @keyframes ctpSlideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(100%);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .ctp-col {
+                width: 100px;
+            }
+
+            .ctp-scroll {
+                height: 210px;
+            }
+
+            .ctp-item {
+                height: 42px;
+                font-size: 1.25rem;
+            }
+
+            .ctp-item.active {
+                font-size: 1.4rem;
+            }
+
+            .ctp-overlay {
+                display: block;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, .35);
+                z-index: 1054;
+                animation: ctpFadeIn .15s ease;
+            }
+        }
+
+        @media (min-width: 577px) {
+            .ctp-overlay {
+                display: none !important;
+            }
+        }
+
+        .ctp-ok-wrapper {
+            text-align: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .ctp-ok-btn {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 40px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .15s, transform .1s;
+            letter-spacing: .5px;
+        }
+
+        .ctp-ok-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .ctp-ok-btn:active {
+            background: #1e40af;
+            transform: scale(0.96);
+        }
+
+        @media (max-width: 576px) {
+            .ctp-ok-btn {
+                width: 100%;
+                padding: 14px;
+                font-size: 1.15rem;
+            }
         }
     </style>
 
@@ -416,18 +786,200 @@
                 );
             }
 
-            // Buka timepicker popup secara langsung saat input jam mulai / selesai diklik
-            $('#auth_jam_mulai, #auth_jam_selesai').on('click focus', function() {
-                try {
-                    if (typeof this.showPicker === 'function') {
-                        this.showPicker();
+            // ====== Custom 24h Scroll Time Picker ======
+            const ITEM_H = window.innerWidth <= 576 ? 42 : 36;
+            const VISIBLE = 5;
+            const CENTER = Math.floor(VISIBLE / 2); // index 2 = tengah
+
+            function buildColumn(scrollEl, max, pad) {
+                let inner = $('<div class="ctp-scroll-inner"></div>');
+                // Padding items di atas
+                for (let p = 0; p < CENTER; p++) {
+                    inner.append('<div class="ctp-item ctp-pad" style="visibility:hidden;">&nbsp;</div>');
+                }
+                for (let i = 0; i < max; i++) {
+                    let label = String(i).padStart(pad, '0');
+                    inner.append(`<div class="ctp-item" data-value="${i}">${label}</div>`);
+                }
+                // Padding items di bawah
+                for (let p = 0; p < CENTER; p++) {
+                    inner.append('<div class="ctp-item ctp-pad" style="visibility:hidden;">&nbsp;</div>');
+                }
+                scrollEl.empty().append(inner);
+            }
+
+            function scrollToValue(scrollEl, value) {
+                let inner = scrollEl.find('.ctp-scroll-inner');
+                let offset = -(value) * ITEM_H;
+                inner.css('transform', `translateY(${offset}px)`);
+                // Update active
+                scrollEl.find('.ctp-item').removeClass('active');
+                scrollEl.find(`.ctp-item[data-value="${value}"]`).addClass('active');
+            }
+
+            function getSelectedValue(scrollEl) {
+                let activeItem = scrollEl.find('.ctp-item.active');
+                return activeItem.length ? parseInt(activeItem.data('value')) : 0;
+            }
+
+            function updateHiddenInput(pickerName) {
+                let h = getSelectedValue($(`#scroll_hour_${pickerName}`));
+                let m = getSelectedValue($(`#scroll_minute_${pickerName}`));
+                let timeStr = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+                let targetId = $(`#picker_${pickerName}`).data('target');
+                $(`#${targetId}`).val(timeStr);
+                $(`#display_text_${pickerName}`).text(timeStr);
+                hitungDurasi();
+            }
+
+            function initPicker(pickerName) {
+                let hourScroll = $(`#scroll_hour_${pickerName}`);
+                let minScroll = $(`#scroll_minute_${pickerName}`);
+
+                buildColumn(hourScroll, 24, 2);
+                buildColumn(minScroll, 60, 2);
+
+                // Set initial value from hidden input if exists
+                let targetId = $(`#picker_${pickerName}`).data('target');
+                let existingVal = $(`#${targetId}`).val();
+                if (existingVal && existingVal.includes(':')) {
+                    let [h, m] = existingVal.split(':').map(Number);
+                    scrollToValue(hourScroll, h);
+                    scrollToValue(minScroll, m);
+                    $(`#display_text_${pickerName}`).text(existingVal);
+                } else {
+                    scrollToValue(hourScroll, 0);
+                    scrollToValue(minScroll, 0);
+                }
+
+                // Click on item to select
+                hourScroll.on('click', '.ctp-item:not(.ctp-pad)', function() {
+                    scrollToValue(hourScroll, parseInt($(this).data('value')));
+                    updateHiddenInput(pickerName);
+                });
+                minScroll.on('click', '.ctp-item:not(.ctp-pad)', function() {
+                    scrollToValue(minScroll, parseInt($(this).data('value')));
+                    updateHiddenInput(pickerName);
+                });
+
+                // Mouse wheel scroll
+                [hourScroll, minScroll].forEach(function(scrollEl) {
+                    scrollEl[0].addEventListener('wheel', function(e) {
+                        e.preventDefault();
+                        let col = scrollEl.data('col');
+                        let max = col === 'hour' ? 24 : 60;
+                        let current = getSelectedValue(scrollEl);
+                        let next = e.deltaY > 0 ? Math.min(current + 1, max - 1) : Math.max(
+                            current - 1, 0);
+                        scrollToValue(scrollEl, next);
+                        updateHiddenInput(pickerName);
+                    }, {
+                        passive: false
+                    });
+                });
+
+                // Touch swipe support
+                [hourScroll, minScroll].forEach(function(scrollEl) {
+                    let touchStartY = 0;
+                    let touchAccum = 0;
+
+                    scrollEl[0].addEventListener('touchstart', function(e) {
+                        touchStartY = e.touches[0].clientY;
+                        touchAccum = 0;
+                        scrollEl.find('.ctp-scroll-inner').css('transition', 'none');
+                    }, {
+                        passive: true
+                    });
+
+                    scrollEl[0].addEventListener('touchmove', function(e) {
+                        e.preventDefault();
+                        let diff = touchStartY - e.touches[0].clientY;
+                        touchAccum += diff;
+                        touchStartY = e.touches[0].clientY;
+
+                        let col = scrollEl.data('col');
+                        let max = col === 'hour' ? 24 : 60;
+                        let threshold = ITEM_H / 2;
+
+                        while (Math.abs(touchAccum) >= threshold) {
+                            let current = getSelectedValue(scrollEl);
+                            let next = touchAccum > 0 ? Math.min(current + 1, max - 1) : Math.max(
+                                current - 1, 0);
+                            scrollToValue(scrollEl, next);
+                            touchAccum -= (touchAccum > 0 ? threshold : -threshold);
+                        }
+                    }, {
+                        passive: false
+                    });
+
+                    scrollEl[0].addEventListener('touchend', function() {
+                        scrollEl.find('.ctp-scroll-inner').css('transition',
+                            'transform .2s cubic-bezier(.4,0,.2,1)');
+                        updateHiddenInput(pickerName);
+                    }, {
+                        passive: true
+                    });
+                });
+            }
+
+            // Arrow button handlers
+            $(document).on('click', '.ctp-arrow', function() {
+                let dir = $(this).data('dir');
+                let col = $(this).data('col');
+                let pickerName = $(this).data('picker');
+                let scrollEl = $(`#scroll_${col}_${pickerName}`);
+                let max = col === 'hour' ? 24 : 60;
+                let current = getSelectedValue(scrollEl);
+                let next = dir === 'up' ? Math.max(current - 1, 0) : Math.min(current + 1, max - 1);
+                scrollToValue(scrollEl, next);
+                updateHiddenInput(pickerName);
+            });
+
+            // OK button handler - tutup picker
+            $(document).on('click', '.ctp-ok-btn', function(e) {
+                e.stopPropagation();
+                let picker = $(this).closest('.custom-time-picker');
+                picker.removeClass('open');
+                $('.ctp-overlay').remove();
+            });
+
+            // Toggle dropdown
+            $(document).on('click', '.ctp-display', function(e) {
+                e.stopPropagation();
+                let picker = $(this).closest('.custom-time-picker');
+                let isOpen = picker.hasClass('open');
+
+                // Close all other pickers
+                $('.custom-time-picker').removeClass('open');
+                $('.ctp-overlay').remove();
+
+                if (!isOpen) {
+                    picker.addClass('open');
+                    // Add overlay for mobile
+                    if (window.innerWidth <= 576) {
+                        let overlay = $('<div class="ctp-overlay"></div>');
+                        overlay.on('click', function() {
+                            picker.removeClass('open');
+                            $(this).remove();
+                        });
+                        $('body').append(overlay);
                     }
-                } catch (e) {
-                    // Fallback
                 }
             });
 
-            $('#auth_jam_mulai, #auth_jam_selesai').on('input change blur keyup', hitungDurasi);
+            // Close picker when clicking outside
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.custom-time-picker').length) {
+                    $('.custom-time-picker').removeClass('open');
+                    $('.ctp-overlay').remove();
+                }
+            });
+
+            // Init both pickers
+            initPicker('jam_mulai');
+            initPicker('jam_selesai');
+
+            // Trigger durasi if both have values
             if ($('#auth_jam_mulai').val() && $('#auth_jam_selesai').val()) {
                 hitungDurasi();
             }
