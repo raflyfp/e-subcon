@@ -104,6 +104,7 @@ Route::middleware(['auth', 'throttle:web-traffic'])->group(function () {
     });
 
     Route::get('/laporan-subcon', [PengerjaanController::class, 'laporan'])->name('laporan.index')->middleware('permission:laporan_subcon');
+    Route::get('/laporan-subcon/export-pdf', [PengerjaanController::class, 'exportPdf'])->name('laporan.export-pdf')->middleware('permission:laporan_subcon');
 
 
     /*

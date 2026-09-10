@@ -198,26 +198,32 @@
 
                             {{-- Header Dokumen Laporan --}}
                             <div class="report-header mb-4 pb-2 border-bottom">
-                                <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.02em;">PT. SNA MEDIKA
-                                </h4>
-                                <h5 class="fw-bold mb-1 text-dark">Laporan Pengerjaan Barang Subcon</h5>
-                                <div class="fw-bold text-dark fs-6 mb-2">
-                                    Periode :
-                                    {{ $tanggalMulai ? \Carbon\Carbon::parse($tanggalMulai)->format('Y-m-d') : 'Awal' }}
-                                    s/d
-                                    {{ $tanggalAkhir ? \Carbon\Carbon::parse($tanggalAkhir)->format('Y-m-d') : 'Sekarang' }}
-                                </div>
-                                <div class="small fw-semibold text-secondary pt-1">
-                                    <span><strong>Barang :</strong>
-                                        {{ $selectedBarangObj ? '[' . $selectedBarangObj->kode_barang . '] ' . $selectedBarangObj->nama_barang . ' (' . ($selectedBarangObj->satuan ?? 'PCS') . ')' : 'SEMUA BARANG' }}</span>
-                                    <span class="mx-2">|</span>
-                                    <span><strong>Lokasi :</strong>
-                                        {{ $selectedLokasiObj ? $selectedLokasiObj->nama_lokasi : 'SEMUA LOKASI' }}</span>
-                                    @if (auth()->user()->is_admin)
-                                        <span class="mx-2">|</span>
-                                        <span><strong>Karyawan :</strong>
-                                            {{ $selectedKaryawanObj ? $selectedKaryawanObj->nama_karyawan . ' (' . $selectedKaryawanObj->no_karyawan . ')' : 'SEMUA KARYAWAN' }}</span>
-                                    @endif
+                                <div class="d-flex justify-content-between align-items-start gap-3">
+                                    <div>
+                                        <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.02em;">PT. SNA MEDIKA</h4>
+                                        <h5 class="fw-bold mb-1 text-dark">Laporan Pengerjaan Barang Subcon</h5>
+                                        <div class="fw-bold text-dark fs-6 mb-2">
+                                            Periode :
+                                            {{ $tanggalMulai ? \Carbon\Carbon::parse($tanggalMulai)->format('Y-m-d') : 'Awal' }}
+                                            s/d
+                                            {{ $tanggalAkhir ? \Carbon\Carbon::parse($tanggalAkhir)->format('Y-m-d') : 'Sekarang' }}
+                                        </div>
+                                        <div class="small fw-semibold text-secondary pt-1">
+                                            <span><strong>Barang :</strong>
+                                                {{ $selectedBarangObj ? '[' . $selectedBarangObj->kode_barang . '] ' . $selectedBarangObj->nama_barang . ' (' . ($selectedBarangObj->satuan ?? 'PCS') . ')' : 'SEMUA BARANG' }}</span>
+                                            <span class="mx-2">|</span>
+                                            <span><strong>Lokasi :</strong>
+                                                {{ $selectedLokasiObj ? $selectedLokasiObj->nama_lokasi : 'SEMUA LOKASI' }}</span>
+                                            @if (auth()->user()->is_admin)
+                                                <span class="mx-2">|</span>
+                                                <span><strong>Karyawan :</strong>
+                                                    {{ $selectedKaryawanObj ? $selectedKaryawanObj->nama_karyawan . ' (' . $selectedKaryawanObj->no_karyawan . ')' : 'SEMUA KARYAWAN' }}</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="text-end flex-shrink-0">
+                                        <img src="{{ asset('logo.png') }}" alt="Logo SNA" style="max-height: 65px; max-width: 180px; object-fit: contain;">
+                                    </div>
                                 </div>
                             </div>
 
@@ -298,10 +304,8 @@
                                                     @if ($currentGroupBy !== 'subcon')
                                                         <th style="border: 1px solid #94a3b8;">Lokasi Subcon</th>
                                                     @endif
-                                                    <th style="width: 110px; border: 1px solid #94a3b8;">Jenis Pekerjaan
-                                                    </th>
-                                                    <th style="width: 105px; border: 1px solid #94a3b8;">Jumlah Selesai
-                                                    </th>
+                                                    <th style="width: 110px; border: 1px solid #94a3b8;">Jenis Pekerjaan</th>
+                                                    <th style="width: 105px; border: 1px solid #94a3b8;">Jumlah Selesai</th>
                                                     <th style="width: 65px; border: 1px solid #94a3b8;">Satuan</th>
                                                     <th style="border: 1px solid #94a3b8;">Keterangan</th>
                                                 </tr>
@@ -449,7 +453,17 @@
             background: #94a3b8;
         }
 
+        .barang-report-block {
+            page-break-inside: avoid !important;
+            margin-bottom: 20px !important;
+        }
+
         @media print {
+            @page {
+                size: A4 portrait;
+                margin: 10mm;
+            }
+
             body {
                 background: #ffffff !important;
                 color: #000000 !important;
@@ -496,18 +510,19 @@
 
             .barang-report-block {
                 page-break-inside: avoid !important;
-                margin-bottom: 20px !important;
+                margin-bottom: 16px !important;
             }
 
             table {
                 width: 100% !important;
                 border-collapse: collapse !important;
+                font-size: 8.5pt !important;
             }
 
             th,
             td {
                 border: 1px solid #000000 !important;
-                padding: 6px 8px !important;
+                padding: 4px 6px !important;
                 color: #000000 !important;
             }
         }
@@ -534,50 +549,33 @@
             });
         });
 
-        // Print Laporan Sheet
+        // Print Laporan Sheet (Menggunakan Dialog Cetak Browser)
         function printReportSheet() {
             window.print();
         }
 
-        // Export PDF Laporan (Exact Document PDF)
+        // Export PDF Laporan (A4 Portrait Native Server-Side DomPDF)
         function exportReportPDF() {
-            const element = document.getElementById('printable-report-sheet');
-            const tglMulai = document.getElementById('filter_tanggal_mulai').value || 'Awal';
-            const tglAkhir = document.getElementById('filter_tanggal_akhir').value || 'Sekarang';
-            const filename = 'Laporan_Subcon_' + tglMulai + '_sd_' + tglAkhir + '.pdf';
+            const form = document.getElementById('filterForm');
+            let queryString = '';
+            if (form) {
+                const formData = new FormData(form);
+                queryString = new URLSearchParams(formData).toString();
+            }
 
-            const opt = {
-                margin: [10, 10, 10, 10],
-                filename: filename,
-                image: {
-                    type: 'jpeg',
-                    quality: 0.98
-                },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true
-                },
-                jsPDF: {
-                    unit: 'mm',
-                    format: 'a4',
-                    orientation: 'landscape'
-                }
-            };
+            const downloadUrl = "{{ route('laporan.export-pdf') }}" + (queryString ? '?' + queryString : '');
 
             Swal.fire({
-                title: 'Sedang Membuat PDF...',
-                text: 'Mohon tunggu sebentar',
-                allowOutsideClick: false,
+                title: 'Sedang Mengunduh PDF...',
+                text: 'Membuat dokumen PDF A4 Portrait resmi...',
+                timer: 1500,
+                timerProgressBar: true,
                 didOpen: () => {
                     Swal.showLoading();
                 }
             });
 
-            html2pdf().set(opt).from(element).save().then(() => {
-                Swal.close();
-            }).catch(err => {
-                Swal.fire('Gagal', 'Terjadi kesalahan saat mengekspor PDF.', 'error');
-            });
+            window.location.href = downloadUrl;
         }
 
         // Export Excel Laporan (Structured HTML Tables per Barang with Header & Subheaders)

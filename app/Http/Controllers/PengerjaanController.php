@@ -311,6 +311,138 @@ class PengerjaanController extends Controller
     }
 
     /**
+     * Export PDF Laporan Subcon (DomPDF A4 Portrait Native)
+     */
+    public function exportPdf(Request $request)
+    {
+        $user = auth()->user();
+
+        $defaultMulai = now()->startOfMonth()->toDateString();
+        $defaultAkhir = now()->toDateString();
+
+        $tanggalMulai     = $request->input('tanggal_mulai', $defaultMulai);
+        $tanggalAkhir     = $request->input('tanggal_akhir', $defaultAkhir);
+        $selectedKaryawan = $request->input('karyawan_id');
+        $selectedBarang   = $request->input('barang_id');
+        $selectedLokasi   = $request->input('lokasi_subcon_id');
+
+        $query = DB::table('tb_pengerjaan as p')
+            ->join('tb_karyawan as k', 'k.id', '=', 'p.karyawan_id')
+            ->join('tb_barang as b', 'b.id', '=', 'p.barang_id')
+            ->join('tb_lokasi_subcon as l', 'l.id', '=', 'p.lokasi_subcon_id')
+            ->select(
+                'p.id',
+                'p.tanggal',
+                'p.jam_mulai',
+                'p.jam_selesai',
+                'p.durasi_menit',
+                'p.jenis_pekerjaan',
+                'k.nama_karyawan',
+                'k.no_karyawan',
+                'b.kode_barang',
+                'b.nama_barang',
+                'b.satuan',
+                'l.nama_lokasi',
+                'p.jumlah',
+                'p.keterangan'
+            );
+
+        if ($tanggalMulai) {
+            $query->whereDate('p.tanggal', '>=', $tanggalMulai);
+        }
+        if ($tanggalAkhir) {
+            $query->whereDate('p.tanggal', '<=', $tanggalAkhir);
+        }
+        if ($selectedBarang) {
+            $query->where('p.barang_id', $selectedBarang);
+        }
+        if ($selectedKaryawan) {
+            $query->where('p.karyawan_id', $selectedKaryawan);
+        }
+
+        if ($user->is_admin) {
+            if ($selectedLokasi) {
+                $query->where('p.lokasi_subcon_id', $selectedLokasi);
+            }
+        } else {
+            $subcon = $user->lokasiSubcon;
+            if ($subcon) {
+                $query->where('p.lokasi_subcon_id', $subcon->id)
+                      ->where('k.lokasi_subcon_id', $subcon->id);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
+        }
+
+        $pengerjaan = $query->orderBy('p.tanggal', 'asc')
+            ->orderBy('p.jam_mulai', 'asc')
+            ->orderBy('p.id', 'asc')
+            ->get();
+
+        if ($user->is_admin) {
+            $karyawanList = Karyawan::where('is_active', true)->orderBy('nama_karyawan')->get();
+            $barangList   = Barang::where('is_active', true)->orderBy('nama_barang')->get();
+            $lokasiList   = LokasiSubcon::where('is_active', true)->orderBy('nama_lokasi')->get();
+            $subcon       = null;
+        } else {
+            $subcon   = $user->lokasiSubcon;
+            $subconId = $subcon?->id;
+
+            $karyawanList = Karyawan::where('lokasi_subcon_id', $subconId)->where('is_active', true)->orderBy('nama_karyawan')->get();
+            $barangList   = collect([]);
+            if ($subcon) {
+                $barangList = $subcon->barang()->where('is_active', true)->orderBy('nama_barang')->get();
+            }
+            if ($barangList->isEmpty()) {
+                $barangList = Barang::where('is_active', true)->orderBy('nama_barang')->get();
+            }
+            $lokasiList = collect([]);
+        }
+
+        $selectedKaryawanObj = $selectedKaryawan ? collect($karyawanList)->firstWhere('id', $selectedKaryawan) : null;
+        $selectedBarangObj   = $selectedBarang ? $barangList->firstWhere('id', $selectedBarang) : null;
+        $selectedLokasiObj   = $user->is_admin
+            ? ($selectedLokasi ? $lokasiList->firstWhere('id', $selectedLokasi) : null)
+            : $subcon;
+
+        $groupBy = $request->input('group_by', 'barang');
+        if (!in_array($groupBy, ['barang', 'karyawan', 'subcon'], true)) {
+            $groupBy = 'barang';
+        }
+
+        // Encode Logo to base64 for fast rendering in DomPDF
+        $logoPath = public_path('logo.png');
+        $logoBase64 = '';
+        if (file_exists($logoPath)) {
+            $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+        }
+
+        $data = compact(
+            'pengerjaan',
+            'tanggalMulai',
+            'tanggalAkhir',
+            'groupBy',
+            'selectedKaryawanObj',
+            'selectedBarangObj',
+            'selectedLokasiObj',
+            'logoBase64'
+        );
+
+        $filename = "Laporan_Subcon_" . ($tanggalMulai ?: 'Awal') . "_sd_" . ($tanggalAkhir ?: 'Sekarang') . ".pdf";
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pages.laporan-subcon-pdf', $data)
+            ->setPaper('a4', 'portrait')
+            ->setOptions([
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled'      => true,
+                'dpi'                  => 150,
+                'defaultFont'          => 'sans-serif'
+            ]);
+
+        return $pdf->download($filename);
+    }
+
+    /**
      * Alias untuk riwayat agar kompatibel
      */
     public function riwayat(Request $request)
