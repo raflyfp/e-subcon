@@ -191,6 +191,25 @@ class PengerjaanController extends Controller
         $selectedBarang   = $request->input('barang_id');
         $selectedLokasi   = $request->input('lokasi_subcon_id');
 
+        // Pastikan selectedKaryawan, selectedBarang, dan selectedLokasi dalam bentuk array bersih
+        if (!is_array($selectedKaryawan)) {
+            $selectedKaryawan = $selectedKaryawan ? [$selectedKaryawan] : [];
+        } else {
+            $selectedKaryawan = array_values(array_filter($selectedKaryawan));
+        }
+
+        if (!is_array($selectedBarang)) {
+            $selectedBarang = $selectedBarang ? [$selectedBarang] : [];
+        } else {
+            $selectedBarang = array_values(array_filter($selectedBarang));
+        }
+
+        if (!is_array($selectedLokasi)) {
+            $selectedLokasi = $selectedLokasi ? [$selectedLokasi] : [];
+        } else {
+            $selectedLokasi = array_values(array_filter($selectedLokasi));
+        }
+
         $isFiltered = $request->has('filter');
 
         $pengerjaan = collect([]);
@@ -225,20 +244,20 @@ class PengerjaanController extends Controller
                 $query->whereDate('p.tanggal', '<=', $tanggalAkhir);
             }
 
-            // Filter Barang
-            if ($selectedBarang) {
-                $query->where('p.barang_id', $selectedBarang);
+            // Filter Barang (Multi-select)
+            if (!empty($selectedBarang)) {
+                $query->whereIn('p.barang_id', $selectedBarang);
             }
 
-            // Filter Karyawan
-            if ($selectedKaryawan) {
-                $query->where('p.karyawan_id', $selectedKaryawan);
+            // Filter Karyawan (Multi-select)
+            if (!empty($selectedKaryawan)) {
+                $query->whereIn('p.karyawan_id', $selectedKaryawan);
             }
 
-            // Role check & Filter Lokasi
+            // Role check & Filter Lokasi (Multi-select)
             if ($user->is_admin) {
-                if ($selectedLokasi) {
-                    $query->where('p.lokasi_subcon_id', $selectedLokasi);
+                if (!empty($selectedLokasi)) {
+                    $query->whereIn('p.lokasi_subcon_id', $selectedLokasi);
                 }
             } else {
                 $subcon = $user->lokasiSubcon;
@@ -280,11 +299,11 @@ class PengerjaanController extends Controller
             $lokasiList = collect([]);
         }
 
-        $selectedKaryawanObj = $selectedKaryawan ? collect($karyawanList)->firstWhere('id', $selectedKaryawan) : null;
-        $selectedBarangObj   = $selectedBarang ? $barangList->firstWhere('id', $selectedBarang) : null;
-        $selectedLokasiObj   = $user->is_admin
-            ? ($selectedLokasi ? $lokasiList->firstWhere('id', $selectedLokasi) : null)
-            : $subcon;
+        $selectedKaryawanObjs = !empty($selectedKaryawan) ? collect($karyawanList)->whereIn('id', $selectedKaryawan)->values() : collect([]);
+        $selectedBarangObjs   = !empty($selectedBarang) ? $barangList->whereIn('id', $selectedBarang)->values() : collect([]);
+        $selectedLokasiObjs   = $user->is_admin
+            ? (!empty($selectedLokasi) ? $lokasiList->whereIn('id', $selectedLokasi)->values() : collect([]))
+            : ($subcon ? collect([$subcon]) : collect([]));
 
         $groupBy = $request->input('group_by', 'barang');
         if (!in_array($groupBy, ['barang', 'karyawan', 'subcon'], true)) {
@@ -304,9 +323,9 @@ class PengerjaanController extends Controller
             'selectedKaryawan',
             'selectedBarang',
             'selectedLokasi',
-            'selectedKaryawanObj',
-            'selectedBarangObj',
-            'selectedLokasiObj'
+            'selectedKaryawanObjs',
+            'selectedBarangObjs',
+            'selectedLokasiObjs'
         ));
     }
 
@@ -317,14 +336,30 @@ class PengerjaanController extends Controller
     {
         $user = auth()->user();
 
-        $defaultMulai = now()->startOfMonth()->toDateString();
-        $defaultAkhir = now()->toDateString();
-
-        $tanggalMulai     = $request->input('tanggal_mulai', $defaultMulai);
-        $tanggalAkhir     = $request->input('tanggal_akhir', $defaultAkhir);
+        $tanggalMulai     = $request->input('tanggal_mulai');
+        $tanggalAkhir     = $request->input('tanggal_akhir');
         $selectedKaryawan = $request->input('karyawan_id');
         $selectedBarang   = $request->input('barang_id');
         $selectedLokasi   = $request->input('lokasi_subcon_id');
+
+        // Pastikan selectedKaryawan, selectedBarang, dan selectedLokasi dalam bentuk array bersih
+        if (!is_array($selectedKaryawan)) {
+            $selectedKaryawan = $selectedKaryawan ? [$selectedKaryawan] : [];
+        } else {
+            $selectedKaryawan = array_values(array_filter($selectedKaryawan));
+        }
+
+        if (!is_array($selectedBarang)) {
+            $selectedBarang = $selectedBarang ? [$selectedBarang] : [];
+        } else {
+            $selectedBarang = array_values(array_filter($selectedBarang));
+        }
+
+        if (!is_array($selectedLokasi)) {
+            $selectedLokasi = $selectedLokasi ? [$selectedLokasi] : [];
+        } else {
+            $selectedLokasi = array_values(array_filter($selectedLokasi));
+        }
 
         $query = DB::table('tb_pengerjaan as p')
             ->join('tb_karyawan as k', 'k.id', '=', 'p.karyawan_id')
@@ -353,16 +388,16 @@ class PengerjaanController extends Controller
         if ($tanggalAkhir) {
             $query->whereDate('p.tanggal', '<=', $tanggalAkhir);
         }
-        if ($selectedBarang) {
-            $query->where('p.barang_id', $selectedBarang);
+        if (!empty($selectedBarang)) {
+            $query->whereIn('p.barang_id', $selectedBarang);
         }
-        if ($selectedKaryawan) {
-            $query->where('p.karyawan_id', $selectedKaryawan);
+        if (!empty($selectedKaryawan)) {
+            $query->whereIn('p.karyawan_id', $selectedKaryawan);
         }
 
         if ($user->is_admin) {
-            if ($selectedLokasi) {
-                $query->where('p.lokasi_subcon_id', $selectedLokasi);
+            if (!empty($selectedLokasi)) {
+                $query->whereIn('p.lokasi_subcon_id', $selectedLokasi);
             }
         } else {
             $subcon = $user->lokasiSubcon;
@@ -399,11 +434,11 @@ class PengerjaanController extends Controller
             $lokasiList = collect([]);
         }
 
-        $selectedKaryawanObj = $selectedKaryawan ? collect($karyawanList)->firstWhere('id', $selectedKaryawan) : null;
-        $selectedBarangObj   = $selectedBarang ? $barangList->firstWhere('id', $selectedBarang) : null;
-        $selectedLokasiObj   = $user->is_admin
-            ? ($selectedLokasi ? $lokasiList->firstWhere('id', $selectedLokasi) : null)
-            : $subcon;
+        $selectedKaryawanObjs = !empty($selectedKaryawan) ? collect($karyawanList)->whereIn('id', $selectedKaryawan)->values() : collect([]);
+        $selectedBarangObjs   = !empty($selectedBarang) ? $barangList->whereIn('id', $selectedBarang)->values() : collect([]);
+        $selectedLokasiObjs   = $user->is_admin
+            ? (!empty($selectedLokasi) ? $lokasiList->whereIn('id', $selectedLokasi)->values() : collect([]))
+            : ($subcon ? collect([$subcon]) : collect([]));
 
         $groupBy = $request->input('group_by', 'barang');
         if (!in_array($groupBy, ['barang', 'karyawan', 'subcon'], true)) {
@@ -422,9 +457,9 @@ class PengerjaanController extends Controller
             'tanggalMulai',
             'tanggalAkhir',
             'groupBy',
-            'selectedKaryawanObj',
-            'selectedBarangObj',
-            'selectedLokasiObj',
+            'selectedKaryawanObjs',
+            'selectedBarangObjs',
+            'selectedLokasiObjs',
             'logoBase64'
         );
 

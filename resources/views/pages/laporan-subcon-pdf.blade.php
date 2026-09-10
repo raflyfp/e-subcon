@@ -17,7 +17,7 @@
 
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 8pt;
+            font-size: 8.5pt;
             color: #1e293b;
             line-height: 1.25;
             margin: 0;
@@ -40,7 +40,7 @@
         }
 
         .company-title {
-            font-size: 13pt;
+            font-size: 14pt;
             font-weight: bold;
             color: #0f172a;
             margin: 0 0 2px 0;
@@ -48,21 +48,21 @@
         }
 
         .report-title {
-            font-size: 11pt;
+            font-size: 11.5pt;
             font-weight: bold;
             color: #1e293b;
             margin: 0 0 4px 0;
         }
 
         .periode-text {
-            font-size: 8.5pt;
+            font-size: 9pt;
             font-weight: bold;
             color: #334155;
             margin-bottom: 3px;
         }
 
         .filter-meta {
-            font-size: 7.5pt;
+            font-size: 8pt;
             color: #64748b;
         }
 
@@ -85,8 +85,8 @@
             background-color: #e0f2fe;
             color: #0369a1;
             font-weight: bold;
-            font-size: 8.5pt;
-            padding: 4px 8px;
+            font-size: 9pt;
+            padding: 5px 8px;
             border: 1px solid #94a3b8;
             border-bottom: none;
             border-top-left-radius: 3px;
@@ -120,9 +120,9 @@
             background-color: #f1f5f9;
             color: #0f172a;
             font-weight: bold;
-            font-size: 7.5pt;
+            font-size: 8pt;
             text-align: center;
-            padding: 4px 3px;
+            padding: 5px 3px;
             border: 0.8px solid #94a3b8;
             vertical-align: middle;
             word-wrap: break-word;
@@ -130,8 +130,8 @@
         }
 
         table.data-table td {
-            font-size: 7.5pt;
-            padding: 3.5px 3px;
+            font-size: 8pt;
+            padding: 4px 3px;
             border: 0.8px solid #cbd5e1;
             vertical-align: middle;
             word-wrap: break-word;
@@ -142,7 +142,8 @@
             background-color: #f8fafc;
             border: 0.8px solid #94a3b8;
             font-weight: bold;
-            padding: 4px 3px;
+            font-size: 8.5pt;
+            padding: 5px 3px;
         }
 
         /* Text Utilities */
@@ -192,12 +193,39 @@
                     {{ $tanggalAkhir ? \Carbon\Carbon::parse($tanggalAkhir)->format('Y-m-d') : 'Sekarang' }}
                 </div>
                 <div class="filter-meta">
-                    <span><strong>Barang :</strong> {{ $selectedBarangObj ? '[' . $selectedBarangObj->kode_barang . '] ' . $selectedBarangObj->nama_barang . ' (' . ($selectedBarangObj->satuan ?? 'PCS') . ')' : 'SEMUA BARANG' }}</span>
+                    <span>
+                        <strong>Barang :</strong>
+                        @if (isset($selectedBarangObjs) && $selectedBarangObjs->count() === 1)
+                            [{{ $selectedBarangObjs[0]->kode_barang }}] {{ $selectedBarangObjs[0]->nama_barang }} ({{ $selectedBarangObjs[0]->satuan ?? 'PCS' }})
+                        @elseif (isset($selectedBarangObjs) && $selectedBarangObjs->count() > 1)
+                            {{ $selectedBarangObjs->count() }} Barang Dipilih ({{ $selectedBarangObjs->pluck('nama_barang')->take(3)->implode(', ') }}{{ $selectedBarangObjs->count() > 3 ? '...' : '' }})
+                        @else
+                            SEMUA BARANG
+                        @endif
+                    </span>
                     &nbsp;|&nbsp;
-                    <span><strong>Lokasi :</strong> {{ $selectedLokasiObj ? $selectedLokasiObj->nama_lokasi : 'SEMUA LOKASI' }}</span>
+                    <span>
+                        <strong>Lokasi :</strong>
+                        @if (isset($selectedLokasiObjs) && $selectedLokasiObjs->count() === 1)
+                            {{ $selectedLokasiObjs[0]->nama_lokasi }}
+                        @elseif (isset($selectedLokasiObjs) && $selectedLokasiObjs->count() > 1)
+                            {{ $selectedLokasiObjs->count() }} Lokasi Dipilih ({{ $selectedLokasiObjs->pluck('nama_lokasi')->take(3)->implode(', ') }}{{ $selectedLokasiObjs->count() > 3 ? '...' : '' }})
+                        @else
+                            {{ !auth()->user()->is_admin && isset($subcon) && $subcon ? $subcon->nama_lokasi : 'SEMUA LOKASI' }}
+                        @endif
+                    </span>
                     @if (auth()->user()->is_admin)
                         &nbsp;|&nbsp;
-                        <span><strong>Karyawan :</strong> {{ $selectedKaryawanObj ? $selectedKaryawanObj->nama_karyawan . ' (' . $selectedKaryawanObj->no_karyawan . ')' : 'SEMUA KARYAWAN' }}</span>
+                        <span>
+                            <strong>Karyawan :</strong>
+                            @if (isset($selectedKaryawanObjs) && $selectedKaryawanObjs->count() === 1)
+                                {{ $selectedKaryawanObjs[0]->nama_karyawan }} ({{ $selectedKaryawanObjs[0]->no_karyawan }})
+                            @elseif (isset($selectedKaryawanObjs) && $selectedKaryawanObjs->count() > 1)
+                                {{ $selectedKaryawanObjs->count() }} Karyawan Dipilih ({{ $selectedKaryawanObjs->pluck('nama_karyawan')->take(3)->implode(', ') }}{{ $selectedKaryawanObjs->count() > 3 ? '...' : '' }})
+                            @else
+                                SEMUA KARYAWAN
+                            @endif
+                        </span>
                     @endif
                 </div>
             </td>

@@ -28,80 +28,159 @@
 
                             {{-- Tanggal Mulai --}}
                             <div class="mb-3">
-                                <label class="form-label fw-semibold" for="filter_tanggal_mulai">Tanggal Mulai</label>
+                                <label class="form-label fw-semibold" for="filter_tanggal_mulai" style="font-size: 0.95rem;">Tanggal Mulai</label>
                                 <input type="date" class="form-control" name="tanggal_mulai" id="filter_tanggal_mulai"
-                                    value="{{ $tanggalMulai }}">
+                                    style="font-size: 0.95rem; min-height: 42px;" value="{{ $tanggalMulai }}">
                             </div>
 
                             {{-- Tanggal Akhir --}}
                             <div class="mb-3">
-                                <label class="form-label fw-semibold" for="filter_tanggal_akhir">Tanggal Akhir</label>
+                                <label class="form-label fw-semibold" for="filter_tanggal_akhir" style="font-size: 0.95rem;">Tanggal Akhir</label>
                                 <input type="date" class="form-control" name="tanggal_akhir" id="filter_tanggal_akhir"
-                                    value="{{ $tanggalAkhir }}">
+                                    style="font-size: 0.95rem; min-height: 42px;" value="{{ $tanggalAkhir }}">
                             </div>
 
                             <hr class="text-secondary opacity-25">
 
                             @if (!auth()->user()->is_admin)
                                 <div class="mb-3 p-2 bg-light rounded border">
-                                    <small class="text-muted d-block">Subcon Pelaksana:</small>
-                                    <strong class="text-primary"><i
+                                    <small class="text-muted d-block" style="font-size: 0.88rem;">Subcon Pelaksana:</small>
+                                    <strong class="text-primary" style="font-size: 1rem;"><i
                                             class="ti ti-building me-1"></i>{{ $subcon->nama_lokasi ?? auth()->user()->name }}</strong>
                                 </div>
                             @endif
 
-                            {{-- Filter Karyawan --}}
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold" for="filter_karyawan_id">Karyawan Pelaksana</label>
-                                <select class="form-select select2-filter" name="karyawan_id" id="filter_karyawan_id">
-                                    <option value="">-- Semua Karyawan --</option>
-                                    @foreach ($karyawanList as $k)
-                                        <option value="{{ $k->id }}"
-                                            {{ $selectedKaryawan == $k->id ? 'selected' : '' }}>
-                                            {{ $k->nama_karyawan }} ({{ $k->no_karyawan }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            {{-- Filter Barang --}}
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold" for="filter_barang_id">Barang</label>
-                                <select class="form-select select2-filter" name="barang_id" id="filter_barang_id">
-                                    <option value="">-- Semua Barang --</option>
-                                    @foreach ($barangList as $b)
-                                        <option value="{{ $b->id }}"
-                                            {{ $selectedBarang == $b->id ? 'selected' : '' }}>
-                                            [{{ $b->kode_barang }}] {{ $b->nama_barang }} ({{ $b->satuan ?? 'PCS' }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            {{-- Filter Lokasi Subcon (Hanya Admin) --}}
+                            {{-- Filter Lokasi Subcon (Hanya Admin - Compact Multi-Select) --}}
                             @if (auth()->user()->is_admin)
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold" for="filter_lokasi_subcon_id">Lokasi
-                                        Subcon</label>
-                                    <select class="form-select select2-filter" name="lokasi_subcon_id"
-                                        id="filter_lokasi_subcon_id">
-                                        <option value="">-- Semua Lokasi --</option>
-                                        @foreach ($lokasiList as $l)
-                                            <option value="{{ $l->id }}"
-                                                {{ $selectedLokasi == $l->id ? 'selected' : '' }}>
-                                                {{ $l->nama_lokasi }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                <div class="custom-multiselect-wrapper mb-3" id="ms_lokasi">
+                                    <label class="form-label fw-semibold mb-1" style="font-size: 0.95rem;">
+                                        <i class="ti ti-building me-1 text-primary"></i>Lokasi Subcon
+                                    </label>
+                                    <div class="dropdown custom-multiselect">
+                                        <button class="form-select text-start d-flex justify-content-between align-items-center multiselect-trigger bg-white shadow-none" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                            <span class="multiselect-label text-truncate me-2 text-muted">-- Semua Lokasi (Multi-Select) --</span>
+                                            <span class="badge bg-primary rounded-pill multiselect-count d-none" style="font-size: 0.85rem;">0</span>
+                                        </button>
+                                        <div class="dropdown-menu p-2 shadow-sm w-100 custom-multiselect-dropdown" style="min-width: 300px; max-width: 380px; z-index: 1050;">
+                                            <div class="mb-2 d-flex gap-1 align-items-center">
+                                                <div class="position-relative flex-grow-1">
+                                                    <input type="text" class="form-control multiselect-search ps-4" style="font-size: 0.9rem;" placeholder="Cari lokasi subcon...">
+                                                    <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted" style="font-size: 15px;"></i>
+                                                </div>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm multiselect-undo-btn px-2 d-flex align-items-center justify-content-center" title="Reset / Batalkan Pilihan Lokasi" style="height: 38px; min-width: 38px; border-color: #cbd5e1;">
+                                                    <i class="ti ti-rotate-2 text-danger" style="font-size: 16px;"></i>
+                                                </button>
+                                            </div>
+                                            <div class="multiselect-options-list overflow-auto" style="max-height: 230px;">
+                                                @foreach ($lokasiList as $l)
+                                                    <label class="dropdown-item d-flex align-items-center justify-content-between py-2 px-2 rounded multiselect-option-label" style="cursor: pointer;">
+                                                        <div class="d-flex align-items-start gap-2 w-100">
+                                                            <input class="form-check-input mt-1 multiselect-checkbox" type="checkbox" name="lokasi_subcon_id[]" value="{{ $l->id }}"
+                                                                {{ in_array($l->id, (array) $selectedLokasi) ? 'checked' : '' }}
+                                                                data-label="{{ $l->nama_lokasi }}">
+                                                            <span style="font-size: 0.88rem; line-height: 1.35; white-space: normal; word-break: break-word;">{{ $l->nama_lokasi }}</span>
+                                                        </div>
+                                                    </label>
+                                                @endforeach
+                                            </div>
+                                            <div class="pt-2 mt-2 border-top d-flex justify-content-end">
+                                                <button type="button" class="btn btn-primary btn-sm px-3 py-1 fw-semibold multiselect-ok-btn" style="font-size: 0.9rem;">
+                                                    <i class="ti ti-check me-1"></i>OK
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             @endif
 
+                            {{-- Filter Karyawan (Compact Multi-Select Menyesuaikan Lokasi Subcon) --}}
+                            <div class="custom-multiselect-wrapper mb-3" id="ms_karyawan">
+                                <label class="form-label fw-semibold mb-1" style="font-size: 0.95rem;">
+                                    <i class="ti ti-users me-1 text-primary"></i>Karyawan Pelaksana
+                                </label>
+                                <div class="dropdown custom-multiselect">
+                                    <button class="form-select text-start d-flex justify-content-between align-items-center multiselect-trigger bg-white shadow-none" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                        <span class="multiselect-label text-truncate me-2 text-muted">-- Semua Karyawan (Multi-Select) --</span>
+                                        <span class="badge bg-primary rounded-pill multiselect-count d-none" style="font-size: 0.82rem;">0</span>
+                                    </button>
+                                    <div class="dropdown-menu p-2 shadow-sm w-100 custom-multiselect-dropdown" style="min-width: 320px; max-width: 400px; z-index: 1050;">
+                                        <div class="mb-2 d-flex gap-1 align-items-center">
+                                            <div class="position-relative flex-grow-1">
+                                                <input type="text" class="form-control multiselect-search ps-4" style="font-size: 0.9rem;" placeholder="Cari nama / no karyawan...">
+                                                <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted" style="font-size: 15px;"></i>
+                                            </div>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm multiselect-undo-btn px-2 d-flex align-items-center justify-content-center" title="Reset / Batalkan Pilihan Karyawan" style="height: 38px; min-width: 38px; border-color: #cbd5e1;">
+                                                <i class="ti ti-rotate-2 text-danger" style="font-size: 16px;"></i>
+                                            </button>
+                                        </div>
+                                        <div class="multiselect-options-list overflow-auto" style="max-height: 230px;">
+                                            @foreach ($karyawanList as $k)
+                                                <label class="dropdown-item d-flex align-items-center justify-content-between py-2 px-2 rounded multiselect-option-label" data-lokasi="{{ $k->lokasi_subcon_id }}" style="cursor: pointer;">
+                                                    <div class="d-flex align-items-start gap-2 w-100">
+                                                        <input class="form-check-input mt-1 multiselect-checkbox" type="checkbox" name="karyawan_id[]" value="{{ $k->id }}"
+                                                            {{ in_array($k->id, (array) $selectedKaryawan) ? 'checked' : '' }}
+                                                            data-label="{{ $k->nama_karyawan }} ({{ $k->no_karyawan }})">
+                                                        <span style="font-size: 0.88rem; line-height: 1.35; white-space: normal; word-break: break-word;">{{ $k->nama_karyawan }} <span class="text-muted">({{ $k->no_karyawan }})</span></span>
+                                                    </div>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                        <div class="pt-2 mt-2 border-top d-flex justify-content-end">
+                                            <button type="button" class="btn btn-primary btn-sm px-3 py-1 fw-semibold multiselect-ok-btn" style="font-size: 0.9rem;">
+                                                <i class="ti ti-check me-1"></i>OK
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Filter Barang (Compact Multi-Select Menyesuaikan Lokasi Subcon) --}}
+                            <div class="custom-multiselect-wrapper mb-3" id="ms_barang">
+                                <label class="form-label fw-semibold mb-1" style="font-size: 0.95rem;">
+                                    <i class="ti ti-package me-1 text-primary"></i>Barang
+                                </label>
+                                <div class="dropdown custom-multiselect">
+                                    <button class="form-select text-start d-flex justify-content-between align-items-center multiselect-trigger bg-white shadow-none" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                        <span class="multiselect-label text-truncate me-2 text-muted">-- Semua Barang (Multi-Select) --</span>
+                                        <span class="badge bg-primary rounded-pill multiselect-count d-none" style="font-size: 0.82rem;">0</span>
+                                    </button>
+                                    <div class="dropdown-menu p-2 shadow-sm w-100 custom-multiselect-dropdown" style="min-width: 340px; max-width: 440px; z-index: 1050;">
+                                        <div class="mb-2 d-flex gap-1 align-items-center">
+                                            <div class="position-relative flex-grow-1">
+                                                <input type="text" class="form-control multiselect-search ps-4" style="font-size: 0.9rem;" placeholder="Cari kode / nama barang...">
+                                                <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted" style="font-size: 15px;"></i>
+                                            </div>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm multiselect-undo-btn px-2 d-flex align-items-center justify-content-center" title="Reset / Batalkan Pilihan Barang" style="height: 38px; min-width: 38px; border-color: #cbd5e1;">
+                                                <i class="ti ti-rotate-2 text-danger" style="font-size: 16px;"></i>
+                                            </button>
+                                        </div>
+                                        <div class="multiselect-options-list overflow-auto" style="max-height: 240px;">
+                                            @foreach ($barangList as $b)
+                                                <label class="dropdown-item d-flex align-items-center justify-content-between py-2 px-2 rounded multiselect-option-label" data-lokasi="{{ $b->lokasi_subcon_id }}" style="cursor: pointer;">
+                                                    <div class="d-flex align-items-start gap-2 w-100">
+                                                        <input class="form-check-input mt-1 multiselect-checkbox" type="checkbox" name="barang_id[]" value="{{ $b->id }}"
+                                                            {{ in_array($b->id, (array) $selectedBarang) ? 'checked' : '' }}
+                                                            data-label="[{{ $b->kode_barang }}] {{ $b->nama_barang }}">
+                                                        <span style="font-size: 0.875rem; line-height: 1.35; white-space: normal; word-break: break-word;"><strong class="text-primary">[{{ $b->kode_barang }}]</strong> {{ $b->nama_barang }} <span class="text-muted">({{ $b->satuan ?? 'PCS' }})</span></span>
+                                                    </div>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                        <div class="pt-2 mt-2 border-top d-flex justify-content-end">
+                                            <button type="button" class="btn btn-primary btn-sm px-3 py-1 fw-semibold multiselect-ok-btn" style="font-size: 0.9rem;">
+                                                <i class="ti ti-check me-1"></i>OK
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             {{-- Sort By Laporan --}}
                             <div class="mb-3">
-                                <label class="form-label fw-semibold" for="filter_group_by">
+                                <label class="form-label fw-semibold" for="filter_group_by" style="font-size: 0.95rem;">
                                     <i class="ti ti-sort-ascending me-1 text-primary"></i>Sort By
                                 </label>
-                                <select class="form-select" name="group_by" id="filter_group_by">
+                                <select class="form-select" name="group_by" id="filter_group_by" style="font-size: 0.95rem; min-height: 42px;">
                                     <option value="barang" {{ ($groupBy ?? 'barang') === 'barang' ? 'selected' : '' }}>
                                         Per Kode / Nama Barang
                                     </option>
@@ -118,10 +197,10 @@
 
                             {{-- Submit Buttons --}}
                             <div class="d-grid gap-2 mt-4">
-                                <button type="submit" class="btn btn-primary fw-semibold py-2">
+                                <button type="submit" class="btn btn-primary fw-semibold py-2 fs-6" style="font-size: 1rem !important;">
                                     <i class="ti ti-filter me-1"></i> Terapkan Filter
                                 </button>
-                                <a href="{{ route('laporan.index') }}" class="btn btn-outline-secondary btn-sm py-2">
+                                <a href="{{ route('laporan.index') }}" class="btn btn-outline-secondary btn-sm py-2 fs-6" style="font-size: 0.95rem !important;">
                                     <i class="ti ti-rotate-2 me-1"></i> Reset Filter
                                 </a>
                             </div>
@@ -200,7 +279,8 @@
                             <div class="report-header mb-4 pb-2 border-bottom">
                                 <div class="d-flex justify-content-between align-items-start gap-3">
                                     <div>
-                                        <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.02em;">PT. SNA MEDIKA</h4>
+                                        <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.02em;">PT. SNA MEDIKA
+                                        </h4>
                                         <h5 class="fw-bold mb-1 text-dark">Laporan Pengerjaan Barang Subcon</h5>
                                         <div class="fw-bold text-dark fs-6 mb-2">
                                             Periode :
@@ -209,20 +289,51 @@
                                             {{ $tanggalAkhir ? \Carbon\Carbon::parse($tanggalAkhir)->format('Y-m-d') : 'Sekarang' }}
                                         </div>
                                         <div class="small fw-semibold text-secondary pt-1">
-                                            <span><strong>Barang :</strong>
-                                                {{ $selectedBarangObj ? '[' . $selectedBarangObj->kode_barang . '] ' . $selectedBarangObj->nama_barang . ' (' . ($selectedBarangObj->satuan ?? 'PCS') . ')' : 'SEMUA BARANG' }}</span>
+                                            <span>
+                                                <strong>Barang :</strong>
+                                                @if (isset($selectedBarangObjs) && $selectedBarangObjs->count() === 1)
+                                                    [{{ $selectedBarangObjs[0]->kode_barang }}]
+                                                    {{ $selectedBarangObjs[0]->nama_barang }}
+                                                    ({{ $selectedBarangObjs[0]->satuan ?? 'PCS' }})
+                                                @elseif (isset($selectedBarangObjs) && $selectedBarangObjs->count() > 1)
+                                                    {{ $selectedBarangObjs->count() }} Barang Dipilih
+                                                    ({{ $selectedBarangObjs->pluck('nama_barang')->take(3)->implode(', ') }}{{ $selectedBarangObjs->count() > 3 ? '...' : '' }})
+                                                @else
+                                                    SEMUA BARANG
+                                                @endif
+                                            </span>
                                             <span class="mx-2">|</span>
-                                            <span><strong>Lokasi :</strong>
-                                                {{ $selectedLokasiObj ? $selectedLokasiObj->nama_lokasi : 'SEMUA LOKASI' }}</span>
+                                            <span>
+                                                <strong>Lokasi :</strong>
+                                                @if (isset($selectedLokasiObjs) && $selectedLokasiObjs->count() === 1)
+                                                    {{ $selectedLokasiObjs[0]->nama_lokasi }}
+                                                @elseif (isset($selectedLokasiObjs) && $selectedLokasiObjs->count() > 1)
+                                                    {{ $selectedLokasiObjs->count() }} Lokasi Dipilih
+                                                    ({{ $selectedLokasiObjs->pluck('nama_lokasi')->take(3)->implode(', ') }}{{ $selectedLokasiObjs->count() > 3 ? '...' : '' }})
+                                                @else
+                                                    {{ !auth()->user()->is_admin && $subcon ? $subcon->nama_lokasi : 'SEMUA LOKASI' }}
+                                                @endif
+                                            </span>
                                             @if (auth()->user()->is_admin)
                                                 <span class="mx-2">|</span>
-                                                <span><strong>Karyawan :</strong>
-                                                    {{ $selectedKaryawanObj ? $selectedKaryawanObj->nama_karyawan . ' (' . $selectedKaryawanObj->no_karyawan . ')' : 'SEMUA KARYAWAN' }}</span>
+                                                <span>
+                                                    <strong>Karyawan :</strong>
+                                                    @if (isset($selectedKaryawanObjs) && $selectedKaryawanObjs->count() === 1)
+                                                        {{ $selectedKaryawanObjs[0]->nama_karyawan }}
+                                                        ({{ $selectedKaryawanObjs[0]->no_karyawan }})
+                                                    @elseif (isset($selectedKaryawanObjs) && $selectedKaryawanObjs->count() > 1)
+                                                        {{ $selectedKaryawanObjs->count() }} Karyawan Dipilih
+                                                        ({{ $selectedKaryawanObjs->pluck('nama_karyawan')->take(3)->implode(', ') }}{{ $selectedKaryawanObjs->count() > 3 ? '...' : '' }})
+                                                    @else
+                                                        SEMUA KARYAWAN
+                                                    @endif
+                                                </span>
                                             @endif
                                         </div>
                                     </div>
                                     <div class="text-end flex-shrink-0">
-                                        <img src="{{ asset('logo.png') }}" alt="Logo SNA" style="max-height: 65px; max-width: 180px; object-fit: contain;">
+                                        <img src="{{ asset('logo.png') }}" alt="Logo SNA"
+                                            style="max-height: 65px; max-width: 180px; object-fit: contain;">
                                     </div>
                                 </div>
                             </div>
@@ -304,8 +415,10 @@
                                                     @if ($currentGroupBy !== 'subcon')
                                                         <th style="border: 1px solid #94a3b8;">Lokasi Subcon</th>
                                                     @endif
-                                                    <th style="width: 110px; border: 1px solid #94a3b8;">Jenis Pekerjaan</th>
-                                                    <th style="width: 105px; border: 1px solid #94a3b8;">Jumlah Selesai</th>
+                                                    <th style="width: 110px; border: 1px solid #94a3b8;">Jenis Pekerjaan
+                                                    </th>
+                                                    <th style="width: 105px; border: 1px solid #94a3b8;">Jumlah Selesai
+                                                    </th>
                                                     <th style="width: 65px; border: 1px solid #94a3b8;">Satuan</th>
                                                     <th style="border: 1px solid #94a3b8;">Keterangan</th>
                                                 </tr>
@@ -526,27 +639,254 @@
                 color: #000000 !important;
             }
         }
+
+        /* Custom Compact Checkbox Multi-Select Styling */
+        .custom-multiselect-dropdown {
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+        }
+        .multiselect-options-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .multiselect-options-list::-webkit-scrollbar-track {
+            background: #f8fafc;
+        }
+        .multiselect-options-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .multiselect-option-label {
+            transition: all 0.12s ease;
+            user-select: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            padding: 6px 8px;
+        }
+        .multiselect-option-label:hover {
+            background-color: #f1f5f9 !important;
+        }
+        .multiselect-option-label.is-checked {
+            background-color: #e0f2fe !important;
+            font-weight: 600;
+        }
+        .multiselect-option-label .multiselect-checkbox {
+            width: 1.15em;
+            height: 1.15em;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .multiselect-trigger {
+            cursor: pointer;
+            min-height: 42px;
+            font-size: 0.95rem;
+            border-color: #dee2e6;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            padding: 8px 12px;
+        }
+        .multiselect-trigger:focus,
+        .multiselect-trigger:active {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15) !important;
+        }
+        .report-table th, 
+        .report-table td {
+            font-size: 0.95rem;
+        }
     </style>
 
 @endsection
 
 @push('scripts')
-    <!-- Select2 CSS & JS -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
     <!-- html2pdf.js for exact PDF export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
         $(document).ready(function() {
-            // Select2 Filter
-            $('.select2-filter').select2({
-                theme: 'bootstrap-5',
-                width: '100%'
-            });
+            // Helper fungsi untuk inisialisasi Custom Multi-Select Dropdown
+            function initCustomMultiselect(wrapperId, defaultEmptyText, singleNoun, onSelectionChange) {
+                const $wrapper = $('#' + wrapperId);
+                if (!$wrapper.length) return;
+
+                const $dropdownEl = $wrapper.find('.dropdown');
+                const $trigger = $wrapper.find('.multiselect-trigger');
+                const $label = $wrapper.find('.multiselect-label');
+                const $badge = $wrapper.find('.multiselect-count');
+                const $search = $wrapper.find('.multiselect-search');
+                const $optionsList = $wrapper.find('.multiselect-options-list');
+                const $options = $wrapper.find('.multiselect-option-label');
+                const $checkboxes = $wrapper.find('.multiselect-checkbox');
+                const $undoBtn = $wrapper.find('.multiselect-undo-btn');
+                const $okBtn = $wrapper.find('.multiselect-ok-btn');
+
+                // Fungsi memindahkan opsi yang SUDAH DIPILIH / CHECKED ke posisi teratas
+                function sortSelectedOptionsToTop() {
+                    const checkedLabels = [];
+                    const uncheckedLabels = [];
+
+                    $optionsList.children('.multiselect-option-label').each(function() {
+                        if ($(this).find('.multiselect-checkbox').is(':checked')) {
+                            checkedLabels.push(this);
+                        } else {
+                            uncheckedLabels.push(this);
+                        }
+                    });
+
+                    $optionsList.append(checkedLabels);
+                    $optionsList.append(uncheckedLabels);
+                }
+
+                function updateDisplay() {
+                    const checked = $checkboxes.filter(':checked');
+                    const count = checked.length;
+
+                    $options.each(function() {
+                        const cb = $(this).find('.multiselect-checkbox');
+                        if (cb.is(':checked')) {
+                            $(this).addClass('is-checked');
+                        } else {
+                            $(this).removeClass('is-checked');
+                        }
+                    });
+
+                    if (count === 0) {
+                        $label.text(defaultEmptyText).addClass('text-muted').removeClass('text-dark fw-semibold');
+                        $badge.addClass('d-none').text('0');
+                    } else if (count === 1) {
+                        const labelText = checked.first().data('label') || checked.first().parent().text().trim();
+                        $label.text(labelText).removeClass('text-muted').addClass('text-dark fw-semibold');
+                        $badge.removeClass('d-none').text('1');
+                    } else {
+                        $label.text(count + ' ' + singleNoun + ' Dipilih').removeClass('text-muted').addClass('text-dark fw-semibold');
+                        $badge.removeClass('d-none').text(count);
+                    }
+
+                    if (typeof onSelectionChange === 'function') {
+                        onSelectionChange();
+                    }
+                }
+
+                // Checkbox toggle
+                $checkboxes.on('change', function() {
+                    updateDisplay();
+                });
+
+                // Live search dalam dropdown
+                $search.on('input', function() {
+                    const q = $(this).val().toLowerCase().trim();
+                    $options.each(function() {
+                        if ($(this).hasClass('d-none-subcon')) return;
+                        const text = $(this).text().toLowerCase();
+                        if (!q || text.includes(q)) {
+                            $(this).removeClass('d-none');
+                        } else {
+                            $(this).addClass('d-none');
+                        }
+                    });
+                });
+
+                // Tombol Undo / Reset Pilihan di sebelah kolom cari
+                $undoBtn.on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    $checkboxes.prop('checked', false);
+                    $search.val('').trigger('input');
+                    updateDisplay();
+                    sortSelectedOptionsToTop();
+                });
+
+                // Ketika filter dibuka: Taruh pilihan terpilih di atas dan LANGSUNG FOKUS ke kolom cari (user bisa langsung ketik)
+                $dropdownEl.on('shown.bs.dropdown', function() {
+                    sortSelectedOptionsToTop();
+                    setTimeout(function() {
+                        $search.focus().select();
+                    }, 50);
+                });
+
+                // Tombol OK untuk menutup dropdown setelah selesai memilih
+                $okBtn.on('click', function(e) {
+                    e.preventDefault();
+                    sortSelectedOptionsToTop();
+                    const dropdown = bootstrap.Dropdown.getInstance($trigger[0]) || new bootstrap.Dropdown($trigger[0]);
+                    dropdown.hide();
+                });
+
+                // Initial run
+                updateDisplay();
+                sortSelectedOptionsToTop();
+            }
+
+            // Fungsi filter dinamis: Karyawan dan Barang menyesuaikan Lokasi Subcon yang dipilih
+            function syncLokasiToKaryawanAndBarang() {
+                if (!$('#ms_lokasi').length) return;
+
+                const selectedLokasi = $('#ms_lokasi .multiselect-checkbox:checked').map(function() {
+                    return String($(this).val());
+                }).get();
+
+                // 1. Filter Karyawan
+                $('#ms_karyawan .multiselect-option-label').each(function() {
+                    const optLokasi = String($(this).data('lokasi') || '');
+                    const match = selectedLokasi.length === 0 || selectedLokasi.includes(optLokasi);
+                    if (match) {
+                        $(this).removeClass('d-none-subcon d-none');
+                    } else {
+                        $(this).addClass('d-none-subcon d-none');
+                        $(this).find('.multiselect-checkbox').prop('checked', false);
+                    }
+                });
+                updateSingleDisplay('ms_karyawan', '-- Semua Karyawan (Multi-Select) --', 'Karyawan');
+
+                // 2. Filter Barang
+                $('#ms_barang .multiselect-option-label').each(function() {
+                    const optLokasi = String($(this).data('lokasi') || '');
+                    const match = selectedLokasi.length === 0 || !optLokasi || selectedLokasi.includes(optLokasi);
+                    if (match) {
+                        $(this).removeClass('d-none-subcon d-none');
+                    } else {
+                        $(this).addClass('d-none-subcon d-none');
+                        $(this).find('.multiselect-checkbox').prop('checked', false);
+                    }
+                });
+                updateSingleDisplay('ms_barang', '-- Semua Barang (Multi-Select) --', 'Barang');
+            }
+
+            function updateSingleDisplay(wrapperId, defaultEmptyText, singleNoun) {
+                const $wrapper = $('#' + wrapperId);
+                const $label = $wrapper.find('.multiselect-label');
+                const $badge = $wrapper.find('.multiselect-count');
+                const checked = $wrapper.find('.multiselect-checkbox:checked');
+                const count = checked.length;
+
+                $wrapper.find('.multiselect-option-label').each(function() {
+                    const cb = $(this).find('.multiselect-checkbox');
+                    if (cb.is(':checked')) {
+                        $(this).addClass('is-checked');
+                    } else {
+                        $(this).removeClass('is-checked');
+                    }
+                });
+
+                if (count === 0) {
+                    $label.text(defaultEmptyText).addClass('text-muted').removeClass('text-dark fw-semibold');
+                    $badge.addClass('d-none').text('0');
+                } else if (count === 1) {
+                    const labelText = checked.first().data('label') || checked.first().parent().text().trim();
+                    $label.text(labelText).removeClass('text-muted').addClass('text-dark fw-semibold');
+                    $badge.removeClass('d-none').text('1');
+                } else {
+                    $label.text(count + ' ' + singleNoun + ' Dipilih').removeClass('text-muted').addClass('text-dark fw-semibold');
+                    $badge.removeClass('d-none').text(count);
+                }
+            }
+
+            // Inisialisasi masing-masing filter
+            initCustomMultiselect('ms_lokasi', '-- Semua Lokasi (Multi-Select) --', 'Lokasi', syncLokasiToKaryawanAndBarang);
+            initCustomMultiselect('ms_karyawan', '-- Semua Karyawan (Multi-Select) --', 'Karyawan');
+            initCustomMultiselect('ms_barang', '-- Semua Barang (Multi-Select) --', 'Barang');
+
+            // Jalankan sinkronisasi awal
+            syncLokasiToKaryawanAndBarang();
         });
 
         // Print Laporan Sheet (Menggunakan Dialog Cetak Browser)
@@ -556,14 +896,9 @@
 
         // Export PDF Laporan (A4 Portrait Native Server-Side DomPDF)
         function exportReportPDF() {
-            const form = document.getElementById('filterForm');
-            let queryString = '';
-            if (form) {
-                const formData = new FormData(form);
-                queryString = new URLSearchParams(formData).toString();
-            }
-
-            const downloadUrl = "{{ route('laporan.export-pdf') }}" + (queryString ? '?' + queryString : '');
+            // Gunakan parameter filter yang persis sedang aktif di halaman saat ini
+            const currentSearch = window.location.search;
+            const downloadUrl = "{{ route('laporan.export-pdf') }}" + (currentSearch ? currentSearch : '');
 
             Swal.fire({
                 title: 'Sedang Mengunduh PDF...',
