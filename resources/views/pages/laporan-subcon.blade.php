@@ -198,7 +198,7 @@
 
                             {{-- Header Dokumen Laporan --}}
                             <div class="report-header mb-4 pb-2 border-bottom">
-                                <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.02em;">PT. Sinaraya Nugraha
+                                <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.02em;">PT. SNA MEDIKA
                                 </h4>
                                 <h5 class="fw-bold mb-1 text-dark">Laporan Pengerjaan Barang Subcon</h5>
                                 <div class="fw-bold text-dark fs-6 mb-2">
@@ -587,9 +587,10 @@
             const filename = 'Laporan_Subcon_' + tglMulai + '_sd_' + tglAkhir + '.xls';
 
             let reportHeaderHtml = '<table border="0">' +
-                '<tr><td colspan="10" style="font-size:16px; font-weight:bold; font-family: Calibri, sans-serif;">e-System \u2014 PT. Sinaraya Nugraha<\/td><\/tr>' +
+                '<tr><td colspan="10" style="font-size:16px; font-weight:bold; font-family: Calibri, sans-serif;">e-System \u2014 PT. SNA MEDIKA<\/td><\/tr>' +
                 '<tr><td colspan="10" style="font-size:14px; font-weight:bold; font-family: Calibri, sans-serif;">Laporan Pengerjaan Barang Subcon<\/td><\/tr>' +
-                '<tr><td colspan="10" style="font-size:12px; font-weight:bold; font-family: Calibri, sans-serif;">Periode: ' + tglMulai + ' s/d ' + tglAkhir +
+                '<tr><td colspan="10" style="font-size:12px; font-weight:bold; font-family: Calibri, sans-serif;">Periode: ' +
+                tglMulai + ' s/d ' + tglAkhir +
                 '<\/td><\/tr>' +
                 '<tr><td colspan="10"><\/td><\/tr>' +
                 '<\/table>';
@@ -602,19 +603,22 @@
                 if (table) {
                     const clone = table.cloneNode(true);
 
-                    // Format angka kuantitas & total dengan pemisah ribuan titik (format Indonesia: 1.000, 1.500)
-                    // dan gunakan mso-number-format:"\@" agar Excel menampilkannya persis dengan titik tanpa diubah ke koma / desimal
+                    // Format angka kuantitas & total sebagai Number murni (bukan text)
+                    // Menggunakan mso-number-format:"\#\,\#\#0" agar Excel mengenali sebagai Angka (Number)
+                    // dengan pemisah ribuan otomatis, tanpa warning tanda seru hijau dan tidak terkonversi 1000 jadi 1
                     clone.querySelectorAll('.col-jumlah, .col-total, [data-raw-value]').forEach(td => {
                         const rawVal = td.getAttribute('data-raw-value');
                         if (rawVal !== null && rawVal !== '') {
-                            td.textContent = Number(rawVal).toLocaleString('id-ID');
+                            td.textContent = rawVal; // Masukkan angka murni (contoh: 1000, 500)
                         }
-                        td.setAttribute('style', (td.getAttribute('style') || '') + '; mso-number-format:"\\@"; text-align:right;');
+                        td.setAttribute('style', (td.getAttribute('style') || '') +
+                            '; mso-number-format:"\\#\\,\\#\\#0"; text-align:right;');
                     });
 
                     // Untuk kolom teks lainnya, pastikan format teks dipertahankan
                     clone.querySelectorAll('td').forEach(td => {
-                        if (!td.classList.contains('col-jumlah') && !td.classList.contains('col-total') && !td.hasAttribute('data-raw-value')) {
+                        if (!td.classList.contains('col-jumlah') && !td.classList.contains('col-total') && !
+                            td.hasAttribute('data-raw-value')) {
                             const currentStyle = td.getAttribute('style') || '';
                             if (!currentStyle.includes('mso-number-format')) {
                                 td.setAttribute('style', currentStyle + '; mso-number-format:"\\@";');
