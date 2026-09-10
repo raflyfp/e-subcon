@@ -365,8 +365,9 @@
                                                         <td class="text-center" style="border: 1px solid #cbd5e1;">
                                                             {{ $item->jenis_pekerjaan ?: '-' }}
                                                         </td>
-                                                        <td class="text-end fw-bold text-dark pe-3"
-                                                            style="border: 1px solid #cbd5e1;">
+                                                        <td class="text-end fw-bold text-dark pe-3 col-jumlah"
+                                                            style="border: 1px solid #cbd5e1;"
+                                                            data-raw-value="{{ $item->jumlah }}">
                                                             {{ number_format($item->jumlah, 0, ',', '.') }}
                                                         </td>
                                                         <td class="text-center" style="border: 1px solid #cbd5e1;">
@@ -389,8 +390,9 @@
                                                         {{ $durasiTotalText }}
                                                     </td>
                                                     <td colspan="3" style="border: 1px solid #94a3b8;"></td>
-                                                    <td class="text-end fw-bold text-primary pe-3"
-                                                        style="border: 1px solid #94a3b8;">
+                                                    <td class="text-end fw-bold text-primary pe-3 col-total"
+                                                        style="border: 1px solid #94a3b8;"
+                                                        data-raw-value="{{ $subtotal }}">
                                                         {{ number_format($subtotal, 0, ',', '.') }}
                                                     </td>
                                                     <td colspan="2" style="border: 1px solid #94a3b8;"></td>
@@ -585,9 +587,9 @@
             const filename = 'Laporan_Subcon_' + tglMulai + '_sd_' + tglAkhir + '.xls';
 
             let reportHeaderHtml = '<table border="0">' +
-                '<tr><td colspan="10" style="font-size:16px; font-weight:bold;">e-System \u2014 PT. Sinaraya Nugraha<\/td><\/tr>' +
-                '<tr><td colspan="10" style="font-size:14px; font-weight:bold;">Laporan Pengerjaan Barang Subcon<\/td><\/tr>' +
-                '<tr><td colspan="10" style="font-size:12px; font-weight:bold;">Periode: ' + tglMulai + ' s/d ' + tglAkhir +
+                '<tr><td colspan="10" style="font-size:16px; font-weight:bold; font-family: Calibri, sans-serif;">e-System \u2014 PT. Sinaraya Nugraha<\/td><\/tr>' +
+                '<tr><td colspan="10" style="font-size:14px; font-weight:bold; font-family: Calibri, sans-serif;">Laporan Pengerjaan Barang Subcon<\/td><\/tr>' +
+                '<tr><td colspan="10" style="font-size:12px; font-weight:bold; font-family: Calibri, sans-serif;">Periode: ' + tglMulai + ' s/d ' + tglAkhir +
                 '<\/td><\/tr>' +
                 '<tr><td colspan="10"><\/td><\/tr>' +
                 '<\/table>';
@@ -598,11 +600,33 @@
                 const headerText = block.querySelector('.rounded-top')?.innerText.trim() || '';
                 const table = block.querySelector('table');
                 if (table) {
+                    const clone = table.cloneNode(true);
+
+                    // Format angka kuantitas & total dengan pemisah ribuan titik (format Indonesia: 1.000, 1.500)
+                    // dan gunakan mso-number-format:"\@" agar Excel menampilkannya persis dengan titik tanpa diubah ke koma / desimal
+                    clone.querySelectorAll('.col-jumlah, .col-total, [data-raw-value]').forEach(td => {
+                        const rawVal = td.getAttribute('data-raw-value');
+                        if (rawVal !== null && rawVal !== '') {
+                            td.textContent = Number(rawVal).toLocaleString('id-ID');
+                        }
+                        td.setAttribute('style', (td.getAttribute('style') || '') + '; mso-number-format:"\\@"; text-align:right;');
+                    });
+
+                    // Untuk kolom teks lainnya, pastikan format teks dipertahankan
+                    clone.querySelectorAll('td').forEach(td => {
+                        if (!td.classList.contains('col-jumlah') && !td.classList.contains('col-total') && !td.hasAttribute('data-raw-value')) {
+                            const currentStyle = td.getAttribute('style') || '';
+                            if (!currentStyle.includes('mso-number-format')) {
+                                td.setAttribute('style', currentStyle + '; mso-number-format:"\\@";');
+                            }
+                        }
+                    });
+
                     tablesHtml += '<table border="0">' +
-                        '<tr><td colspan="10" style="background-color:#e0f2fe; font-size:13px; font-weight:bold; color:#0369a1; border:0.5pt solid #94a3b8;">' +
+                        '<tr><td colspan="10" style="background-color:#e0f2fe; font-size:13px; font-weight:bold; color:#0369a1; border:0.5pt solid #94a3b8; font-family: Calibri, sans-serif;">' +
                         headerText + '<\/td><\/tr>' +
                         '<\/table>' +
-                        table.outerHTML + '<br/>';
+                        clone.outerHTML + '<br/>';
                 }
             });
 
@@ -610,10 +634,19 @@
                 '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">' +
                 '<head>' +
                 '<meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8"/>' +
+                '<!--[if gte mso 9]><xml>' +
+                '<' + 'x:ExcelWorkbook><' + 'x:ExcelWorksheets><' + 'x:ExcelWorksheet>' +
+                '<' + 'x:Name>Laporan Subcon</' + 'x:Name>' +
+                '<' + 'x:WorksheetOptions><' + 'x:DisplayGridlines/></' + 'x:WorksheetOptions>' +
+                '</' + 'x:ExcelWorksheet></' + 'x:ExcelWorksheets></' + 'x:ExcelWorkbook>' +
+                '</xml><![endif]-->' +
                 '<style>' +
-                'table { border-collapse: collapse; margin-bottom: 15px; }' +
-                'th, td { border: 0.5pt solid #000000; padding: 5px; }' +
-                'th { background-color: #f8fafc; font-weight: bold; }' +
+                'table { border-collapse: collapse; margin-bottom: 15px; font-family: Calibri, Arial, sans-serif; font-size: 11pt; }' +
+                'th, td { border: 0.5pt solid #94a3b8; padding: 6px; }' +
+                'th { background-color: #f8fafc; font-weight: bold; text-align: center; }' +
+                '.text-start { text-align: left; }' +
+                '.text-center { text-align: center; }' +
+                '.text-end { text-align: right; }' +
                 '<\/style>' +
                 '<\/head>' +
                 '<body>' +
