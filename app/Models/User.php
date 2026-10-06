@@ -56,7 +56,8 @@ class User extends Authenticatable
             'formulir_pengerjaan.view' => 'Buka Form & Input Pengerjaan',
         ],
         'Laporan Subcon' => [
-            'laporan_subcon.view' => 'Lihat & Export Laporan',
+            'laporan_subcon.view'   => 'Lihat & Export Laporan',
+            'laporan_subcon.delete' => 'Hapus Data Pengerjaan',
         ],
         'Log Report' => [
             'log_report.view' => 'Lihat Log Report',
@@ -125,7 +126,7 @@ class User extends Authenticatable
                 'view'   => 'laporan_subcon.view',
                 'create' => null,
                 'edit'   => null,
-                'delete' => null,
+                'delete' => 'laporan_subcon.delete',
             ],
             [
                 'name'   => 'Log Report',
@@ -169,6 +170,7 @@ class User extends Authenticatable
         'formulir_pengerjaan.view'   => 'Buka Form & Input Pengerjaan',
         'laporan_subcon'             => 'Laporan Subcon',
         'laporan_subcon.view'        => 'Lihat & Export Laporan',
+        'laporan_subcon.delete'      => 'Hapus Data Pengerjaan Subcon',
         'log_report'                 => 'Log Report',
         'log_report.view'            => 'Lihat Log Report',
     ];
@@ -245,6 +247,11 @@ class User extends Authenticatable
                 }
             }
         } else {
+            // Untuk hak akses delete pada laporan_subcon, harus direct match dan tidak diwarisi dari base permission legacy
+            if ($permission === 'laporan_subcon.delete') {
+                return false;
+            }
+
             // Jika cek 'master_barang.view', izinkan jika punya permission legacy 'master_barang'
             $base = explode('.', $permission)[0];
             if (in_array($base, $this->permissions, true)) {

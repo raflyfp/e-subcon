@@ -421,6 +421,9 @@
                                                     </th>
                                                     <th style="width: 65px; border: 1px solid #94a3b8;">Satuan</th>
                                                     <th style="border: 1px solid #94a3b8;">Keterangan</th>
+                                                    @if (auth()->user()->canAccess('laporan_subcon.delete'))
+                                                        <th style="width: 50px; border: 1px solid #94a3b8;" class="col-aksi">Aksi</th>
+                                                    @endif
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -492,6 +495,17 @@
                                                         </td>
                                                         <td class="text-start" style="border: 1px solid #cbd5e1;">
                                                             {{ $item->keterangan ?: '-' }}</td>
+                                                        @if (auth()->user()->canAccess('laporan_subcon.delete'))
+                                                            <td class="text-center col-aksi" style="border: 1px solid #cbd5e1;">
+                                                                <button type="button"
+                                                                    class="btn btn-outline-danger btn-sm p-1 lh-1 btn-delete-pengerjaan"
+                                                                    data-id="{{ $item->id }}"
+                                                                    data-info="{{ $item->nama_karyawan }} — {{ $item->nama_barang }} ({{ number_format($item->jumlah, 0, ',', '.') }} {{ $item->satuan ?? 'PCS' }})"
+                                                                    title="Hapus Data Pengerjaan">
+                                                                    <i class="ti ti-trash" style="font-size: 15px;"></i>
+                                                                </button>
+                                                            </td>
+                                                        @endif
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -513,6 +527,9 @@
                                                         {{ number_format($subtotal, 0, ',', '.') }}
                                                     </td>
                                                     <td colspan="2" style="border: 1px solid #94a3b8;"></td>
+                                                    @if (auth()->user()->canAccess('laporan_subcon.delete'))
+                                                        <td style="border: 1px solid #94a3b8;" class="col-aksi"></td>
+                                                    @endif
                                                 </tr>
                                             </tfoot>
                                         </table>
@@ -589,6 +606,7 @@
             .sticky-top,
             .card-header,
             .btn,
+            .col-aksi,
             .d-flex.justify-content-between.align-items-center.mb-3 {
                 display: none !important;
             }
@@ -936,6 +954,9 @@
                 if (table) {
                     const clone = table.cloneNode(true);
 
+                    // Hapus kolom aksi agar tidak muncul di file Excel
+                    clone.querySelectorAll('.col-aksi').forEach(el => el.remove());
+
                     // Format angka kuantitas & total sebagai Number murni (bukan text)
                     // Menggunakan mso-number-format:"\#\,\#\#0" agar Excel mengenali sebagai Angka (Number)
                     // dengan pemisah ribuan otomatis, tanpa warning tanda seru hijau dan tidak terkonversi 1000 jadi 1
@@ -1002,5 +1023,72 @@
             link.click();
             document.body.removeChild(link);
         }
+
+        @if (auth()->user()->canAccess('laporan_subcon.delete'))
+            // Handler Hapus Transaksi Pengerjaan dari Lembar Laporan
+            $(document).on('click', '.btn-delete-pengerjaan', function(e) {
+                e.preventDefault();
+                const id = $(this).data('id');
+                const info = $(this).data('info') || 'data pengerjaan ini';
+
+                Swal.fire({
+                    title: 'Konfirmasi Hapus Data',
+                    html: `Apakah Anda yakin ingin menghapus catatan pengerjaan:<br><strong class="text-primary mt-2 d-inline-block">${info}</strong>?<br><br><span class="badge bg-danger-subtle text-danger border">Tindakan ini permanen dan akan dicatat di Log Sistem</span>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: '<i class="ti ti-trash me-1"></i> Ya, Hapus',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Menghapus Data...',
+                            text: 'Mohon tunggu sebentar...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        $.ajax({
+                            url: `{{ url('laporan-subcon') }}/${id}`,
+                            type: 'DELETE',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(res) {
+                                if (res.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Berhasil Dihapus',
+                                        text: res.message || 'Data pengerjaan barang berhasil dihapus.',
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        window.location.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Gagal Menghapus',
+                                        text: res.message || 'Terjadi kesalahan saat menghapus data.'
+                                    });
+                                }
+                            },
+                            error: function(xhr) {
+                                const msg = xhr.responseJSON?.message || 'Akses ditolak atau terjadi kendala server.';
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal / Akses Ditolak',
+                                    text: msg
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        @endif
     </script>
 @endpush

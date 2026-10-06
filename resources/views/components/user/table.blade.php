@@ -113,6 +113,7 @@
                     'master_lokasi_subcon.view', 'master_lokasi_subcon.create', 'master_lokasi_subcon.edit', 'master_lokasi_subcon.toggle',
                     'formulir_pengerjaan.view',
                     'laporan_subcon.view',
+                    'laporan_subcon.delete',
                     'log_report.view'
                 ],
                 'admin_ppic': [
@@ -256,7 +257,7 @@
                         $(this).prop('checked', true);
                     } else if (Array.isArray(permissions)) {
                         const baseModule = val.split('.')[0];
-                        const isChecked = permissions.includes(val) || permissions.includes(baseModule);
+                        const isChecked = permissions.includes(val) || (val.endsWith('.view') && permissions.includes(baseModule));
                         $(this).prop('checked', isChecked);
                     } else {
                         $(this).prop('checked', false);

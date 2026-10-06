@@ -493,6 +493,14 @@ class PengerjaanController extends Controller
         $user       = auth()->user();
         $pengerjaan = Pengerjaan::findOrFail($id);
 
+        // Hak akses: harus memiliki laporan_subcon.delete atau formulir_pengerjaan
+        if (!$user->canAccess('laporan_subcon.delete') && !$user->canAccess('formulir_pengerjaan')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki hak akses untuk menghapus data ini.',
+            ], 403);
+        }
+
         // Akun Subcon hanya bisa menghapus data subcon miliknya
         if (!$user->is_admin) {
             if ($user->lokasiSubcon?->id !== $pengerjaan->lokasi_subcon_id) {
@@ -503,19 +511,23 @@ class PengerjaanController extends Controller
             }
         }
 
-        $info = "Hapus transaksi pengerjaan ID #{$pengerjaan->id}: {$pengerjaan->jumlah} pcs tanggal {$pengerjaan->tanggal}";
+        $barangName   = $pengerjaan->barang?->nama_barang ?: 'Barang';
+        $karyawanName = $pengerjaan->karyawan?->nama_karyawan ?: 'Karyawan';
+        $lokasiName   = $pengerjaan->lokasiSubcon?->nama_lokasi ?: 'Subcon';
+
+        $info = "Hapus pengerjaan: {$pengerjaan->jumlah} pcs {$barangName} oleh {$karyawanName} di {$lokasiName} (Tanggal: {$pengerjaan->tanggal})";
 
         $pengerjaan->delete();
 
         \App\Models\ActivityLog::record(
-            'Formulir Pengerjaan',
+            'Laporan Subcon',
             'DELETE',
             $info
         );
 
         return response()->json([
             'success' => true,
-            'message' => 'Pengerjaan barang berhasil dihapus',
+            'message' => 'Data pengerjaan barang berhasil dihapus.',
         ]);
     }
 }
