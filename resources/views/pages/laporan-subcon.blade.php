@@ -28,14 +28,16 @@
 
                             {{-- Tanggal Mulai --}}
                             <div class="mb-3">
-                                <label class="form-label fw-semibold" for="filter_tanggal_mulai" style="font-size: 0.95rem;">Tanggal Mulai</label>
+                                <label class="form-label fw-semibold" for="filter_tanggal_mulai"
+                                    style="font-size: 0.95rem;">Tanggal Mulai</label>
                                 <input type="date" class="form-control" name="tanggal_mulai" id="filter_tanggal_mulai"
                                     style="font-size: 0.95rem; min-height: 42px;" value="{{ $tanggalMulai }}">
                             </div>
 
                             {{-- Tanggal Akhir --}}
                             <div class="mb-3">
-                                <label class="form-label fw-semibold" for="filter_tanggal_akhir" style="font-size: 0.95rem;">Tanggal Akhir</label>
+                                <label class="form-label fw-semibold" for="filter_tanggal_akhir"
+                                    style="font-size: 0.95rem;">Tanggal Akhir</label>
                                 <input type="date" class="form-control" name="tanggal_akhir" id="filter_tanggal_akhir"
                                     style="font-size: 0.95rem; min-height: 42px;" value="{{ $tanggalAkhir }}">
                             </div>
@@ -57,34 +59,52 @@
                                         <i class="ti ti-building me-1 text-primary"></i>Lokasi Subcon
                                     </label>
                                     <div class="dropdown custom-multiselect">
-                                        <button class="form-select text-start d-flex justify-content-between align-items-center multiselect-trigger bg-white shadow-none" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                            <span class="multiselect-label text-truncate me-2 text-muted">-- Semua Lokasi (Multi-Select) --</span>
-                                            <span class="badge bg-primary rounded-pill multiselect-count d-none" style="font-size: 0.85rem;">0</span>
+                                        <button
+                                            class="form-select text-start d-flex justify-content-between align-items-center multiselect-trigger bg-white shadow-none"
+                                            type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside"
+                                            aria-expanded="false">
+                                            <span class="multiselect-label text-truncate me-2 text-muted">-- Semua Lokasi
+                                                (Multi-Select) --</span>
+                                            <span class="badge bg-primary rounded-pill multiselect-count d-none"
+                                                style="font-size: 0.85rem;">0</span>
                                         </button>
-                                        <div class="dropdown-menu p-2 shadow-sm w-100 custom-multiselect-dropdown" style="min-width: 300px; max-width: 380px; z-index: 1050;">
+                                        <div class="dropdown-menu p-2 shadow-sm w-100 custom-multiselect-dropdown"
+                                            style="min-width: 300px; max-width: 380px; z-index: 1050;">
                                             <div class="mb-2 d-flex gap-1 align-items-center">
                                                 <div class="position-relative flex-grow-1">
-                                                    <input type="text" class="form-control multiselect-search ps-4" style="font-size: 0.9rem;" placeholder="Cari lokasi subcon...">
-                                                    <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted" style="font-size: 15px;"></i>
+                                                    <input type="text" class="form-control multiselect-search ps-4"
+                                                        style="font-size: 0.9rem;" placeholder="Cari lokasi subcon...">
+                                                    <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"
+                                                        style="font-size: 15px;"></i>
                                                 </div>
-                                                <button type="button" class="btn btn-outline-secondary btn-sm multiselect-undo-btn px-2 d-flex align-items-center justify-content-center" title="Reset / Batalkan Pilihan Lokasi" style="height: 38px; min-width: 38px; border-color: #cbd5e1;">
+                                                <button type="button"
+                                                    class="btn btn-outline-secondary btn-sm multiselect-undo-btn px-2 d-flex align-items-center justify-content-center"
+                                                    title="Reset / Batalkan Pilihan Lokasi"
+                                                    style="height: 38px; min-width: 38px; border-color: #cbd5e1;">
                                                     <i class="ti ti-rotate-2 text-danger" style="font-size: 16px;"></i>
                                                 </button>
                                             </div>
                                             <div class="multiselect-options-list overflow-auto" style="max-height: 230px;">
                                                 @foreach ($lokasiList as $l)
-                                                    <label class="dropdown-item d-flex align-items-center justify-content-between py-2 px-2 rounded multiselect-option-label" style="cursor: pointer;">
+                                                    <label
+                                                        class="dropdown-item d-flex align-items-center justify-content-between py-2 px-2 rounded multiselect-option-label"
+                                                        style="cursor: pointer;">
                                                         <div class="d-flex align-items-start gap-2 w-100">
-                                                            <input class="form-check-input mt-1 multiselect-checkbox" type="checkbox" name="lokasi_subcon_id[]" value="{{ $l->id }}"
+                                                            <input class="form-check-input mt-1 multiselect-checkbox"
+                                                                type="checkbox" name="lokasi_subcon_id[]"
+                                                                value="{{ $l->id }}"
                                                                 {{ in_array($l->id, (array) $selectedLokasi) ? 'checked' : '' }}
                                                                 data-label="{{ $l->nama_lokasi }}">
-                                                            <span style="font-size: 0.88rem; line-height: 1.35; white-space: normal; word-break: break-word;">{{ $l->nama_lokasi }}</span>
+                                                            <span
+                                                                style="font-size: 0.88rem; line-height: 1.35; white-space: normal; word-break: break-word;">{{ $l->nama_lokasi }}</span>
                                                         </div>
                                                     </label>
                                                 @endforeach
                                             </div>
                                             <div class="pt-2 mt-2 border-top d-flex justify-content-end">
-                                                <button type="button" class="btn btn-primary btn-sm px-3 py-1 fw-semibold multiselect-ok-btn" style="font-size: 0.9rem;">
+                                                <button type="button"
+                                                    class="btn btn-primary btn-sm px-3 py-1 fw-semibold multiselect-ok-btn"
+                                                    style="font-size: 0.9rem;">
                                                     <i class="ti ti-check me-1"></i>OK
                                                 </button>
                                             </div>
@@ -99,34 +119,53 @@
                                     <i class="ti ti-users me-1 text-primary"></i>Karyawan Pelaksana
                                 </label>
                                 <div class="dropdown custom-multiselect">
-                                    <button class="form-select text-start d-flex justify-content-between align-items-center multiselect-trigger bg-white shadow-none" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                        <span class="multiselect-label text-truncate me-2 text-muted">-- Semua Karyawan (Multi-Select) --</span>
-                                        <span class="badge bg-primary rounded-pill multiselect-count d-none" style="font-size: 0.82rem;">0</span>
+                                    <button
+                                        class="form-select text-start d-flex justify-content-between align-items-center multiselect-trigger bg-white shadow-none"
+                                        type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside"
+                                        aria-expanded="false">
+                                        <span class="multiselect-label text-truncate me-2 text-muted">-- Semua Karyawan
+                                            (Multi-Select) --</span>
+                                        <span class="badge bg-primary rounded-pill multiselect-count d-none"
+                                            style="font-size: 0.82rem;">0</span>
                                     </button>
-                                    <div class="dropdown-menu p-2 shadow-sm w-100 custom-multiselect-dropdown" style="min-width: 320px; max-width: 400px; z-index: 1050;">
+                                    <div class="dropdown-menu p-2 shadow-sm w-100 custom-multiselect-dropdown"
+                                        style="min-width: 320px; max-width: 400px; z-index: 1050;">
                                         <div class="mb-2 d-flex gap-1 align-items-center">
                                             <div class="position-relative flex-grow-1">
-                                                <input type="text" class="form-control multiselect-search ps-4" style="font-size: 0.9rem;" placeholder="Cari nama / no karyawan...">
-                                                <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted" style="font-size: 15px;"></i>
+                                                <input type="text" class="form-control multiselect-search ps-4"
+                                                    style="font-size: 0.9rem;" placeholder="Cari nama / no karyawan...">
+                                                <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"
+                                                    style="font-size: 15px;"></i>
                                             </div>
-                                            <button type="button" class="btn btn-outline-secondary btn-sm multiselect-undo-btn px-2 d-flex align-items-center justify-content-center" title="Reset / Batalkan Pilihan Karyawan" style="height: 38px; min-width: 38px; border-color: #cbd5e1;">
+                                            <button type="button"
+                                                class="btn btn-outline-secondary btn-sm multiselect-undo-btn px-2 d-flex align-items-center justify-content-center"
+                                                title="Reset / Batalkan Pilihan Karyawan"
+                                                style="height: 38px; min-width: 38px; border-color: #cbd5e1;">
                                                 <i class="ti ti-rotate-2 text-danger" style="font-size: 16px;"></i>
                                             </button>
                                         </div>
                                         <div class="multiselect-options-list overflow-auto" style="max-height: 230px;">
                                             @foreach ($karyawanList as $k)
-                                                <label class="dropdown-item d-flex align-items-center justify-content-between py-2 px-2 rounded multiselect-option-label" data-lokasi="{{ $k->lokasi_subcon_id }}" style="cursor: pointer;">
+                                                <label
+                                                    class="dropdown-item d-flex align-items-center justify-content-between py-2 px-2 rounded multiselect-option-label"
+                                                    data-lokasi="{{ $k->lokasi_subcon_id }}" style="cursor: pointer;">
                                                     <div class="d-flex align-items-start gap-2 w-100">
-                                                        <input class="form-check-input mt-1 multiselect-checkbox" type="checkbox" name="karyawan_id[]" value="{{ $k->id }}"
+                                                        <input class="form-check-input mt-1 multiselect-checkbox"
+                                                            type="checkbox" name="karyawan_id[]"
+                                                            value="{{ $k->id }}"
                                                             {{ in_array($k->id, (array) $selectedKaryawan) ? 'checked' : '' }}
                                                             data-label="{{ $k->nama_karyawan }} ({{ $k->no_karyawan }})">
-                                                        <span style="font-size: 0.88rem; line-height: 1.35; white-space: normal; word-break: break-word;">{{ $k->nama_karyawan }} <span class="text-muted">({{ $k->no_karyawan }})</span></span>
+                                                        <span
+                                                            style="font-size: 0.88rem; line-height: 1.35; white-space: normal; word-break: break-word;">{{ $k->nama_karyawan }}
+                                                            <span class="text-muted">({{ $k->no_karyawan }})</span></span>
                                                     </div>
                                                 </label>
                                             @endforeach
                                         </div>
                                         <div class="pt-2 mt-2 border-top d-flex justify-content-end">
-                                            <button type="button" class="btn btn-primary btn-sm px-3 py-1 fw-semibold multiselect-ok-btn" style="font-size: 0.9rem;">
+                                            <button type="button"
+                                                class="btn btn-primary btn-sm px-3 py-1 fw-semibold multiselect-ok-btn"
+                                                style="font-size: 0.9rem;">
                                                 <i class="ti ti-check me-1"></i>OK
                                             </button>
                                         </div>
@@ -140,34 +179,55 @@
                                     <i class="ti ti-package me-1 text-primary"></i>Barang
                                 </label>
                                 <div class="dropdown custom-multiselect">
-                                    <button class="form-select text-start d-flex justify-content-between align-items-center multiselect-trigger bg-white shadow-none" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                        <span class="multiselect-label text-truncate me-2 text-muted">-- Semua Barang (Multi-Select) --</span>
-                                        <span class="badge bg-primary rounded-pill multiselect-count d-none" style="font-size: 0.82rem;">0</span>
+                                    <button
+                                        class="form-select text-start d-flex justify-content-between align-items-center multiselect-trigger bg-white shadow-none"
+                                        type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside"
+                                        aria-expanded="false">
+                                        <span class="multiselect-label text-truncate me-2 text-muted">-- Semua Barang
+                                            (Multi-Select) --</span>
+                                        <span class="badge bg-primary rounded-pill multiselect-count d-none"
+                                            style="font-size: 0.82rem;">0</span>
                                     </button>
-                                    <div class="dropdown-menu p-2 shadow-sm w-100 custom-multiselect-dropdown" style="min-width: 340px; max-width: 440px; z-index: 1050;">
+                                    <div class="dropdown-menu p-2 shadow-sm w-100 custom-multiselect-dropdown"
+                                        style="min-width: 340px; max-width: 440px; z-index: 1050;">
                                         <div class="mb-2 d-flex gap-1 align-items-center">
                                             <div class="position-relative flex-grow-1">
-                                                <input type="text" class="form-control multiselect-search ps-4" style="font-size: 0.9rem;" placeholder="Cari kode / nama barang...">
-                                                <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted" style="font-size: 15px;"></i>
+                                                <input type="text" class="form-control multiselect-search ps-4"
+                                                    style="font-size: 0.9rem;" placeholder="Cari kode / nama barang...">
+                                                <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"
+                                                    style="font-size: 15px;"></i>
                                             </div>
-                                            <button type="button" class="btn btn-outline-secondary btn-sm multiselect-undo-btn px-2 d-flex align-items-center justify-content-center" title="Reset / Batalkan Pilihan Barang" style="height: 38px; min-width: 38px; border-color: #cbd5e1;">
+                                            <button type="button"
+                                                class="btn btn-outline-secondary btn-sm multiselect-undo-btn px-2 d-flex align-items-center justify-content-center"
+                                                title="Reset / Batalkan Pilihan Barang"
+                                                style="height: 38px; min-width: 38px; border-color: #cbd5e1;">
                                                 <i class="ti ti-rotate-2 text-danger" style="font-size: 16px;"></i>
                                             </button>
                                         </div>
                                         <div class="multiselect-options-list overflow-auto" style="max-height: 240px;">
                                             @foreach ($barangList as $b)
-                                                <label class="dropdown-item d-flex align-items-center justify-content-between py-2 px-2 rounded multiselect-option-label" data-lokasi="{{ $b->lokasi_subcon_id }}" style="cursor: pointer;">
+                                                <label
+                                                    class="dropdown-item d-flex align-items-center justify-content-between py-2 px-2 rounded multiselect-option-label"
+                                                    data-lokasi="{{ $b->lokasi_subcon_id }}" style="cursor: pointer;">
                                                     <div class="d-flex align-items-start gap-2 w-100">
-                                                        <input class="form-check-input mt-1 multiselect-checkbox" type="checkbox" name="barang_id[]" value="{{ $b->id }}"
+                                                        <input class="form-check-input mt-1 multiselect-checkbox"
+                                                            type="checkbox" name="barang_id[]"
+                                                            value="{{ $b->id }}"
                                                             {{ in_array($b->id, (array) $selectedBarang) ? 'checked' : '' }}
                                                             data-label="[{{ $b->kode_barang }}] {{ $b->nama_barang }}">
-                                                        <span style="font-size: 0.875rem; line-height: 1.35; white-space: normal; word-break: break-word;"><strong class="text-primary">[{{ $b->kode_barang }}]</strong> {{ $b->nama_barang }} <span class="text-muted">({{ $b->satuan ?? 'PCS' }})</span></span>
+                                                        <span
+                                                            style="font-size: 0.875rem; line-height: 1.35; white-space: normal; word-break: break-word;"><strong
+                                                                class="text-primary">[{{ $b->kode_barang }}]</strong>
+                                                            {{ $b->nama_barang }} <span
+                                                                class="text-muted">({{ $b->satuan ?? 'PCS' }})</span></span>
                                                     </div>
                                                 </label>
                                             @endforeach
                                         </div>
                                         <div class="pt-2 mt-2 border-top d-flex justify-content-end">
-                                            <button type="button" class="btn btn-primary btn-sm px-3 py-1 fw-semibold multiselect-ok-btn" style="font-size: 0.9rem;">
+                                            <button type="button"
+                                                class="btn btn-primary btn-sm px-3 py-1 fw-semibold multiselect-ok-btn"
+                                                style="font-size: 0.9rem;">
                                                 <i class="ti ti-check me-1"></i>OK
                                             </button>
                                         </div>
@@ -180,7 +240,8 @@
                                 <label class="form-label fw-semibold" for="filter_group_by" style="font-size: 0.95rem;">
                                     <i class="ti ti-sort-ascending me-1 text-primary"></i>Sort By
                                 </label>
-                                <select class="form-select" name="group_by" id="filter_group_by" style="font-size: 0.95rem; min-height: 42px;">
+                                <select class="form-select" name="group_by" id="filter_group_by"
+                                    style="font-size: 0.95rem; min-height: 42px;">
                                     <option value="barang" {{ ($groupBy ?? 'barang') === 'barang' ? 'selected' : '' }}>
                                         Per Kode / Nama Barang
                                     </option>
@@ -197,10 +258,12 @@
 
                             {{-- Submit Buttons --}}
                             <div class="d-grid gap-2 mt-4">
-                                <button type="submit" class="btn btn-primary fw-semibold py-2 fs-6" style="font-size: 1rem !important;">
+                                <button type="submit" class="btn btn-primary fw-semibold py-2 fs-6"
+                                    style="font-size: 1rem !important;">
                                     <i class="ti ti-filter me-1"></i> Terapkan Filter
                                 </button>
-                                <a href="{{ route('laporan.index') }}" class="btn btn-outline-secondary btn-sm py-2 fs-6" style="font-size: 0.95rem !important;">
+                                <a href="{{ route('laporan.index') }}" class="btn btn-outline-secondary btn-sm py-2 fs-6"
+                                    style="font-size: 0.95rem !important;">
                                     <i class="ti ti-rotate-2 me-1"></i> Reset Filter
                                 </a>
                             </div>
@@ -248,7 +311,17 @@
                                 </span>
                             </div>
 
-                            <div class="d-flex gap-2 align-items-center">
+                            <div class="d-flex gap-2 align-items-center flex-wrap">
+                                @if (auth()->user()->canAccess('laporan_subcon.delete'))
+                                    {{-- Tombol Sembunyikan / Tampilkan Kolom Aksi --}}
+                                    <button type="button" class="btn btn-outline-secondary btn-sm fw-semibold"
+                                        id="btnToggleColAksi" onclick="toggleKolomAksi()"
+                                        title="Sembunyikan / Tampilkan Kolom Aksi">
+                                        <i class="ti ti-eye me-1" id="iconToggleColAksi"></i>
+                                        <span id="textToggleColAksi">Aksi</span>
+                                    </button>
+                                @endif
+
                                 @if (auth()->user()->canAccess('laporan_subcon'))
                                     {{-- Tombol Print --}}
                                     <button type="button" class="btn btn-outline-dark btn-sm fw-semibold"
@@ -422,7 +495,8 @@
                                                     <th style="width: 65px; border: 1px solid #94a3b8;">Satuan</th>
                                                     <th style="border: 1px solid #94a3b8;">Keterangan</th>
                                                     @if (auth()->user()->canAccess('laporan_subcon.delete'))
-                                                        <th style="width: 50px; border: 1px solid #94a3b8;" class="col-aksi">Aksi</th>
+                                                        <th style="width: 50px; border: 1px solid #94a3b8;"
+                                                            class="col-aksi">Aksi</th>
                                                     @endif
                                                 </tr>
                                             </thead>
@@ -496,7 +570,8 @@
                                                         <td class="text-start" style="border: 1px solid #cbd5e1;">
                                                             {{ $item->keterangan ?: '-' }}</td>
                                                         @if (auth()->user()->canAccess('laporan_subcon.delete'))
-                                                            <td class="text-center col-aksi" style="border: 1px solid #cbd5e1;">
+                                                            <td class="text-center col-aksi"
+                                                                style="border: 1px solid #cbd5e1;">
                                                                 <button type="button"
                                                                     class="btn btn-outline-danger btn-sm p-1 lh-1 btn-delete-pengerjaan"
                                                                     data-id="{{ $item->id }}"
@@ -664,16 +739,20 @@
             border-radius: 8px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
         }
+
         .multiselect-options-list::-webkit-scrollbar {
             width: 6px;
         }
+
         .multiselect-options-list::-webkit-scrollbar-track {
             background: #f8fafc;
         }
+
         .multiselect-options-list::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 4px;
         }
+
         .multiselect-option-label {
             transition: all 0.12s ease;
             user-select: none;
@@ -681,19 +760,23 @@
             font-size: 0.95rem;
             padding: 6px 8px;
         }
+
         .multiselect-option-label:hover {
             background-color: #f1f5f9 !important;
         }
+
         .multiselect-option-label.is-checked {
             background-color: #e0f2fe !important;
             font-weight: 600;
         }
+
         .multiselect-option-label .multiselect-checkbox {
             width: 1.15em;
             height: 1.15em;
             cursor: pointer;
             flex-shrink: 0;
         }
+
         .multiselect-trigger {
             cursor: pointer;
             min-height: 42px;
@@ -702,12 +785,14 @@
             transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
             padding: 8px 12px;
         }
+
         .multiselect-trigger:focus,
         .multiselect-trigger:active {
             border-color: #86b7fe;
             box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15) !important;
         }
-        .report-table th, 
+
+        .report-table th,
         .report-table td {
             font-size: 0.95rem;
         }
@@ -775,7 +860,8 @@
                         $label.text(labelText).removeClass('text-muted').addClass('text-dark fw-semibold');
                         $badge.removeClass('d-none').text('1');
                     } else {
-                        $label.text(count + ' ' + singleNoun + ' Dipilih').removeClass('text-muted').addClass('text-dark fw-semibold');
+                        $label.text(count + ' ' + singleNoun + ' Dipilih').removeClass('text-muted').addClass(
+                            'text-dark fw-semibold');
                         $badge.removeClass('d-none').text(count);
                     }
 
@@ -825,7 +911,8 @@
                 $okBtn.on('click', function(e) {
                     e.preventDefault();
                     sortSelectedOptionsToTop();
-                    const dropdown = bootstrap.Dropdown.getInstance($trigger[0]) || new bootstrap.Dropdown($trigger[0]);
+                    const dropdown = bootstrap.Dropdown.getInstance($trigger[0]) || new bootstrap.Dropdown(
+                        $trigger[0]);
                     dropdown.hide();
                 });
 
@@ -858,7 +945,8 @@
                 // 2. Filter Barang
                 $('#ms_barang .multiselect-option-label').each(function() {
                     const optLokasi = String($(this).data('lokasi') || '');
-                    const match = selectedLokasi.length === 0 || !optLokasi || selectedLokasi.includes(optLokasi);
+                    const match = selectedLokasi.length === 0 || !optLokasi || selectedLokasi.includes(
+                        optLokasi);
                     if (match) {
                         $(this).removeClass('d-none-subcon d-none');
                     } else {
@@ -893,13 +981,15 @@
                     $label.text(labelText).removeClass('text-muted').addClass('text-dark fw-semibold');
                     $badge.removeClass('d-none').text('1');
                 } else {
-                    $label.text(count + ' ' + singleNoun + ' Dipilih').removeClass('text-muted').addClass('text-dark fw-semibold');
+                    $label.text(count + ' ' + singleNoun + ' Dipilih').removeClass('text-muted').addClass(
+                        'text-dark fw-semibold');
                     $badge.removeClass('d-none').text(count);
                 }
             }
 
             // Inisialisasi masing-masing filter
-            initCustomMultiselect('ms_lokasi', '-- Semua Lokasi (Multi-Select) --', 'Lokasi', syncLokasiToKaryawanAndBarang);
+            initCustomMultiselect('ms_lokasi', '-- Semua Lokasi (Multi-Select) --', 'Lokasi',
+                syncLokasiToKaryawanAndBarang);
             initCustomMultiselect('ms_karyawan', '-- Semua Karyawan (Multi-Select) --', 'Karyawan');
             initCustomMultiselect('ms_barang', '-- Semua Barang (Multi-Select) --', 'Barang');
 
@@ -1025,6 +1115,39 @@
         }
 
         @if (auth()->user()->canAccess('laporan_subcon.delete'))
+            // Toggle Sembunyikan / Tampilkan Kolom Aksi
+            function updateColAksiVisibility(hide) {
+                if (hide) {
+                    $('.col-aksi').addClass('d-none');
+                    $('#btnToggleColAksi').removeClass('btn-outline-secondary').addClass('btn-secondary');
+                    $('#iconToggleColAksi').removeClass('ti-eye').addClass('ti-eye-off');
+                    $('#textToggleColAksi').text('Aksi');
+                } else {
+                    $('.col-aksi').removeClass('d-none');
+                    $('#btnToggleColAksi').removeClass('btn-secondary').addClass('btn-outline-secondary');
+                    $('#iconToggleColAksi').removeClass('ti-eye-off').addClass('ti-eye');
+                    $('#textToggleColAksi').text('Aksi');
+                }
+            }
+
+            function toggleKolomAksi() {
+                const currentlyHidden = $('.col-aksi').first().hasClass('d-none');
+                const newState = !currentlyHidden;
+                updateColAksiVisibility(newState);
+                try {
+                    localStorage.setItem('laporan_subcon_hide_aksi', newState ? '1' : '0');
+                } catch (e) {}
+            }
+
+            // Restore preference saat halaman selesai dimuat
+            $(document).ready(function() {
+                try {
+                    if (localStorage.getItem('laporan_subcon_hide_aksi') === '1') {
+                        updateColAksiVisibility(true);
+                    }
+                } catch (e) {}
+            });
+
             // Handler Hapus Transaksi Pengerjaan dari Lembar Laporan
             $(document).on('click', '.btn-delete-pengerjaan', function(e) {
                 e.preventDefault();
@@ -1063,7 +1186,8 @@
                                     Swal.fire({
                                         icon: 'success',
                                         title: 'Berhasil Dihapus',
-                                        text: res.message || 'Data pengerjaan barang berhasil dihapus.',
+                                        text: res.message ||
+                                            'Data pengerjaan barang berhasil dihapus.',
                                         timer: 1500,
                                         showConfirmButton: false
                                     }).then(() => {
@@ -1073,12 +1197,14 @@
                                     Swal.fire({
                                         icon: 'error',
                                         title: 'Gagal Menghapus',
-                                        text: res.message || 'Terjadi kesalahan saat menghapus data.'
+                                        text: res.message ||
+                                            'Terjadi kesalahan saat menghapus data.'
                                     });
                                 }
                             },
                             error: function(xhr) {
-                                const msg = xhr.responseJSON?.message || 'Akses ditolak atau terjadi kendala server.';
+                                const msg = xhr.responseJSON?.message ||
+                                    'Akses ditolak atau terjadi kendala server.';
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Gagal / Akses Ditolak',
