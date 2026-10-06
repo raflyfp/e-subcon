@@ -553,4 +553,127 @@ class MonitoringApiController extends Controller
             'data'    => $result,
         ]);
     }
+
+    /**
+     * Endpoint Khusus Daftar Transaksi Semua Pengerjaan
+     * GET /api/monitoring/pengerjaan
+     */
+    public function pengerjaan(Request $request): JsonResponse
+    {
+        $auth = $this->authenticateApi($request);
+        if (!$auth['authorized']) {
+            return response()->json([
+                'success' => false,
+                'message' => $auth['error'],
+            ], $auth['status']);
+        }
+
+        $tanggalMulai = $request->input('tanggal_mulai');
+        $tanggalAkhir = $request->input('tanggal_akhir');
+        $tanggal      = $request->input('tanggal');
+        $lokasiId     = $auth['is_admin'] ? $request->input('lokasi_subcon_id') : $auth['subcon_id'];
+        $karyawanId   = $request->input('karyawan_id');
+        $barangId     = $request->input('barang_id');
+        $search       = $request->input('search');
+        $perPage      = $request->input('per_page');
+
+        $query = Pengerjaan::with(['karyawan', 'barang', 'lokasiSubcon']);
+
+        if ($lokasiId) {
+            $query->where('lokasi_subcon_id', $lokasiId);
+        }
+
+        if ($karyawanId) {
+            $query->where('karyawan_id', $karyawanId);
+        }
+
+        if ($barangId) {
+            $query->where('barang_id', $barangId);
+        }
+
+        if ($tanggal) {
+            $query->whereDate('tanggal', $tanggal);
+        } elseif ($tanggalMulai && $tanggalAkhir) {
+            $query->whereBetween('tanggal', [$tanggalMulai, $tanggalAkhir]);
+        } elseif ($tanggalMulai) {
+            $query->whereDate('tanggal', '>=', $tanggalMulai);
+        } elseif ($tanggalAkhir) {
+            $query->whereDate('tanggal', '<=', $tanggalAkhir);
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('karyawan', function ($qk) use ($search) {
+                    $qk->where('nama_karyawan', 'like', "%{$search}%")
+                       ->orWhere('no_karyawan', 'like', "%{$search}%");
+                })->orWhereHas('barang', function ($qb) use ($search) {
+                    $qb->where('nama_barang', 'like', "%{$search}%")
+                       ->orWhere('kode_barang', 'like', "%{$search}%");
+                })->orWhere('jenis_pekerjaan', 'like', "%{$search}%")
+                  ->orWhere('keterangan', 'like', "%{$search}%");
+            });
+        }
+
+        $query->orderBy('tanggal', 'desc')->orderBy('created_at', 'desc');
+
+        $formatter = function ($p) {
+            return [
+                'id'              => $p->id,
+                'tanggal'         => $p->tanggal ? Carbon::parse($p->tanggal)->format('Y-m-d') : null,
+                'jam_mulai'       => $p->jam_mulai ? substr($p->jam_mulai, 0, 5) : null,
+                'jam_selesai'     => $p->jam_selesai ? substr($p->jam_selesai, 0, 5) : null,
+                'durasi_menit'    => (int) $p->durasi_menit,
+                'durasi_text'     => $p->durasi_text,
+                'lokasi_subcon'   => [
+                    'id'   => $p->lokasi_subcon_id,
+                    'nama' => $p->lokasiSubcon?->nama_lokasi,
+                ],
+                'karyawan'        => [
+                    'id'   => $p->karyawan_id,
+                    'no'   => $p->karyawan?->no_karyawan,
+                    'nama' => $p->karyawan?->nama_karyawan,
+                ],
+                'barang'          => [
+                    'id'     => $p->barang_id,
+                    'kode'   => $p->barang?->kode_barang,
+                    'nama'   => $p->barang?->nama_barang,
+                    'satuan' => $p->barang?->satuan ?: 'PCS',
+                ],
+                'jenis_pekerjaan' => $p->jenis_pekerjaan,
+                'jumlah'          => (int) $p->jumlah,
+                'keterangan'      => $p->keterangan,
+                'created_at'      => $p->created_at?->toIso8601String(),
+            ];
+        };
+
+        if ($perPage && $perPage !== 'all') {
+            $paginated = $query->paginate((int) $perPage);
+            $items = collect($paginated->items())->map($formatter);
+            return response()->json([
+                'success' => true,
+                'message' => 'Data pengerjaan berhasil dimuat',
+                'pagination' => [
+                    'current_page' => $paginated->currentPage(),
+                    'last_page'    => $paginated->lastPage(),
+                    'per_page'     => $paginated->perPage(),
+                    'total'        => $paginated->total(),
+                ],
+                'data' => $items,
+            ]);
+        }
+
+        $allPengerjaan = $query->get();
+        $items = $allPengerjaan->map($formatter);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data semua pengerjaan berhasil dimuat',
+            'meta'    => [
+                'total_transaksi'    => $items->count(),
+                'total_output_pcs'   => (int) $allPengerjaan->sum('jumlah'),
+                'total_durasi_menit' => (int) $allPengerjaan->sum('durasi_menit'),
+            ],
+            'data'    => $items,
+        ]);
+    }
 }

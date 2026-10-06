@@ -21,4 +21,7 @@ Route::prefix('monitoring')->group(function () {
 
     // Endpoint performa per lokasi subcon
     Route::get('/subcon', [MonitoringApiController::class, 'subcon'])->name('api.monitoring.subcon');
+
+    // Endpoint seluruh data transaksi pengerjaan
+    Route::get('/pengerjaan', [MonitoringApiController::class, 'pengerjaan'])->name('api.monitoring.pengerjaan');
 });
